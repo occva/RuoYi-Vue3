@@ -1043,7 +1043,6 @@
           </template>
           <div class="body">
             <img
-              src="@/assets/images/pay.png"
               alt="donate"
               style="width:100%"
             />

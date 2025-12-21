@@ -88,6 +88,13 @@
       }
     }
 
+    & .theme-blue .sub-menu-title-noDropdown,
+    & .theme-blue .el-sub-menu__title {
+      &:hover {
+        background-color: vars.$menuBlueHover !important;
+      }
+    }
+
     & .theme-dark .is-active > .el-sub-menu__title {
       color: vars.$base-menu-color-active !important;
     }
@@ -107,6 +114,15 @@
 
       &:hover {
         background-color: vars.$base-sub-menu-hover !important;
+      }
+    }
+
+    & .theme-blue .nest-menu .el-sub-menu>.el-sub-menu__title,
+    & .theme-blue .el-sub-menu .el-menu-item {
+      background-color: vars.$menuBlueBg;
+
+      &:hover {
+        background-color: vars.$menuBlueHover !important;
       }
     }
   }

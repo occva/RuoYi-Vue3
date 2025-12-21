@@ -20,6 +20,20 @@ $menuLightHover: #f0f1f5;
 $menuLightText: #303133;
 $menuLightActiveText: #409EFF;
 
+// 蓝色主题theme-blue
+$menuBlueBg: #E8F4FD;
+$menuBlueHover: #D0E9FA;
+$menuBlueText: #2C5F8D;
+$menuBlueActiveText: #1E88E5;
+$navbarBlueBg: #E8F4FD;
+$navbarBlueText: #2C5F8D;
+$navbarBlueHover: #D0E9FA;
+$tagsBlueBg: #E8F4FD;
+$tagsBlueItemBg: #FFFFFF;
+$tagsBlueItemBorder: #B3D9F2;
+$tagsBlueItemText: #2C5F8D;
+$tagsBlueItemHover: #D0E9FA;
+
 // 基础变量
 $base-sidebar-width: 200px;
 $sideBarWidth: 200px;
@@ -47,6 +61,18 @@ $--color-info: #909399;
   menuLightHover: $menuLightHover;
   menuLightText: $menuLightText;
   menuLightActiveText: $menuLightActiveText;
+  menuBlueBg: $menuBlueBg;
+  menuBlueHover: $menuBlueHover;
+  menuBlueText: $menuBlueText;
+  menuBlueActiveText: $menuBlueActiveText;
+  navbarBlueBg: $navbarBlueBg;
+  navbarBlueText: $navbarBlueText;
+  navbarBlueHover: $navbarBlueHover;
+  tagsBlueBg: $tagsBlueBg;
+  tagsBlueItemBg: $tagsBlueItemBg;
+  tagsBlueItemBorder: $tagsBlueItemBorder;
+  tagsBlueItemText: $tagsBlueItemText;
+  tagsBlueItemHover: $tagsBlueItemHover;
   sideBarWidth: $sideBarWidth;
   // 导出基础颜色
   blue: $blue;

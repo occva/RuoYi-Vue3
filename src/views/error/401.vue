@@ -13,7 +13,7 @@
         <ul class="list-unstyled">
           <li class="link-type">
             <router-link to="/">
-              回首页
+              回首�?
             </router-link>
           </li>
         </ul>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import errImage from "@/assets/401_images/401.gif"
+import errImage from "@admin/assets/401_images/401.gif"
 
 let { proxy } = getCurrentInstance()
 
@@ -80,3 +80,4 @@ function back() {
   }
 }
 </style>
+

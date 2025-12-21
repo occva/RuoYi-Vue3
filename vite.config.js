@@ -20,7 +20,9 @@ export default defineConfig(({ mode, command }) => {
         // 设置路径
         '~': path.resolve(__dirname, './'),
         // 设置别名
-        '@': path.resolve(__dirname, './src')
+        '@': path.resolve(__dirname, './src'),
+        // 管理端别名
+        '@admin': path.resolve(__dirname, './src')
       },
       // https://cn.vitejs.dev/config/#resolve-extensions
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
@@ -52,10 +54,20 @@ export default defineConfig(({ mode, command }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         },
-         // springdoc proxy
-         '^/v3/api-docs/(.*)': {
+        // Knife4j 文档页面
+        '/doc.html': {
           target: baseUrl,
-          changeOrigin: true,
+          changeOrigin: true
+        },
+        // Knife4j 静态资源（需要放在 /dev-api 之前，避免被重写）
+        '/webjars': {
+          target: baseUrl,
+          changeOrigin: true
+        },
+        // OpenAPI 文档（需要放在 /dev-api 之前，避免被重写）
+        '/v3/api-docs': {
+          target: baseUrl,
+          changeOrigin: true
         }
       }
     },
