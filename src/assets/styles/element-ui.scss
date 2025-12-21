@@ -71,6 +71,20 @@
   a {
     display: block
   }
+
+  // Custom styles for dropdown menu items
+  .el-dropdown-menu__item {
+    &:hover {
+      background-color: var(--el-dropdown-menuItem-hover-fill);
+      color: var(--el-dropdown-menuItem-hover-color);
+    }
+
+    // Remove underline for links
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
 }
 
 // fix date-picker ui bug in filter-item
@@ -93,4 +107,127 @@
 
 .el-dropdown .el-dropdown-link{
   color: var(--el-color-primary) !important;
+}
+
+// Ensure dropdown avatar style consistency
+.dropdown-header img.dropdown-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50%;
+  border: 2px solid var(--el-border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Global Message Box Styling (Modern Centered)
+.el-message-box {
+  display: inline-block;
+  width: 360px; // Compact width
+  max-width: 90%;
+  padding: 32px !important; // More padding for breathing room
+  vertical-align: middle;
+  background-color: var(--el-bg-color);
+  border-radius: 20px !important; // Larger radius
+  border: none !important;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.18) !important; // Floating effect
+  text-align: center !important; // Center everything
+  overflow: visible !important;
+
+  // Hide the close icon
+  .el-message-box__headerbtn {
+    display: none !important;
+  }
+
+  // Header (Title)
+  .el-message-box__header {
+    padding: 0 0 12px 0 !important;
+    
+    .el-message-box__title {
+      justify-content: center;
+      font-size: 18px;
+      color: var(--el-text-color-primary);
+      font-weight: 700;
+    }
+  }
+
+  // Content
+  .el-message-box__content {
+    padding: 0 0 24px 0 !important;
+    color: var(--el-text-color-regular);
+    font-size: 14px;
+    
+    .el-message-box__container {
+      display: flex;
+      flex-direction: column; // Stack icon and text
+      align-items: center;
+    }
+
+    // The Icon
+    .el-message-box__status {
+      position: static;
+      margin-bottom: 16px;
+      font-size: 48px !important; // Big, bold icon
+      padding-right: 0 !important;
+    }
+
+    .el-message-box__message {
+      padding-left: 0 !important;
+      text-align: center;
+      
+      p {
+        line-height: 1.6;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  // Buttons Container
+  .el-message-box__btns {
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    background-color: transparent; // No separate footer bg
+
+    .el-button {
+      min-width: 100px;
+      height: 40px;
+      padding: 0 20px;
+      margin-left: 0 !important;
+      border-radius: 20px; // Pill shape
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      
+      // Cancel Button (Soft Gray)
+      &--default {
+        border: 1px solid transparent;
+        background-color: var(--el-fill-color);
+        color: var(--el-text-color-regular);
+        
+        &:hover {
+          background-color: var(--el-fill-color-darker);
+          transform: scale(1.02);
+        }
+      }
+      
+      // Confirm Button (White with Blue Border)
+      &--primary {
+        background: #ffffff !important;
+        color: var(--el-color-primary) !important;
+        border: 1px solid var(--el-color-primary) !important;
+        box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.1);
+        
+        &:hover {
+          background: var(--el-color-primary-light-9) !important;
+          transform: scale(1.02) translateY(-1px);
+          box-shadow: 0 6px 16px rgba(var(--el-color-primary-rgb), 0.15);
+        }
+        
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
 }

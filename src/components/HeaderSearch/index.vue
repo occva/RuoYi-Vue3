@@ -1,6 +1,10 @@
 <template>
-  <div class="header-search">
-    <svg-icon class-name="search-icon" icon-class="search" @click.stop="click" />
+  <div class="header-search" :class="{ 'is-input': isInput }">
+    <div v-if="isInput" class="search-input-box" @click.stop="click">
+      <svg-icon class-name="search-icon" icon-class="search" />
+      <span>菜单搜索...</span>
+    </div>
+    <svg-icon v-else class-name="search-icon" icon-class="search" @click.stop="click" />
     <el-dialog
       v-model="show"
       width="600"
@@ -50,6 +54,13 @@ import { getNormalPath } from '@/utils/ruoyi'
 import { isHttp } from '@/utils/validate'
 import useSettingsStore from '@/store/modules/settings'
 import usePermissionStore from '@/store/modules/permission'
+
+const props = defineProps({
+  isInput: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const search = ref('')
 const options = ref([])
@@ -198,10 +209,44 @@ watch(searchPool, (list) => {
 
 <style lang='scss' scoped>
 .header-search {
+  display: flex;
+  align-items: center;
+
+  &.is-input {
+    padding: 0 20px;
+  }
+
   .search-icon {
     cursor: pointer;
     font-size: 18px;
     vertical-align: middle;
+  }
+
+  .search-input-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    height: 32px;
+    background: #f4f4f5;
+    border: 1px solid #e4e7ed;
+    border-radius: 20px;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #909399;
+    font-size: 14px;
+
+    &:hover {
+      border-color: #c0c4cc;
+      background: #ebedf0;
+    }
+
+    .search-icon {
+      margin-right: 8px;
+      font-size: 16px;
+      color: #909399;
+    }
   }
 }
 

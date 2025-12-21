@@ -2,6 +2,9 @@
   <div class="navbar" :class="'nav' + settingsStore.navType">
     <hamburger id="hamburger-container" :is-active="appStore.sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
     <breadcrumb v-if="settingsStore.navType == 1" id="breadcrumb-container" class="breadcrumb-container" />
+    
+    <header-search v-if="settingsStore.navType == 1 && appStore.device !== 'mobile'" is-input />
+
     <top-nav v-if="settingsStore.navType == 2" id="topmenu-container" class="topmenu-container" />
     <template v-if="settingsStore.navType == 3">
       <logo v-show="settingsStore.sidebarLogo" :collapse="false"></logo>
@@ -10,7 +13,7 @@
 
     <div class="right-menu">
       <template v-if="appStore.device !== 'mobile'">
-        <header-search id="header-search" class="right-menu-item" />
+        <header-search v-if="settingsStore.navType != 1" id="header-search" class="right-menu-item" />
 
   
   
@@ -23,20 +26,36 @@
 
         </template>
 
-      <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover">
+      <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover" popper-class="user-dropdown-menu">
         <div class="avatar-wrapper">
           <img :src="userStore.avatar" class="user-avatar" />
-          <span class="user-nickname"> {{ userStore.nickName }} </span>
+          <el-icon class="el-icon--right"><caret-bottom /></el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
+            <div class="dropdown-header">
+              <img :src="userStore.avatar" class="dropdown-avatar" />
+              <div class="header-info">
+                <span class="dropdown-nickname">{{ userStore.nickName }}</span>
+                <span class="dropdown-username" v-if="userStore.name">@{{ userStore.name }}</span>
+              </div>
+            </div>
+            
             <router-link to="/user-profile/profile">
-              <el-dropdown-item>个人中心</el-dropdown-item>
+              <el-dropdown-item>
+                <el-icon><User /></el-icon>
+                <span>个人中心</span>
+              </el-dropdown-item>
             </router-link>
             <el-dropdown-item command="setLayout" v-if="settingsStore.showSettings">
-                <span>布局设置</span>
-              </el-dropdown-item>
-            <el-dropdown-item divided command="logout">
+              <el-icon><Setting /></el-icon>
+              <span>布局设置</span>
+            </el-dropdown-item>
+            
+            <el-divider />
+            
+            <el-dropdown-item command="logout" class="logout-item">
+              <el-icon><SwitchButton /></el-icon>
               <span>退出登录</span>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -48,6 +67,7 @@
 
 <script setup>
 import { ElMessageBox } from 'element-plus'
+import { User, Setting, SwitchButton, CaretBottom } from '@element-plus/icons-vue'
 import Breadcrumb from '@/components/Breadcrumb'
 import TopNav from '@/components/TopNav'
 import TopBar from './TopBar'
@@ -83,7 +103,8 @@ function logout() {
   ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'warning',
+    showClose: false
   }).then(() => {
     userStore.logOut().then(() => {
       location.href = '/index'
@@ -120,23 +141,31 @@ function toggleTheme() {
   box-sizing: border-box;
 
   .hamburger-container {
-    line-height: 46px;
     height: 100%;
+    padding: 0 12px;
     cursor: pointer;
-    transition: background 0.3s;
-    -webkit-tap-highlight-color: transparent;
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    margin-right: 8px;
+    transition: all 0.3s;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.025);
+      background: var(--el-fill-color-light);
     }
   }
 
   .breadcrumb-container {
     flex-shrink: 0;
+    margin-left: 4px;
+  }
+
+  :deep(.header-search.is-input) {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .topmenu-container {
@@ -150,7 +179,7 @@ function toggleTheme() {
     display: flex;
     align-items: center;
     overflow: hidden;
-    margin-left: 8px;
+    margin-left: 12px;
   }
 
   .errLog-container {
@@ -159,81 +188,230 @@ function toggleTheme() {
   }
 
   .right-menu {
+    margin-left: auto;
     height: 100%;
-    line-height: 50px;
     display: flex;
     align-items: center;
-    margin-left: auto;
+    padding-right: 16px;
+    gap: 4px;
 
     &:focus {
       outline: none;
     }
 
     .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      height: 34px;
       font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+      color: var(--el-text-color-regular);
+      border-radius: 8px;
+      transition: all 0.2s ease;
 
       &.hover-effect {
         cursor: pointer;
-        transition: background 0.3s;
 
         &:hover {
-          background: rgba(0, 0, 0, 0.025);
+          background: var(--el-fill-color-light);
+          color: var(--el-color-primary);
         }
       }
 
       &.theme-switch-wrapper {
-        display: flex;
-        align-items: center;
-
         svg {
-          transition: transform 0.3s;
+          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           
           &:hover {
-            transform: scale(1.15);
+            transform: scale(1.15) rotate(15deg);
           }
         }
+      }
+    }
+
+    .avatar-wrapper {
+      margin-left: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 10px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--el-fill-color-light);
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+      }
+
+      .el-icon--right {
+        margin-left: 8px;
+        font-size: 10px;
+        color: var(--el-text-color-secondary);
+        transition: transform 0.3s ease;
+      }
+
+      &:hover .el-icon--right {
+        transform: rotate(180deg);
+        color: var(--el-text-color-primary);
       }
     }
 
     .avatar-container {
       margin-right: 0px;
       padding-right: 0px;
+    }
+  }
+}
+</style>
 
-      .avatar-wrapper {
-        margin-top: 10px;
-        right: 8px;
-        position: relative;
+<style lang="scss">
+.user-dropdown-menu {
+  &.el-popper {
+    border: none !important;
+    border-radius: 16px !important;
+    padding: 8px !important;
+    background: var(--el-bg-color-overlay) !important;
+    box-shadow: 0 16px 48px 16px rgba(0, 0, 0, 0.1), 0 12px 32px 0 rgba(0, 0, 0, 0.12), 0 8px 16px -8px rgba(0, 0, 0, 0.16) !important;
+  }
 
-        .user-avatar {
-          cursor: pointer;
-          width: 30px;
-          height: 30px;
-          margin-right: 8px;
-          border-radius: 50%;
-        }
+  .el-dropdown-menu {
+    padding: 0 !important;
+    min-width: 220px;
+    background: transparent !important;
+    border: none !important;
+  }
 
-        .user-nickname{
-          position: relative;
-          left: 0px;
-          bottom: 10px;
-          font-size: 14px;
-          font-weight: bold;
-        }
+  /* Header Section */
+  .dropdown-header {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 19px;
+    align-items: center;
+    padding: 20px 20px 16px;
+    background: transparent;
+    border-bottom: 1px solid var(--el-border-color);
+    margin-bottom: 8px;
 
-        i {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
-        }
+    .dropdown-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--el-bg-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+      margin: 0 !important;
+      object-fit: cover;
+    }
+
+    &:hover .dropdown-avatar {
+      transform: scale(1.05);
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      min-width: 0;
+      gap: 4px;
+      padding: 0 !important;
+      margin: 0 !important;
+      
+      .dropdown-nickname {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--el-text-color-primary);
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .dropdown-username {
+        font-size: 12px;
+        color: var(--el-text-color-secondary);
+        background: var(--el-fill-color-light);
+        padding: 2px 8px;
+        border-radius: 4px;
+        width: fit-content;
+        line-height: 1;
+        margin-left: -7px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
     }
+  }
+
+  /* Menu Items */
+  .el-dropdown-menu__item {
+    padding: 10px 16px !important;
+    margin: 2px 8px;
+    border-radius: 8px;
+    font-weight: 500;
+    color: var(--el-text-color-regular);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
+
+    .el-icon {
+      margin-right: 12px;
+      font-size: 16px;
+      color: var(--el-text-color-secondary);
+      transition: color 0.2s;
+    }
+
+    /* Hover Effects */
+    &:hover, &:focus {
+      background-color: var(--el-color-primary-light-9) !important;
+      color: var(--el-color-primary) !important;
+      transform: translateY(0);
+      box-shadow: none;
+
+      .el-icon {
+        color: var(--el-color-primary);
+      }
+    }
+  }
+
+  /* Divider */
+  .el-divider--horizontal {
+    margin: 6px 0 !important;
+    width: 100% !important;
+    border-top: 1px solid var(--el-border-color) !important;
+    opacity: 1;
+  }
+
+  /* Logout Special Style */
+  .el-dropdown-menu__item.logout-item {
+    margin-top: 8px;
+    
+    &:hover {
+      background-color: var(--el-color-danger-light-9) !important;
+      color: var(--el-color-danger) !important;
+      
+      .el-icon {
+        color: var(--el-color-danger);
+      }
+    }
+  }
+
+  /* Arrow (popper) adjustments */
+  .el-popper__arrow {
+    display: none; /* Hide arrow for cleaner floating look */
   }
 }
 </style>
