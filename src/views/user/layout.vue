@@ -16,7 +16,7 @@
         </nav>
         
         <div class="auth-buttons">
-          <el-button @click="$router.push('/login')">登录</el-button>
+          <el-button @click="handleLogin">登录</el-button>
           <el-button type="primary" @click="$router.push('/register')">注册</el-button>
         </div>
 
@@ -33,7 +33,7 @@
         <a href="#" class="mobile-nav-link">校园活动</a>
         <a href="#" class="mobile-nav-link">关于我们</a>
         <div class="mobile-auth">
-          <el-button @click="$router.push('/login'); mobileMenuOpen = false">登录</el-button>
+          <el-button @click="() => { handleLogin(); mobileMenuOpen = false }">登录</el-button>
           <el-button type="primary" @click="$router.push('/register'); mobileMenuOpen = false">注册</el-button>
         </div>
       </div>
@@ -80,9 +80,27 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Menu } from '@element-plus/icons-vue'
+import { getToken } from '@/utils/auth'
 
+const router = useRouter()
 const mobileMenuOpen = ref(false)
+
+const handleLogin = () => {
+  console.log('点击登录按钮')
+  console.log('当前token:', getToken())
+
+  // 如果已经有token，跳转到管理后台首页
+  if (getToken()) {
+    console.log('已登录状态，跳转到管理后台')
+    router.push('/index')
+    return
+  }
+
+  console.log('跳转到登录页面')
+  router.push('/login')
+}
 </script>
 
 <style lang="scss" scoped>
