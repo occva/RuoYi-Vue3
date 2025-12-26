@@ -24,7 +24,7 @@
 
         <div class="right-section" v-else>
           <el-dropdown @command="handleCommand" class="avatar-container" trigger="hover" popper-class="user-dropdown-menu">
-            <div class="avatar-wrapper el-tooltip__trigger">
+            <div class="avatar-wrapper">
               <img :src="userStore.avatar" class="user-avatar" />
               <el-icon class="el-icon--right"><caret-bottom /></el-icon>
             </div>

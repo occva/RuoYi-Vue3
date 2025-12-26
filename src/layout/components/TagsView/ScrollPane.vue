@@ -101,7 +101,12 @@ defineExpose({
     bottom: 0px;
   }
   :deep(.el-scrollbar__wrap) {
-    height: 39px;
+    height: 46px; /* Increased slightly to avoid scrollbar overlap if any */
+  }
+  :deep(.el-scrollbar__view) {
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 }
 </style>

@@ -97,15 +97,11 @@
   box-sizing: content-box;
 }
 
-.el-menu--collapse
-  > div
-  > .el-submenu
-  > .el-submenu__title
-  .el-submenu__icon-arrow {
+.el-menu--collapse>div>.el-submenu>.el-submenu__title .el-submenu__icon-arrow {
   display: none;
 }
 
-.el-dropdown .el-dropdown-link{
+.el-dropdown .el-dropdown-link {
   color: var(--el-color-primary) !important;
 }
 
@@ -140,7 +136,7 @@
   // Header (Title)
   .el-message-box__header {
     padding: 0 0 12px 0 !important;
-    
+
     .el-message-box__title {
       justify-content: center;
       font-size: 18px;
@@ -154,7 +150,7 @@
     padding: 0 0 24px 0 !important;
     color: var(--el-text-color-regular);
     font-size: 14px;
-    
+
     .el-message-box__container {
       display: flex;
       flex-direction: column; // Stack icon and text
@@ -172,7 +168,7 @@
     .el-message-box__message {
       padding-left: 0 !important;
       text-align: center;
-      
+
       p {
         line-height: 1.6;
         opacity: 0.8;
@@ -198,32 +194,32 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-      
+
       // Cancel Button (Soft Gray)
       &--default {
         border: 1px solid transparent;
         background-color: var(--el-fill-color);
         color: var(--el-text-color-regular);
-        
+
         &:hover {
           background-color: var(--el-fill-color-darker);
           transform: scale(1.02);
         }
       }
-      
+
       // Confirm Button (White with Blue Border)
       &--primary {
         background: #ffffff !important;
         color: var(--el-color-primary) !important;
         border: 1px solid var(--el-color-primary) !important;
         box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.1);
-        
+
         &:hover {
           background: var(--el-color-primary-light-9) !important;
           transform: scale(1.02) translateY(-1px);
           box-shadow: 0 6px 16px rgba(var(--el-color-primary-rgb), 0.15);
         }
-        
+
         &:active {
           transform: scale(0.98);
         }

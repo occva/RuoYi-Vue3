@@ -7,7 +7,7 @@
 
     <top-nav v-if="settingsStore.navType == 2" id="topmenu-container" class="topmenu-container" />
     <template v-if="settingsStore.navType == 3">
-      <logo v-show="settingsStore.sidebarLogo" :collapse="false"></logo>
+      <logo v-if="appStore.device !== 'mobile' && settingsStore.sidebarLogo" :collapse="false"></logo>
       <top-bar id="topbar-container" class="topbar-container" />
     </template>
 
@@ -28,7 +28,7 @@
 
       <template v-if="userStore.token">
         <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover" popper-class="user-dropdown-menu">
-          <div class="avatar-wrapper el-tooltip__trigger">
+          <div class="avatar-wrapper">
             <img :src="userStore.avatar" class="user-avatar" />
             <el-icon class="el-icon--right"><caret-bottom /></el-icon>
           </div>
@@ -384,15 +384,16 @@ function toggleTheme() {
 
   /* Menu Items */
   .el-dropdown-menu__item {
-    padding: 10px 16px !important;
-    margin: 2px 8px;
+    margin: 2px 4px !important;
+    padding: 0 8px !important;
+    height: 40px !important;
+    line-height: 40px !important;
     border-radius: 8px;
     font-weight: 500;
     color: var(--el-text-color-regular);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    line-height: 1.5;
 
     .el-icon {
       margin-right: 12px;

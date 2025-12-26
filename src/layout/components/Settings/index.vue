@@ -10,11 +10,6 @@
         </div>
       </el-tooltip>
 
-      <el-tooltip content="混合菜单" placement="bottom">
-        <div class="item mix" @click="handleNavType(2)" :class="{ activeItem: navType == 2 }">
-          <b></b><b></b>
-        </div>
-      </el-tooltip>
       <el-tooltip content="顶部菜单" placement="bottom">
         <div class="item top" @click="handleNavType(3)" :class="{ activeItem: navType == 3 }">
           <b></b><b></b>
@@ -91,13 +86,6 @@
       </span>
     </div>
 
-    <div class="drawer-item">
-      <span>底部版权</span>
-      <span class="comp-style">
-        <el-switch v-model="settingsStore.footerVisible" class="drawer-switch" />
-      </span>
-    </div>
-
     <el-divider />
 
     <el-button type="primary" plain icon="DocumentAdd" @click="saveSetting">保存配置</el-button>
@@ -171,7 +159,6 @@ function saveSetting() {
     "fixedHeader": storeSettings.value.fixedHeader,
     "sidebarLogo": storeSettings.value.sidebarLogo,
     "dynamicTitle": storeSettings.value.dynamicTitle,
-    "footerVisible": storeSettings.value.footerVisible,
     "sideTheme": storeSettings.value.sideTheme,
     "theme": storeSettings.value.theme
   }
@@ -286,21 +273,6 @@ defineExpose({
       height: 100%;
       top: 0;
       border-radius: 4px 0 0 4px;
-    }
-  }
-  .mix {
-    b:first-child {
-      border-radius: 4px 4px 0 0;
-      display: block;
-      height: 30%;
-      background: #1b2a47;
-    }
-    b:last-child {
-      width: 30%;
-      background: #1b2a47;
-      position: absolute;
-      height: 70%;
-      border-radius: 0 0 0 4px;
     }
   }
   .top {

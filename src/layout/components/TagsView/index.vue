@@ -91,7 +91,8 @@ function activeStyle(tag) {
   if (!isActive(tag)) return {}
   return {
     "background-color": theme.value,
-    "border-color": theme.value
+    "border-color": theme.value,
+    "box-shadow": `0 4px 10px ${theme.value}4d`
   }
 }
 
@@ -261,26 +262,34 @@ function handleScroll() {
 
 <style lang="scss" scoped>
 .tags-view-container {
-  height: 34px;
+  height: 40px;
   width: 100%;
   background: var(--tags-bg, #fff);
-  border-bottom: 1px solid var(--tags-item-border, #d8dce5);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+  border-bottom: 1px solid var(--tags-border-color, rgba(0, 0, 0, 0.05));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .05);
+  display: flex;
+  align-items: center;
 
   .tags-view-wrapper {
+    flex: 1;
+    overflow: hidden;
+    
     .tags-view-item {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       position: relative;
       cursor: pointer;
-      height: 26px;
-      line-height: 26px;
-      border: 1px solid var(--tags-item-border, #d8dce5);
-      color: var(--tags-item-text, #495060);
+      height: 28px;
+      line-height: 28px;
+      border: 1px solid var(--tags-item-border, #e4e7ed);
+      color: var(--tags-item-text, #606266);
       background: var(--tags-item-bg, #fff);
-      padding: 0 8px;
-      font-size: 12px;
-      margin-left: 5px;
-      margin-top: 4px;
+      padding: 0 12px;
+      font-size: 13px;
+      margin-left: 8px;
+      border-radius: 6px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
 
       &:first-of-type {
         margin-left: 15px;
@@ -290,20 +299,45 @@ function handleScroll() {
         margin-right: 15px;
       }
 
+      &:hover {
+        background-color: var(--tags-item-hover, #f5f7fa);
+        border-color: var(--tags-item-border-hover, #dcdfe6);
+        color: var(--tags-item-text-hover, #409eff);
+        transform: translateY(-1px);
+      }
+
       &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
+        color: #fff !important;
+        border-color: transparent !important;
+        font-weight: 500;
 
         &::before {
           content: '';
           background: #fff;
           display: inline-block;
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
           position: relative;
-          margin-right: 5px;
+          margin-right: 8px;
+          box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      .el-icon-close {
+        margin-left: 6px;
+        width: 14px;
+        height: 14px;
+        font-size: 10px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.15);
+          color: #fff;
         }
       }
     }
@@ -319,21 +353,31 @@ function handleScroll() {
     z-index: 3000;
     position: absolute;
     list-style-type: none;
-    padding: 5px 0;
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 6px 0;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 400;
-    color: var(--tags-item-text, #333);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+    color: var(--el-text-color-primary, #333);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     border: 1px solid var(--el-border-color-light, #e4e7ed);
+    backdrop-filter: blur(10px);
 
     li {
       margin: 0;
-      padding: 7px 16px;
+      padding: 8px 16px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
 
       &:hover {
-        background: var(--tags-item-hover, #eee);
+        background: var(--el-fill-color-light, #f5f7fa);
+        color: var(--el-color-primary, #409eff);
+      }
+
+      svg {
+        font-size: 14px;
       }
     }
   }
@@ -345,26 +389,7 @@ function handleScroll() {
 .tags-view-wrapper {
   .tags-view-item {
     .el-icon-close {
-      width: 16px;
-      height: 16px;
-      vertical-align: 2px;
-      border-radius: 50%;
-      text-align: center;
-      transition: all .3s cubic-bezier(.645, .045, .355, 1);
-      transform-origin: 100% 50%;
-
-      &:before {
-        transform: scale(.6);
-        display: inline-block;
-        vertical-align: -3px;
-      }
-
-      &:hover {
-        background-color: var(--tags-close-hover, #b4bccc);
-        color: #fff;
-        width: 12px !important;
-        height: 12px !important;
-      }
+      // styles moved to scoped block
     }
   }
 }

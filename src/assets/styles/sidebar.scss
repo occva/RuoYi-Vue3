@@ -10,7 +10,7 @@
   }
 
   .sidebarHide {
-    margin-left: 0!important;
+    margin-left: 0 !important;
   }
 
   .sidebar-container {
@@ -24,7 +24,7 @@
     left: 0;
     z-index: 1001;
     overflow: hidden;
-    -webkit-box-shadow: 2px 0 6px rgba(0,21,41,.35);
+    -webkit-box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.1);
 
     // reset element-ui css
@@ -70,7 +70,8 @@
       width: 100% !important;
     }
 
-    .el-menu-item, .menu-title {
+    .el-menu-item,
+    .menu-title {
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
@@ -88,7 +89,7 @@
       }
     }
 
-    & .theme-dark .is-active > .el-sub-menu__title {
+    & .theme-dark .is-active>.el-sub-menu__title {
       color: vars.$base-menu-color-active !important;
     }
 
@@ -156,6 +157,7 @@
             visibility: hidden;
             display: inline-block;
           }
+
           &>i {
             height: 0;
             width: 0;
