@@ -8,7 +8,7 @@
         :background-color="getMenuBackground"
         :text-color="getMenuTextColor"
         :unique-opened="true"
-        :active-text-color="theme"
+        :active-text-color="activeTextColor"
         :collapse-transition="false"
         mode="vertical"
         :class="sideTheme"
@@ -43,10 +43,20 @@ const sideTheme = computed(() => settingsStore.sideTheme)
 const theme = computed(() => settingsStore.theme)
 const isCollapse = computed(() => !appStore.sidebar.opened)
 
+const activeTextColor = computed(() => {
+  if (sideTheme.value === 'theme-modern') {
+    return variables.menuModernActiveText
+  }
+  return settingsStore.theme
+})
+
 // 获取菜单背景色
 const getMenuBackground = computed(() => {
   if (settingsStore.isDark) {
     return 'var(--sidebar-bg)'
+  }
+  if (sideTheme.value === 'theme-modern') {
+    return variables.menuModernBg
   }
   return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
 })
@@ -55,6 +65,9 @@ const getMenuBackground = computed(() => {
 const getMenuTextColor = computed(() => {
   if (settingsStore.isDark) {
     return 'var(--sidebar-text)'
+  }
+  if (sideTheme.value === 'theme-modern') {
+    return variables.menuModernText
   }
   return sideTheme.value === 'theme-dark' ? variables.menuText : variables.menuLightText
 })

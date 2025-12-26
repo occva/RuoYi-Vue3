@@ -20,7 +20,7 @@ export default {
   topNav: false,
 
   /**
-   * 菜单导航模式 1、纯左侧 2、混合（左侧+顶部） 3、纯顶部
+   * 菜单导航模式 1、纯左侧 2、纯顶部
    */
   navType: 1,
 
@@ -49,13 +49,4 @@ export default {
    */
   dynamicTitle: false,
 
-  /**
-   * 是否显示底部版权
-   */
-  footerVisible: false,
-
-  /**
-   * 底部版权文本内容
-   */
-  footerContent: 'Copyright © 2018-2025 社团管理系统. All Rights Reserved.'
 }

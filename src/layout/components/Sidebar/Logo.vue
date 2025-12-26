@@ -37,6 +37,9 @@ const getLogoBackground = computed(() => {
   if (settingsStore.navType == 3) {
     return variables.menuLightBg
   }
+  if (sideTheme.value === 'theme-modern') {
+    return variables.menuModernBg
+  }
   return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
 })
 
@@ -47,6 +50,9 @@ const getLogoTextColor = computed(() => {
   }
   if (settingsStore.navType == 3) {
     return variables.menuLightText
+  }
+  if (sideTheme.value === 'theme-modern') {
+    return variables.menuModernText
   }
   return sideTheme.value === 'theme-dark' ? '#fff' : variables.menuLightText
 })

@@ -13,7 +13,7 @@
           <el-button
             type="primary"
             icon="Cloudy"
-            plain
+
             @click="goTarget('https://gitee.com/y_project/RuoYi-Vue')"
             >访问码云</el-button
           >

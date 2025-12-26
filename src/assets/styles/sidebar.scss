@@ -110,6 +110,15 @@
         background-color: vars.$base-sub-menu-hover !important;
       }
     }
+
+    & .theme-modern .nest-menu .el-sub-menu>.el-sub-menu__title,
+    & .theme-modern .el-sub-menu .el-menu-item {
+      background-color: vars.$menuModernBg; // Use same bg or slightly different
+
+      &:hover {
+        background-color: vars.$menuModernHover !important;
+      }
+    }
   }
 
   .hideSidebar {

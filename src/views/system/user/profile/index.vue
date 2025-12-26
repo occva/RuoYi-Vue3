@@ -126,7 +126,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .profile-container {
    padding: 24px;
-   background-color: var(--el-bg-color-page);
+   background-color: #f7f9fb;
    min-height: calc(100vh - 84px);
 }
 

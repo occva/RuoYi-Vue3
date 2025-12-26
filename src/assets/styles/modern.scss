@@ -1,0 +1,396 @@
+/* Modern Theme - Premium Light Redesign */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.theme-modern {
+    /* =========================================
+     Color Variables - "Ocean Breeze" Palette (Optimized High Contrast)
+     ========================================= */
+    --modern-primary: #4F46E5;
+    /* Indigo 600 - Stronger definition */
+    --modern-primary-dark: #4338CA;
+    /* Indigo 700 - For text on light bg */
+    --modern-primary-light: #EEF2FF;
+    /* Indigo 50 - Lighter for better contrast */
+
+    --modern-secondary: #0EA5E9;
+    /* Sky 500 - Vibrant accent */
+    --modern-success: #10B981;
+    /* Emerald 500 */
+    --modern-warning: #F59E0B;
+    /* Amber 500 */
+    --modern-danger: #EF4444;
+    /* Red 500 */
+
+    --modern-bg: #F8FAFC;
+    /* Slate 50 */
+
+    --modern-sidebar-bg: #FFFFFF;
+    --modern-sidebar-text: #64748B;
+    /* Slate 500 */
+    --modern-sidebar-text-hover: #4338CA;
+    /* Indigo 700 - Better text contrast */
+    --modern-sidebar-heading: #0F172A;
+    /* Slate 900 - Max contrast */
+
+    /* Active Menu: Deep gradient */
+    --modern-sidebar-active-bg: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+    --modern-sidebar-active-text: #FFFFFF;
+    --modern-sidebar-active-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.4);
+
+    --modern-border: #E2E8F0;
+    /* Slate 200 */
+    --modern-card-bg: #FFFFFF;
+
+    /* =========================================
+     Override Element Plus Global Theme Color
+     ========================================= */
+    --el-color-primary: #4F46E5 !important;
+    --el-color-primary-light-3: #818CF8 !important;
+    --el-color-primary-light-5: #A5B4FC !important;
+    --el-color-primary-light-7: #C7D2FE !important;
+    --el-color-primary-light-8: #E0E7FF !important;
+    --el-color-primary-light-9: #EEF2FF !important;
+    --el-color-primary-dark-2: #4338CA !important;
+
+    background-color: var(--modern-bg);
+    color: #334155;
+    /* Body text - Slate 700 */
+
+    /* Typography Reset & Standardization */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Apply to all children to override Element Plus defaults */
+    * {
+        font-family: inherit;
+    }
+
+    /* Type Scale */
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 15px;
+    /* Slightly larger base size for modern feel */
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    font-weight: 400;
+    /* Regular default weight */
+
+    /* =========================================
+     Sidebar Redesign (Light & Clean)
+     ========================================= */
+    .sidebar-container {
+        background-color: var(--modern-sidebar-bg) !important;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.04) !important;
+        border-right: 1px solid var(--modern-border);
+
+        .sidebar-logo-container {
+            background-color: var(--modern-sidebar-bg) !important;
+            border-bottom: 1px solid var(--modern-border);
+
+            .sidebar-title {
+                color: var(--modern-sidebar-heading) !important;
+                font-weight: 700;
+                font-size: 18px;
+            }
+        }
+
+        .el-scrollbar {
+            background-color: var(--modern-sidebar-bg) !important;
+            height: calc(100% - 50px);
+        }
+
+        .el-scrollbar__view {
+            height: 100%;
+        }
+
+        .el-menu {
+            background-color: transparent !important;
+            border: none;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Menu Item Base */
+        .el-menu-item,
+        .el-sub-menu__title {
+            height: 44px;
+            line-height: 44px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: var(--modern-sidebar-text) !important;
+            transition: all 0.2s ease;
+            font-weight: 500;
+
+            &:hover {
+                background-color: var(--modern-primary-light) !important;
+                color: var(--modern-sidebar-text-hover) !important;
+            }
+
+            i,
+            svg {
+                color: inherit;
+            }
+        }
+
+        .el-sub-menu .el-sub-menu__icon-arrow {
+            margin-top: -3px;
+        }
+
+        /* Active Menu Item */
+        .el-menu-item.is-active {
+            background: var(--modern-sidebar-active-bg) !important;
+            color: var(--modern-sidebar-active-text) !important;
+            box-shadow: var(--modern-sidebar-active-shadow);
+
+            i,
+            svg {
+                color: #ffffff !important;
+            }
+        }
+
+        /* Submenu */
+        .el-sub-menu {
+            .el-menu-item {
+                height: 40px;
+                line-height: 40px;
+                padding-left: 15px !important;
+                margin: 0 8px 4px 8px !important;
+                font-weight: 400;
+
+                &.is-active {
+                    background: var(--modern-sidebar-active-bg) !important;
+                    color: var(--modern-sidebar-active-text) !important;
+                    box-shadow: var(--modern-sidebar-active-shadow);
+                    font-weight: 600;
+                    border-radius: 8px !important;
+                    /* Ensure rounded corners match top-level */
+
+                    /* Remove the dot indicator to match the solid style */
+                    &::before {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+
+    /* Collapsed Sidebar Styles */
+    &.hideSidebar {
+        .sidebar-container {
+            .el-scrollbar {
+                height: calc(100% - 50px);
+            }
+
+            .el-menu {
+                padding: 8px 4px;
+            }
+
+            .el-menu-item,
+            .el-sub-menu__title {
+                padding: 0 !important;
+                text-align: center;
+
+                .svg-icon {
+                    margin: 0 auto;
+                }
+            }
+        }
+    }
+
+    /* =========================================
+     Global Layout Fixes
+     ========================================= */
+    .main-container {
+        background-color: var(--modern-bg);
+        overflow-x: hidden !important;
+        min-height: 100vh;
+    }
+
+    /* =========================================
+     Navbar Redesign (Glassy & Floating)
+     ========================================= */
+    .navbar {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.05) !important;
+        margin: 10px 20px 0;
+        /* Adjusted margins */
+        border-radius: 10px;
+        width: auto !important;
+        top: 0;
+        position: sticky;
+        z-index: 100;
+
+        .hamburger-container {
+            color: var(--modern-sidebar-text);
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        .right-menu-item {
+            color: var(--modern-sidebar-text);
+
+            &:hover {
+                color: var(--modern-sidebar-text-hover);
+                background-color: var(--modern-primary-light);
+            }
+        }
+
+        /* Disable Dark Mode Toggle in Modern Theme */
+        .theme-switch-wrapper {
+            display: none !important;
+        }
+    }
+
+    /* =========================================
+     Tags View (Pill Style)
+     ========================================= */
+    .tags-view-container {
+        margin: 0 20px;
+        /* Aligned with navbar */
+        padding-top: 1px;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+
+        .tags-view-wrapper {
+            .tags-view-item {
+                background: #FFFFFF !important;
+                border: 1px solid var(--modern-border) !important;
+                color: var(--modern-sidebar-text) !important;
+                border-radius: 4px;
+                height: 28px;
+                line-height: 26px;
+                margin-left: 1px !important;
+                margin-right: 6px !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+                &:hover {
+                    border-color: var(--modern-sidebar-text-hover) !important;
+                    color: var(--modern-sidebar-text-hover) !important;
+                }
+
+                &.active {
+                    background-color: var(--modern-primary) !important;
+                    color: #FFFFFF !important;
+                    border-color: var(--modern-primary) !important;
+                    box-shadow: 0 3px 6px rgba(115, 103, 240, 0.3);
+
+                    .el-icon-close {
+                        color: #fff;
+
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* =========================================
+     App Main & Content Cards
+     ========================================= */
+    .app-main {
+        background-color: var(--modern-bg);
+        padding: 20px;
+        min-height: calc(100vh - 100px);
+        box-sizing: border-box;
+        /* Ensure padding doesn't add to width */
+        width: 100%;
+    }
+
+    /* Cards - Floating Paper */
+    .el-card {
+        border: none;
+        border-radius: 10px;
+        /* Consistent radius */
+        box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.06) !important;
+        background: #ffffff;
+
+        .el-card__header {
+            padding: 20px;
+            border-bottom: 1px solid var(--modern-border);
+            font-weight: 600;
+            color: var(--modern-sidebar-heading);
+        }
+
+        .el-card__body {
+            padding: 20px;
+        }
+    }
+
+    /* =========================================
+     Component Overrides
+     ========================================= */
+    /* Buttons - Ensure text is white or appropriate contrast */
+    .el-button--primary {
+        background-color: var(--modern-primary);
+        border-color: var(--modern-primary);
+        color: #FFFFFF !important;
+        /* Force white text */
+        box-shadow: 0 2px 6px 0 rgba(79, 70, 229, 0.4);
+
+        &:hover,
+        &:focus {
+            background-color: var(--modern-primary-dark);
+            border-color: var(--modern-primary-dark);
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px 0 rgba(79, 70, 229, 0.5);
+        }
+    }
+
+    /* Generic Utility: When bg is primary, text must be white */
+    .bg-primary,
+    [class*="bg-primary"],
+    [style*="background-color: var(--modern-primary)"],
+    [style*="background-color: #4F46E5"] {
+        color: #FFFFFF !important;
+    }
+
+    /* Inputs */
+    .el-input__wrapper,
+    .el-textarea__inner {
+        box-shadow: none !important;
+        border: 1px solid #d9d9d9 !important;
+        background-color: #ffffff !important;
+        border-radius: 6px !important;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: #b9b9b9 !important;
+        }
+
+        &.is-focus {
+            border-color: var(--modern-primary) !important;
+            box-shadow: 0 0 0 3px var(--modern-primary-light) !important;
+        }
+    }
+
+    /* Tables */
+    .el-table {
+        background-color: transparent;
+
+        th.el-table__cell {
+            background-color: #FAFAFA !important;
+            color: var(--modern-sidebar-heading);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            height: 50px;
+        }
+
+        td.el-table__cell {
+            border-bottom: 1px solid var(--modern-border);
+            color: var(--modern-sidebar-text);
+        }
+    }
+}
