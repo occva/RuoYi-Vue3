@@ -327,7 +327,7 @@ function closeDialog() {
 }
 
 .el-dialog.premium-dialog {
-   border-radius: 20px !important;
+   border-radius: 14px !important;
    overflow: hidden;
    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.25) !important;
    background: var(--el-bg-color-overlay);

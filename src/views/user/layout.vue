@@ -242,7 +242,13 @@ function logout() {
 
   .login-btn {
     border: none;
-    font-weight: 500;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all 0.2s;
+    
     &:hover {
       color: #3b82f6;
       background: #eff6ff;
@@ -250,15 +256,20 @@ function logout() {
   }
 
   .register-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 9999px;
-    font-weight: 500;
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 8px; // Premium radius
+    font-weight: 600;
     box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 6px 12px -1px rgba(59, 130, 246, 0.3);
+    }
+    
+    &:active {
+      transform: scale(0.98);
     }
   }
 }

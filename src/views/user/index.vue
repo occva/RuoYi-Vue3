@@ -87,6 +87,43 @@ const clubs = ref(MOCK_CLUBS.slice(0, 6))
   display: flex;
   gap: 1rem;
   justify-content: center;
+
+  .el-button {
+    height: 48px; // Taller for hero section
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 32px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    &--primary {
+      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+      border: none;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(64, 158, 255, 0.4);
+      }
+      
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    // Secondary / Outline style for the second button
+    &:not(.el-button--primary) {
+      border: 1px solid #e5e7eb;
+      color: #4b5563;
+      background: #ffffff;
+      
+      &:hover {
+        border-color: var(--el-color-primary);
+        color: var(--el-color-primary);
+        background: var(--el-color-primary-light-9);
+        transform: translateY(-2px);
+      }
+    }
+  }
 }
 
 .club-section {
@@ -109,5 +146,19 @@ const clubs = ref(MOCK_CLUBS.slice(0, 6))
 .view-all {
   text-align: center;
   margin-top: 3rem;
+
+  .el-button {
+    height: 42px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 0 28px;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.15);
+    }
+  }
 }
 </style>

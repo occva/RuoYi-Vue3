@@ -122,7 +122,7 @@
   padding: 32px !important; // More padding for breathing room
   vertical-align: middle;
   background-color: var(--el-bg-color);
-  border-radius: 20px !important; // Larger radius
+  border-radius: 14px !important; // Larger radius
   border: none !important;
   box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.18) !important; // Floating effect
   text-align: center !important; // Center everything
@@ -186,10 +186,10 @@
 
     .el-button {
       min-width: 100px;
-      height: 40px;
+      height: 38px; // Matches spec
       padding: 0 20px;
       margin-left: 0 !important;
-      border-radius: 20px; // Pill shape
+      border-radius: 8px; // Matches spec (was 20px)
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -197,27 +197,29 @@
 
       // Cancel Button (Soft Gray)
       &--default {
-        border: 1px solid transparent;
-        background-color: var(--el-fill-color);
+        border: none;
+        background-color: var(--el-fill-color-light);
         color: var(--el-text-color-regular);
 
         &:hover {
-          background-color: var(--el-fill-color-darker);
-          transform: scale(1.02);
+          background-color: var(--el-fill-color);
+          color: var(--el-text-color-primary);
+          transform: translateY(-1px);
         }
       }
 
-      // Confirm Button (White with Blue Border)
+      // Confirm Button (Filled Primary with Shadow)
       &--primary {
-        background: #ffffff !important;
-        color: var(--el-color-primary) !important;
-        border: 1px solid var(--el-color-primary) !important;
-        box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.1);
+        background-color: var(--el-color-primary) !important; // Filled
+        border-color: var(--el-color-primary) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3); // Brand color shadow
 
         &:hover {
-          background: var(--el-color-primary-light-9) !important;
-          transform: scale(1.02) translateY(-1px);
-          box-shadow: 0 6px 16px rgba(var(--el-color-primary-rgb), 0.15);
+          background-color: var(--el-color-primary-light-3) !important;
+          border-color: var(--el-color-primary-light-3) !important;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
         }
 
         &:active {

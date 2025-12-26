@@ -119,6 +119,26 @@
         background-color: vars.$menuModernHover !important;
       }
     }
+
+    // Active menu item styling - Primary Color Background & White Text
+    .el-menu-item.is-active {
+      background-color: var(--el-color-primary) !important;
+      color: #ffffff !important;
+      border-radius: 8px !important;
+      margin: 4px auto !important;
+      width: 90% !important;
+      min-width: 0 !important; // Override the 200px min-width on nested items
+
+      &:hover {
+        background-color: var(--el-color-primary) !important;
+        color: #ffffff !important;
+      }
+
+      .svg-icon {
+        color: #ffffff !important;
+        fill: #ffffff !important;
+      }
+    }
   }
 
   .hideSidebar {

@@ -9,7 +9,10 @@
       v-model="show"
       width="600"
       @close="close"
-      :show-close="false"
+      :show-close="true"
+      title="菜单搜索"
+      class="header-search-dialog"
+      modal-class="header-search-modal"
       append-to-body
     >
       <el-input
@@ -230,7 +233,7 @@ watch(searchPool, (list) => {
     height: 32px;
     background: #f4f4f5;
     border: 1px solid #e4e7ed;
-    border-radius: 20px;
+    border-radius: 14px;
     padding: 0 15px;
     cursor: pointer;
     transition: all 0.3s;
@@ -252,13 +255,15 @@ watch(searchPool, (list) => {
 
 .result-wrap {	
   height: 280px;
-  margin: 6px 0;
+  margin: 12px 0 0;
 
   .search-item {
     display: flex;
     height: 48px;
     align-items: center;
     padding-right: 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
 
     .left {
       width: 60px;
@@ -292,6 +297,67 @@ watch(searchPool, (list) => {
 
   .search-item:hover {
     cursor: pointer;
+  }
+}
+</style>
+
+<style lang="scss">
+/* Global styles for the search dialog to match Premium UI Spec */
+.header-search-modal {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(6px);
+}
+
+.header-search-dialog {
+  border-radius: 14px !important;
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.25) !important;
+
+  .el-input__wrapper {
+    border-radius: 14px !important;
+  }
+
+  .el-dialog__header {
+    border-bottom: none;
+    padding: 32px 32px 12px;
+    margin-right: 0;
+
+    .el-dialog__title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #303133;
+    }
+
+    .el-dialog__headerbtn {
+      top: 24px;
+      right: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: var(--el-fill-color-lighter);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .el-dialog__close {
+        font-size: 16px;
+        color: var(--el-text-color-regular);
+        transition: color 0.3s;
+      }
+
+      &:hover {
+        background: var(--el-color-danger-light-9);
+        transform: scale(1.1);
+
+        .el-dialog__close {
+          color: var(--el-color-danger);
+        }
+      }
+    }
+  }
+
+  .el-dialog__body {
+    padding: 0 32px 32px !important;
   }
 }
 </style>
