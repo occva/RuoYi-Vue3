@@ -26,41 +26,49 @@
 
         </template>
 
-      <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover" popper-class="user-dropdown-menu">
-        <div class="avatar-wrapper">
-          <img :src="userStore.avatar" class="user-avatar" />
-          <el-icon class="el-icon--right"><caret-bottom /></el-icon>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <div class="dropdown-header">
-              <img :src="userStore.avatar" class="dropdown-avatar" />
-              <div class="header-info">
-                <span class="dropdown-nickname">{{ userStore.nickName }}</span>
-                <span class="dropdown-username" v-if="userStore.name">@{{ userStore.name }}</span>
+      <template v-if="userStore.token">
+        <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover" popper-class="user-dropdown-menu">
+          <div class="avatar-wrapper el-tooltip__trigger">
+            <img :src="userStore.avatar" class="user-avatar" />
+            <el-icon class="el-icon--right"><caret-bottom /></el-icon>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <div class="dropdown-header">
+                <img :src="userStore.avatar" class="dropdown-avatar" />
+                <div class="header-info">
+                  <span class="dropdown-nickname">{{ userStore.nickName }}</span>
+                  <span class="dropdown-username" v-if="userStore.name">@{{ userStore.name }}</span>
+                </div>
               </div>
-            </div>
-            
-            <router-link to="/user-profile/profile">
-              <el-dropdown-item>
-                <el-icon><User /></el-icon>
-                <span>个人中心</span>
+              
+              <router-link to="/user-profile/profile">
+                <el-dropdown-item>
+                  <el-icon><User /></el-icon>
+                  <span>个人中心</span>
+                </el-dropdown-item>
+              </router-link>
+              <el-dropdown-item command="setLayout" v-if="settingsStore.showSettings">
+                <el-icon><Setting /></el-icon>
+                <span>布局设置</span>
               </el-dropdown-item>
-            </router-link>
-            <el-dropdown-item command="setLayout" v-if="settingsStore.showSettings">
-              <el-icon><Setting /></el-icon>
-              <span>布局设置</span>
-            </el-dropdown-item>
-            
-            <el-divider />
-            
-            <el-dropdown-item command="logout" class="logout-item">
-              <el-icon><SwitchButton /></el-icon>
-              <span>退出登录</span>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+              
+              <el-divider />
+              
+              <el-dropdown-item command="logout" class="logout-item">
+                <el-icon><SwitchButton /></el-icon>
+                <span>退出登录</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </template>
+      <template v-else>
+        <div class="auth-buttons">
+          <el-button type="primary" link @click="$router.push('/login')">登录</el-button>
+          <el-button type="primary" link @click="$router.push('/register')">注册</el-button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -273,6 +281,25 @@ function toggleTheme() {
     .avatar-container {
       margin-right: 0px;
       padding-right: 0px;
+    }
+
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 8px;
+
+      .el-button {
+        font-size: 14px;
+        font-weight: 500;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 6px;
+
+        &:hover {
+          background-color: var(--el-fill-color-light);
+        }
+      }
     }
   }
 }

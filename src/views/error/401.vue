@@ -13,7 +13,7 @@
         <ul class="list-unstyled">
           <li class="link-type">
             <router-link to="/">
-              回首�?
+              回首页
             </router-link>
           </li>
         </ul>
@@ -80,4 +80,3 @@ function back() {
   }
 }
 </style>
-
