@@ -25,3 +25,21 @@ export function listPopularClubs(limit = 6) {
     params: { limit }
   })
 }
+
+// 申请创建社团
+export function applyClub(data) {
+  return request({
+    url: '/api/user/club/apply',
+    method: 'post',
+    data: data
+  })
+}
+
+// 申请加入社团
+export function joinClub(data) {
+  return request({
+    url: '/api/user/club/join',
+    method: 'post',
+    data: data
+  })
+}

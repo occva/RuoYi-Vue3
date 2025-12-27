@@ -13,10 +13,12 @@
       <div class="filter-bar">
         <div class="search-wrapper">
           <el-input
-            v-model="searchTerm"
-            placeholder="搜索社团名称或描述..."
+            v-model="queryParams.clubName"
+            placeholder="搜索社团名称..."
             :prefix-icon="Search"
             clearable
+            @clear="handleQuery"
+            @keyup.enter="handleQuery"
           />
         </div>
 
@@ -24,9 +26,9 @@
           <el-button
             v-for="cat in categories"
             :key="cat.id"
-            :type="filter === cat.id ? 'primary' : 'default'"
+            :type="queryParams.categoryId === cat.id ? 'primary' : 'default'"
             round
-            @click="filter = cat.id"
+            @click="handleCategoryChange(cat.id)"
           >
             {{ cat.label }}
           </el-button>
@@ -34,31 +36,52 @@
       </div>
 
       <!-- 结果网格 -->
-      <div v-if="filteredClubs.length > 0" class="club-grid">
-        <ClubCard v-for="club in filteredClubs" :key="club.clubId" :club="club" />
-      </div>
-      <div v-else class="no-results">
-        <el-empty description="没有找到匹配的社团">
-          <el-button type="primary" @click="clearFilters">清除筛选</el-button>
-        </el-empty>
+      <div v-loading="loading" class="result-section">
+        <div v-if="clubList.length > 0" class="club-grid">
+          <ClubCard v-for="club in clubList" :key="club.clubId" :club="club" />
+        </div>
+        <div v-else class="no-results">
+          <el-empty description="没有找到匹配的社团">
+            <el-button type="primary" @click="clearFilters">清除筛选</el-button>
+          </el-empty>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" v-show="total > 0">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            v-model:current-page="queryParams.pageNum"
+            v-model:page-size="queryParams.pageSize"
+            @current-change="getList"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import { listClubs } from '@/api/user/club'
 import { listCategories } from '@/api/user/category'
 import ClubCard from './components/ClubCard.vue'
 
-const filter = ref('all')
-const searchTerm = ref('')
-const allClubs = ref([])
+const loading = ref(false)
+const clubList = ref([])
+const total = ref(0)
 const categories = ref([
-  { id: 'all', label: '全部' }
+  { id: undefined, label: '全部' }
 ])
+
+const queryParams = ref({
+  pageNum: 1,
+  pageSize: 12,
+  clubName: undefined,
+  categoryId: undefined
+})
 
 onMounted(() => {
   getList()
@@ -66,43 +89,50 @@ onMounted(() => {
 })
 
 const getList = () => {
-  listClubs().then(response => {
-    allClubs.value = response.data
+  loading.value = true
+  listClubs(queryParams.value).then(response => {
+    // Check structure, assuming standard R<TableDataInfo> or similar
+    // response.rows or response.data if it's a list.
+    // Usually list endpoint returns rows and total.
+    if (response.rows) {
+        clubList.value = response.rows
+        total.value = response.total
+    } else if (Array.isArray(response.data)) {
+        // Fallback if API returns just array (no pagination)
+        clubList.value = response.data
+        total.value = response.data.length
+    }
+    loading.value = false
+  }).catch(() => {
+    loading.value = false
+    clubList.value = []
   })
 }
 
 const getCategories = () => {
     listCategories().then(response => {
-        // Map the response to the format expected
         const apiCategories = response.data.map(c => ({
             id: c.categoryId,
             label: c.categoryName
         }))
-        categories.value = [{ id: 'all', label: '全部' }, ...apiCategories]
+        categories.value = [{ id: undefined, label: '全部' }, ...apiCategories]
     })
 }
 
-const filteredClubs = computed(() => {
-  let result = allClubs.value
+const handleQuery = () => {
+  queryParams.value.pageNum = 1
+  getList()
+}
 
-  if (filter.value !== 'all') {
-    result = result.filter(club => club.categoryId === filter.value)
-  }
-
-  if (searchTerm.value) {
-    const term = searchTerm.value.toLowerCase()
-    result = result.filter(club =>
-      club.clubName.toLowerCase().includes(term) ||
-      club.description.toLowerCase().includes(term)
-    )
-  }
-
-  return result
-})
+const handleCategoryChange = (id) => {
+  queryParams.value.categoryId = id
+  handleQuery()
+}
 
 const clearFilters = () => {
-  filter.value = 'all'
-  searchTerm.value = ''
+  queryParams.value.categoryId = undefined
+  queryParams.value.clubName = ''
+  handleQuery()
 }
 </script>
 
@@ -176,5 +206,11 @@ const clearFilters = () => {
 .no-results {
   text-align: center;
   padding: 4rem 0;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
 }
 </style>

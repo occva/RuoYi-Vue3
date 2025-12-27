@@ -1,11 +1,11 @@
 <template>
   <div class="club-detail-page">
     <!-- 加载状态 -->
-    <div v-if="!club" class="container loading">
+    <div v-if="loading" class="container loading">
       <el-skeleton :rows="10" animated />
     </div>
 
-    <template v-else>
+    <template v-else-if="club">
       <!-- 头部区域 -->
       <div class="club-header-section">
         <div class="container club-header-container">
@@ -29,14 +29,14 @@
                 <span>社长: <strong>{{ club.presidentName }}</strong></span>
               </div>
               <div class="club-meta-item">
-                <el-icon><OfficeBuilding /></el-icon>
-                <span>创建时间: <strong>{{ club.foundedDate }}</strong></span>
+                <el-icon><Clock /></el-icon>
+                <span>创建时间: <strong>{{ formatDate(club.foundedDate) }}</strong></span>
               </div>
-              <div class="club-meta-item">
+              <div class="club-meta-item" v-if="club.remark">
                 <el-icon><Calendar /></el-icon>
                 <span>{{ club.remark }}</span>
               </div>
-              <div class="club-meta-item">
+              <div class="club-meta-item" v-if="club.location">
                 <el-icon><Location /></el-icon>
                 <span>{{ club.location }}</span>
               </div>
@@ -62,8 +62,8 @@
               </div>
               <div class="activity-content">
                 <div class="activity-tags">
-                  <el-tag :type="getStatusType(activity.status)" size="small">
-                    {{ getStatusText(activity.status) }}
+                  <el-tag :type="getStatusType(getComputedStatus(activity))" size="small">
+                    {{ getStatusText(getComputedStatus(activity)) }}
                   </el-tag>
                 </div>
                 <h3 class="activity-title">{{ activity.activityTitle }}</h3>
@@ -72,8 +72,14 @@
                   {{ activity.location }}
                 </div>
                 <div class="activity-actions">
-                  <el-button size="small" @click="showActivityDetail">查看详情</el-button>
-                  <el-button v-if="activity.status !== '2'" type="primary" size="small" @click="signUpActivity">
+                  <el-button size="small" @click="showActivityDetail(activity)">查看详情</el-button>
+                  <!-- 只有进行中或未来的活动可以报名 -->
+                  <el-button 
+                    v-if="getComputedStatus(activity) === '0' || getComputedStatus(activity) === '1'" 
+                    type="primary" 
+                    size="small" 
+                    @click="signUpActivity(activity)"
+                  >
                     立即报名
                   </el-button>
                 </div>
@@ -83,7 +89,6 @@
 
           <el-empty v-else description="暂无公开活动" />
 
-          <!-- 加入要求 (Note: Simplified as mocked DB model didn't include explicit requirements array, assuming description covers it or removed for now if not in DB schema provided) -->
         </div>
 
         <!-- 右侧：侧边栏 -->
@@ -103,51 +108,51 @@
             <template v-if="club.notices && club.notices.length > 0">
               <div v-for="notice in club.notices" :key="notice.noticeId" class="notice-item">
                 <div class="notice-date">{{ notice.publishTime }}</div>
-                <div class="notice-text">{{ notice.noticeContent }}</div>
+                <div class="notice-link" @click="viewNotice(notice)">{{ notice.noticeTitle }}</div>
               </div>
             </template>
             <div v-else class="no-notices">暂无最新公告</div>
           </div>
 
-          <!-- 留言板 -->
+          <!-- 联系方式 -->
           <div class="sidebar-section">
-            <h3 class="sidebar-title">留言板</h3>
-            <div class="members-only">仅限成员查看留言。</div>
+              <h3 class="sidebar-title">联系我们</h3>
+              <div class="contact-info">
+                  <div v-if="club.contactPhone" class="contact-item">
+                      <el-icon><Phone /></el-icon> {{ club.contactPhone }}
+                  </div>
+                  <div v-if="club.contactEmail" class="contact-item">
+                      <el-icon><Message /></el-icon> {{ club.contactEmail }}
+                  </div>
+              </div>
           </div>
         </aside>
       </div>
     </template>
+    
+    <el-empty v-else description="未找到社团信息" />
 
     <!-- 申请弹窗 -->
-    <el-dialog v-model="isModalOpen" :title="`申请加入 ${club?.clubName || ''}`" width="600px">
-      <el-form :model="applicationForm" label-position="top">
-        <el-row :gutter="16">
-          <el-col :span="12">
-            <el-form-item label="姓名" required>
-              <el-input v-model="applicationForm.name" placeholder="请输入您的姓名" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="学号" required>
-              <el-input v-model="applicationForm.studentId" placeholder="例如: 20210001" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="专业/班级" required>
-          <el-input v-model="applicationForm.major" placeholder="例如: 计算机科学与技术 2班" />
+    <el-dialog v-model="isModalOpen" :title="`申请加入 ${club?.clubName || ''}`" width="500px">
+      <el-form ref="applyFormRef" :model="applicationForm" :rules="applyRules" label-position="top">
+        <el-form-item label="姓名" prop="name">
+           <el-input v-model="applicationForm.name" placeholder="请输入您的姓名" />
         </el-form-item>
-        <el-form-item label="申请理由" required>
+        <el-form-item label="学号" prop="studentId">
+           <el-input v-model="applicationForm.studentId" placeholder="请输入您的学号" />
+         </el-form-item>
+        <el-form-item label="申请理由" prop="reason">
           <el-input
             v-model="applicationForm.reason"
             type="textarea"
             :rows="4"
-            placeholder="你为什么想加入这个社团？（50字以上）"
+            placeholder="请简述您加入社团的理由..."
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="isModalOpen = false">取消</el-button>
-        <el-button type="primary" @click="handleApply">提交申请</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="handleApply">提交申请</el-button>
       </template>
     </el-dialog>
   </div>
@@ -156,43 +161,61 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { getClub } from '@/api/user/club'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { User, OfficeBuilding, Clock, Calendar, Location, Star, StarFilled, Phone, Message } from '@element-plus/icons-vue'
+import { getClub, joinClub } from '@/api/user/club'
 import { listActivitiesByClub } from '@/api/user/activity'
 import { listNoticesByClub } from '@/api/user/notice'
 
 const route = useRoute()
 const club = ref(null)
+const loading = ref(true)
 const isFavorite = ref(false)
 const isModalOpen = ref(false)
+const submitLoading = ref(false)
+const applyFormRef = ref(null)
 
 const applicationForm = ref({
+  clubId: undefined,
   name: '',
   studentId: '',
-  major: '',
   reason: ''
 })
 
+const applyRules = {
+    name: [{ required: true, message: '请输入姓名', trigger: 'blur'}],
+    studentId: [{ required: true, message: '请输入学号', trigger: 'blur'}],
+    reason: [{ required: true, message: '请输入申请理由', trigger: 'blur'}]
+}
+
 const loadClub = () => {
   const id = route.params.id
-  club.value = null // Reset first
+  if (!id) return
   
+  loading.value = true
   getClub(id).then(async response => {
     const clubData = response.data
     
     // Concurrently fetch related data
-    const [activitiesRes, noticesRes] = await Promise.all([
-        listActivitiesByClub(id),
-        listNoticesByClub(id)
-    ])
-
-    clubData.activities = activitiesRes.data || []
-    clubData.notices = noticesRes.data || []
+    try {
+        const [activitiesRes, noticesRes] = await Promise.all([
+            listActivitiesByClub(id),
+            listNoticesByClub(id)
+        ])
+        // Handle list responses which might be in .rows or .data depending on structure
+        clubData.activities = activitiesRes.data || activitiesRes.rows || []
+        clubData.notices = noticesRes.data || noticesRes.rows || []
+    } catch (e) {
+        console.error("Failed to load related data", e)
+    }
     
     club.value = clubData
-    isFavorite.value = false
+    // Check if favorite (mock)
+    isFavorite.value = false 
+    loading.value = false
   }).catch(() => {
     club.value = null
+    loading.value = false
   })
 }
 
@@ -204,31 +227,77 @@ const toggleFavorite = () => {
   ElMessage.success(isFavorite.value ? '已添加到收藏' : '已取消收藏')
 }
 
+const formatDate = (dateStr) => {
+    if(!dateStr) return '';
+    return dateStr.split(' ')[0]; // Returns YYYY-MM-DD
+}
+
 const getMonth = (date) => new Date(date).getMonth() + 1
 const getDay = (date) => new Date(date).getDate()
 
+const getComputedStatus = (activity) => {
+    const now = new Date()
+    // Parse times. Note: assuming DB stores as string 'YYYY-MM-DD HH:mm:ss' or ISO
+    // If times are null, fallback to DB status or '0' (Upcoming)
+    if (!activity.startTime) return activity.status || '0'
+    
+    const start = new Date(activity.startTime)
+    // If no endTime, maybe assume 2 hours duration or just use start time
+    const end = activity.endTime ? new Date(activity.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000)
+    
+    if (now < start) return '0' // Upcoming
+    if (now >= start && now <= end) return '1' // Ongoing
+    return '2' // Ended
+}
+
 const getStatusType = (status) => {
-  const types = { '0': 'info', '1': 'success', '2': 'warning', '3': 'danger' }
+  const types = { '0': 'primary', '1': 'success', '2': 'info', '3': 'danger' } 
   return types[status] || 'info'
 }
 
 const getStatusText = (status) => {
-  const texts = { '0': '待开始', '1': '进行中', '2': '已结束', '3': '已取消' }
+  const texts = { '0': '即将开始', '1': '进行中', '2': '已结束', '3': '已取消' }
   return texts[status] || status
 }
 
-const showActivityDetail = () => {
-  ElMessage.info('跳转至活动详情')
+const router = useRouter()
+
+const showActivityDetail = (activity) => {
+  router.push(`/user/activity/${activity.activityId}`)
 }
 
-const signUpActivity = () => {
-  ElMessage.success('报名成功！')
+const signUpActivity = (activity) => {
+  // Mock logic
+  ElMessage.success('报名成功: ' + activity.activityTitle)
+}
+
+const viewNotice = (notice) => {
+    ElMessageBox.alert(notice.noticeContent, notice.noticeTitle, {
+        confirmButtonText: '关闭',
+        dangerouslyUseHTMLString: false
+    })
 }
 
 const handleApply = () => {
-  ElMessage.success('申请已提交！社长稍后会进行审核。')
-  isModalOpen.value = false
-  applicationForm.value = { name: '', studentId: '', major: '', reason: '' }
+    if (!applyFormRef.value) return;
+    
+    applyFormRef.value.validate((valid) => {
+        if (valid) {
+            submitLoading.value = true
+            const data = {
+                clubId: club.value.clubId,
+                ...applicationForm.value
+            }
+            joinClub(data).then(res => {
+                ElMessage.success(res.msg || '申请已提交')
+                isModalOpen.value = false
+                applicationForm.value = { name: '', studentId: '', reason: '' }
+                submitLoading.value = false
+            }).catch(() => {
+                submitLoading.value = false
+            })
+        }
+    })
 }
 </script>
 
@@ -249,7 +318,8 @@ const handleApply = () => {
 }
 
 .club-header-section {
-  background: linear-gradient(to bottom, #f0f9ff 0%, #ffffff 100%);
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
   padding: 3rem 0;
   margin-bottom: 2rem;
   position: relative;
@@ -293,17 +363,15 @@ const handleApply = () => {
 .club-profile-image-wrapper {
   flex-shrink: 0;
   width: 100%;
-  max-width: 350px;
+  max-width: 300px;
 }
 
 .club-profile-image {
   width: 100%;
-  height: auto;
+  height: 200px;
   border-radius: 12px;
-  border: 4px solid #ffffff;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   object-fit: cover;
-  aspect-ratio: 4/3;
 }
 
 .club-header-info {
@@ -314,7 +382,7 @@ const handleApply = () => {
 
 .club-badge {
   display: inline-block;
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: #eff6ff;
   color: #3b82f6;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -335,9 +403,9 @@ const handleApply = () => {
 
 .club-meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .club-meta-item {
@@ -347,21 +415,15 @@ const handleApply = () => {
   color: #6b7280;
 
   .el-icon {
-    color: #3b82f6;
+    color: #9ca3af;
   }
 }
 
 .club-description {
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-
   p {
-    line-height: 1.8;
-    color: #111827;
+    line-height: 1.7;
+    color: #4b5563;
     font-size: 1.05rem;
-    margin: 0;
   }
 }
 
@@ -404,8 +466,8 @@ const handleApply = () => {
 }
 
 .activity-date-box {
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: #f9fafb;
+  color: #374151;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -419,7 +481,7 @@ const handleApply = () => {
   @media (min-width: 640px) {
     flex-direction: column;
     padding: 1rem;
-    min-width: 80px;
+    min-width: 100px;
     border-right: 1px solid #e5e7eb;
     border-bottom: none;
     gap: 0;
@@ -427,15 +489,17 @@ const handleApply = () => {
 }
 
 .activity-day {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 800;
   line-height: 1;
+  color: #1f2937;
 }
 
 .activity-month {
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
+  color: #6b7280;
 }
 
 .activity-content {
@@ -451,14 +515,14 @@ const handleApply = () => {
 }
 
 .activity-title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: #111827;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .activity-location {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   color: #6b7280;
   display: flex;
   align-items: center;
@@ -468,54 +532,6 @@ const handleApply = () => {
 .activity-actions {
   margin-top: 1rem;
   display: flex;
-  gap: 0.75rem;
-}
-
-.requirements-section {
-  margin-top: 3rem;
-  padding: 2rem;
-  background-color: #fff;
-  border: 1px dashed #3b82f6;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background-color: #3b82f6;
-  }
-}
-
-.req-header {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.req-intro {
-  margin-bottom: 1rem;
-  color: #4b5563;
-}
-
-.req-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.req-item {
-  display: flex;
-  margin-bottom: 0.75rem;
-  align-items: flex-start;
   gap: 0.75rem;
 }
 
@@ -531,8 +547,8 @@ const handleApply = () => {
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
   padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f3f4f6;
   color: #111827;
 }
 
@@ -542,32 +558,45 @@ const handleApply = () => {
   border-bottom: 1px solid #f9fafb;
 
   &:last-child {
+    border-bottom: none;
     margin-bottom: 0;
     padding-bottom: 0;
-    border-bottom: none;
   }
 }
 
 .notice-date {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #9ca3af;
   margin-bottom: 0.2rem;
 }
 
-.notice-text {
+.notice-link {
   font-size: 0.95rem;
-  line-height: 1.5;
-  color: #111827;
+  color: #4b5563;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+      color: #3b82f6;
+  }
 }
 
-.no-notices,
-.members-only {
-  color: #6b7280;
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: #4b5563;
+}
+
+.no-notices {
+  color: #9ca3af;
   font-style: italic;
+  font-size: 0.9rem;
 }
 
 .recruit-card {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   border-radius: 12px;
   padding: 2rem;
@@ -591,7 +620,7 @@ const handleApply = () => {
 .recruit-btn {
   width: 100%;
   background: white !important;
-  color: #3b82f6 !important;
+  color: #2563eb !important;
   font-weight: 700;
   border: none !important;
 

@@ -12,28 +12,52 @@
           <el-button type="primary" size="large" @click="$router.push('/user/clubs')">
             探索社团
           </el-button>
-          <el-button size="large" @click="$router.push('/register')">
+          <el-button size="large" @click="$router.push('/user/club-apply')">
             创建新社团
           </el-button>
         </div>
       </div>
     </section>
 
-    <!-- 热门社团 -->
-    <main id="clubs" class="club-section">
+    <!-- 公告通知 -->
+    <section class="notice-section" v-if="notices.length > 0">
       <div class="container">
-        <h2 class="section-title">热门社团</h2>
+        <div class="notice-bar">
+          <el-icon class="notice-icon"><Bell /></el-icon>
+          <div class="notice-content">
+            <span class="notice-tag">最新公告</span>
+            <span class="notice-title">{{ notices[0].noticeTitle }}</span>
+          </div>
+          <el-button link type="primary" @click="viewNotice(notices[0])">查看详情</el-button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 热门社团 -->
+    <main id="clubs" class="section club-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">热门社团</h2>
+          <el-button link @click="$router.push('/user/clubs')">查看全部 <el-icon><ArrowRight /></el-icon></el-button>
+        </div>
         <div class="club-grid">
           <ClubCard v-for="club in clubs" :key="club.clubId" :club="club" />
         </div>
-        <div class="view-all">
-          <el-button type="primary" plain @click="$router.push('/user/clubs')">
-            查看全部社团
-            <el-icon class="el-icon--right"><ArrowRight /></el-icon>
-          </el-button>
-        </div>
       </div>
     </main>
+
+    <!-- 校园活动 -->
+    <section class="section activity-section" v-if="activities.length > 0">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">精彩活动</h2>
+          <el-button link @click="$router.push('/user/activities')">更多活动 <el-icon><ArrowRight /></el-icon></el-button>
+        </div>
+        <div class="activity-grid">
+          <ActivityCard v-for="activity in activities" :key="activity.activityId" :activity="activity" />
+        </div>
+      </div>
+    </section>
 
     <!-- AI Assistant -->
     <AIAssistant />
@@ -42,20 +66,53 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { Bell, ArrowRight } from '@element-plus/icons-vue'
 import { listClubs } from '@/api/user/club'
+import { listActivities } from '@/api/user/activity'
+import { listNotices } from '@/api/user/notice'
+import { ElMessageBox } from 'element-plus'
 import ClubCard from './components/ClubCard.vue'
+import ActivityCard from './components/ActivityCard.vue'
 import AIAssistant from './components/AIAssistant.vue'
 
 const clubs = ref([])
+const activities = ref([])
+const notices = ref([])
 
 onMounted(() => {
-  getClubs()
+  getStats()
 })
 
-const getClubs = () => {
-  listClubs().then(response => {
-    clubs.value = response.data.slice(0, 6)
+const getStats = () => {
+  listClubs({ pageNum: 1, pageSize: 6 }).then(response => {
+    clubs.value = response.data || response.rows?.slice(0, 6) || []
   })
+  
+  listActivities({ pageNum: 1, pageSize: 3, status: '1' }).then(response => {
+    // try to get ongoing first, if empty get upcoming
+    if (response.rows && response.rows.length > 0) {
+        activities.value = response.rows.slice(0, 3)
+    } else {
+        listActivities({ pageNum: 1, pageSize: 3 }).then(res => {
+            activities.value = res.rows?.slice(0, 3) || []
+        })
+    }
+  })
+
+  listNotices({ pageNum: 1, pageSize: 5 }).then(response => {
+    notices.value = response.rows || []
+  })
+}
+
+const viewNotice = (notice) => {
+  ElMessageBox.alert(
+    `<div style="white-space: pre-wrap;">${notice.noticeContent}</div>`,
+    notice.noticeTitle,
+    {
+      dangerouslyUseHTMLString: true,
+      confirmButtonText: '关闭'
+    }
+  )
 }
 </script>
 
@@ -135,15 +192,71 @@ const getClubs = () => {
   }
 }
 
-.club-section {
-  padding: 4rem 0;
+.notice-section {
+  margin-top: -2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.notice-bar {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f3f4f6;
+
+  .notice-icon {
+    color: #f59e0b;
+    font-size: 1.25rem;
+  }
+
+  .notice-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+
+    .notice-tag {
+      background: #fef3c7;
+      color: #d97706;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .notice-title {
+      color: #374151;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.section {
+  padding: 3rem 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .section-title {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 3rem;
+  font-size: 1.8rem;
   color: #111827;
+  font-weight: 700;
+  margin: 0;
 }
 
 .club-grid {
@@ -152,22 +265,9 @@ const getClubs = () => {
   gap: 2rem;
 }
 
-.view-all {
-  text-align: center;
-  margin-top: 3rem;
-
-  .el-button {
-    height: 42px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 0 28px;
-    transition: all 0.3s;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.15);
-    }
-  }
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
 }
 </style>

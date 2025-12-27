@@ -51,6 +51,24 @@ export const constantRoutes = [
                 name: 'UserClubDetail',
                 component: () => import('@/views/user/detail.vue'),
                 meta: { title: '社团详情' }
+            },
+            {
+                path: 'club-apply',
+                name: 'UserClubApply',
+                component: () => import('@/views/user/club-apply.vue'),
+                meta: { title: '创建社团' }
+            },
+            {
+                path: 'activities',
+                name: 'UserActivities',
+                component: () => import('@/views/user/activities.vue'),
+                meta: { title: '校园活动' }
+            },
+            {
+                path: 'activity/:id',
+                name: 'UserActivityDetail',
+                component: () => import('@/views/user/activity-detail.vue'),
+                meta: { title: '活动详情' }
             }
         ]
     },
@@ -173,7 +191,7 @@ export const dynamicRoutes = [
             }
         ]
     },
-  ]
+]
 
 const router = createRouter({
     history: createWebHistory(),

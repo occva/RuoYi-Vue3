@@ -11,7 +11,7 @@
         <nav class="nav-links">
           <router-link to="/user/home" class="nav-link">首页</router-link>
           <router-link to="/user/clubs" class="nav-link">全部社团</router-link>
-          <a href="#" class="nav-link">校园活动</a>
+          <router-link to="/user/activities" class="nav-link">校园活动</router-link>
           <a href="#" class="nav-link">关于我们</a>
         </nav>
         
