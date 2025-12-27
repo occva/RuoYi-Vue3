@@ -54,6 +54,11 @@ export default defineConfig(({ mode, command }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         },
+        // 用户端API代理
+        '/api': {
+          target: baseUrl,
+          changeOrigin: true
+        },
         // Knife4j 文档页面
         '/doc.html': {
           target: baseUrl,

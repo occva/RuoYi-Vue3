@@ -24,7 +24,7 @@
       <div class="container">
         <h2 class="section-title">热门社团</h2>
         <div class="club-grid">
-          <ClubCard v-for="club in clubs" :key="club.id" :club="club" />
+          <ClubCard v-for="club in clubs" :key="club.clubId" :club="club" />
         </div>
         <div class="view-all">
           <el-button type="primary" plain @click="$router.push('/user/clubs')">
@@ -41,12 +41,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { MOCK_CLUBS } from './data/mockData'
+import { ref, onMounted } from 'vue'
+import { listClubs } from '@/api/user/club'
 import ClubCard from './components/ClubCard.vue'
 import AIAssistant from './components/AIAssistant.vue'
 
-const clubs = ref(MOCK_CLUBS.slice(0, 6))
+const clubs = ref([])
+
+onMounted(() => {
+  getClubs()
+})
+
+const getClubs = () => {
+  listClubs().then(response => {
+    clubs.value = response.data.slice(0, 6)
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -89,7 +99,7 @@ const clubs = ref(MOCK_CLUBS.slice(0, 6))
   justify-content: center;
 
   .el-button {
-    height: 48px; // Taller for hero section
+    height: 48px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -110,7 +120,6 @@ const clubs = ref(MOCK_CLUBS.slice(0, 6))
       }
     }
 
-    // Secondary / Outline style for the second button
     &:not(.el-button--primary) {
       border: 1px solid #e5e7eb;
       color: #4b5563;

@@ -61,11 +61,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Apply to all children to override Element Plus defaults */
-    * {
-        font-family: inherit;
-    }
-
     /* Type Scale */
     --font-size-xs: 12px;
     --font-size-sm: 14px;
@@ -78,6 +73,11 @@
     line-height: 1.6;
     font-weight: 400;
     /* Regular default weight */
+
+    /* Apply to all children to override Element Plus defaults */
+    & * {
+        font-family: inherit;
+    }
 
     /* =========================================
      Sidebar Redesign (Light & Clean)

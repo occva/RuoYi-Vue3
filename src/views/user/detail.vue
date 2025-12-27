@@ -17,24 +17,24 @@
           </button>
 
           <div class="club-profile-image-wrapper">
-            <img :src="club.image" :alt="club.name" class="club-profile-image" />
+            <img :src="club.logoUrl" :alt="club.clubName" class="club-profile-image" />
           </div>
 
           <div class="club-header-info">
             <span class="club-badge">学生社团</span>
-            <h1 class="club-title">{{ club.name }}</h1>
+            <h1 class="club-title">{{ club.clubName }}</h1>
             <div class="club-meta-grid">
               <div class="club-meta-item">
                 <el-icon><User /></el-icon>
-                <span>社长: <strong>{{ club.president }}</strong></span>
+                <span>社长: <strong>{{ club.presidentName }}</strong></span>
               </div>
               <div class="club-meta-item">
                 <el-icon><OfficeBuilding /></el-icon>
-                <span>创建时间: <strong>{{ club.founded }}</strong></span>
+                <span>创建时间: <strong>{{ club.foundedDate }}</strong></span>
               </div>
               <div class="club-meta-item">
                 <el-icon><Calendar /></el-icon>
-                <span>{{ club.meetingTime }}</span>
+                <span>{{ club.remark }}</span>
               </div>
               <div class="club-meta-item">
                 <el-icon><Location /></el-icon>
@@ -55,10 +55,10 @@
           <h2 class="section-title-left">社团活动</h2>
 
           <template v-if="club.activities && club.activities.length > 0">
-            <div v-for="activity in club.activities" :key="activity.id" class="activity-card">
+            <div v-for="activity in club.activities" :key="activity.activityId" class="activity-card">
               <div class="activity-date-box">
-                <span class="activity-month">{{ getMonth(activity.date) }}月</span>
-                <span class="activity-day">{{ getDay(activity.date) }}</span>
+                <span class="activity-month">{{ getMonth(activity.startTime) }}月</span>
+                <span class="activity-day">{{ getDay(activity.startTime) }}</span>
               </div>
               <div class="activity-content">
                 <div class="activity-tags">
@@ -66,14 +66,14 @@
                     {{ getStatusText(activity.status) }}
                   </el-tag>
                 </div>
-                <h3 class="activity-title">{{ activity.title }}</h3>
+                <h3 class="activity-title">{{ activity.activityTitle }}</h3>
                 <div class="activity-location">
                   <el-icon><Location /></el-icon>
                   {{ activity.location }}
                 </div>
                 <div class="activity-actions">
                   <el-button size="small" @click="showActivityDetail">查看详情</el-button>
-                  <el-button v-if="activity.status !== 'ended'" type="primary" size="small" @click="signUpActivity">
+                  <el-button v-if="activity.status !== '2'" type="primary" size="small" @click="signUpActivity">
                     立即报名
                   </el-button>
                 </div>
@@ -83,20 +83,7 @@
 
           <el-empty v-else description="暂无公开活动" />
 
-          <!-- 加入要求 -->
-          <div v-if="club.requirements && club.requirements.length > 0" class="requirements-section">
-            <h3 class="req-header">
-              <el-icon color="#fbbf24"><Star /></el-icon>
-              想要加入我们？
-            </h3>
-            <p class="req-intro">我们需要你具备以下特质：</p>
-            <ul class="req-list">
-              <li v-for="(req, index) in club.requirements" :key="index" class="req-item">
-                <el-icon color="#10b981"><CircleCheck /></el-icon>
-                <span>{{ req }}</span>
-              </li>
-            </ul>
-          </div>
+          <!-- 加入要求 (Note: Simplified as mocked DB model didn't include explicit requirements array, assuming description covers it or removed for now if not in DB schema provided) -->
         </div>
 
         <!-- 右侧：侧边栏 -->
@@ -104,7 +91,7 @@
           <!-- 招募卡片 -->
           <div class="recruit-card">
             <h3 class="recruit-title">加入我们!</h3>
-            <p class="recruit-desc">成为 {{ club.name }} 的一员，开启你的精彩旅程。</p>
+            <p class="recruit-desc">成为 {{ club.clubName }} 的一员，开启你的精彩旅程。</p>
             <el-button type="primary" class="recruit-btn" @click="isModalOpen = true">
               申请加入
             </el-button>
@@ -114,9 +101,9 @@
           <div class="sidebar-section">
             <h3 class="sidebar-title">社团公告</h3>
             <template v-if="club.notices && club.notices.length > 0">
-              <div v-for="notice in club.notices" :key="notice.id" class="notice-item">
-                <div class="notice-date">{{ notice.date }}</div>
-                <div class="notice-text">{{ notice.text }}</div>
+              <div v-for="notice in club.notices" :key="notice.noticeId" class="notice-item">
+                <div class="notice-date">{{ notice.publishTime }}</div>
+                <div class="notice-text">{{ notice.noticeContent }}</div>
               </div>
             </template>
             <div v-else class="no-notices">暂无最新公告</div>
@@ -132,7 +119,7 @@
     </template>
 
     <!-- 申请弹窗 -->
-    <el-dialog v-model="isModalOpen" :title="`申请加入 ${club?.name || ''}`" width="600px">
+    <el-dialog v-model="isModalOpen" :title="`申请加入 ${club?.clubName || ''}`" width="600px">
       <el-form :model="applicationForm" label-position="top">
         <el-row :gutter="16">
           <el-col :span="12">
@@ -170,7 +157,9 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { MOCK_CLUBS } from './data/mockData'
+import { getClub } from '@/api/user/club'
+import { listActivitiesByClub } from '@/api/user/activity'
+import { listNoticesByClub } from '@/api/user/notice'
 
 const route = useRoute()
 const club = ref(null)
@@ -185,9 +174,26 @@ const applicationForm = ref({
 })
 
 const loadClub = () => {
-  const id = parseInt(route.params.id)
-  club.value = MOCK_CLUBS.find(c => c.id === id) || null
-  isFavorite.value = false
+  const id = route.params.id
+  club.value = null // Reset first
+  
+  getClub(id).then(async response => {
+    const clubData = response.data
+    
+    // Concurrently fetch related data
+    const [activitiesRes, noticesRes] = await Promise.all([
+        listActivitiesByClub(id),
+        listNoticesByClub(id)
+    ])
+
+    clubData.activities = activitiesRes.data || []
+    clubData.notices = noticesRes.data || []
+    
+    club.value = clubData
+    isFavorite.value = false
+  }).catch(() => {
+    club.value = null
+  })
 }
 
 onMounted(loadClub)
@@ -202,12 +208,12 @@ const getMonth = (date) => new Date(date).getMonth() + 1
 const getDay = (date) => new Date(date).getDate()
 
 const getStatusType = (status) => {
-  const types = { ongoing: 'success', ended: 'info', upcoming: 'primary' }
+  const types = { '0': 'info', '1': 'success', '2': 'warning', '3': 'danger' }
   return types[status] || 'info'
 }
 
 const getStatusText = (status) => {
-  const texts = { ongoing: '进行中', ended: '已结束', upcoming: '即将开始' }
+  const texts = { '0': '待开始', '1': '进行中', '2': '已结束', '3': '已取消' }
   return texts[status] || status
 }
 

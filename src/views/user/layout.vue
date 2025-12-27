@@ -38,12 +38,10 @@
                   </div>
                 </div>
                 
-                <router-link to="/user-profile/profile">
-                  <el-dropdown-item>
-                    <el-icon><User /></el-icon>
-                    <span>个人中心</span>
-                  </el-dropdown-item>
-                </router-link>
+                <el-dropdown-item command="profile">
+                  <el-icon><User /></el-icon>
+                  <span>个人中心</span>
+                </el-dropdown-item>
                 
                 <el-divider />
                 
@@ -73,7 +71,7 @@
           <el-button type="primary" @click="$router.push('/register'); mobileMenuOpen = false">注册</el-button>
         </div>
         <div class="mobile-user" v-else>
-          <div class="mobile-user-info" @click="$router.push('/user-profile/profile'); mobileMenuOpen = false">
+          <div class="mobile-user-info" @click="handleMobileProfile">
             <img :src="userStore.avatar" class="mobile-avatar" />
             <span>{{ userStore.nickName }}</span>
           </div>
@@ -150,9 +148,17 @@ function handleCommand(command) {
     case "logout":
       logout()
       break
+    case "profile":
+      window.location.href = '/user-profile/profile'
+      break
     default:
       break
   }
+}
+
+function handleMobileProfile() {
+  mobileMenuOpen.value = false
+  window.location.href = '/user-profile/profile'
 }
 
 function logout() {

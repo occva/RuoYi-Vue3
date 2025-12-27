@@ -114,6 +114,8 @@ $--color-info: #909399;
   /* splitpanes default-theme 变量 */
   --splitpanes-default-bg: #ffffff;
 
+  /* 应用主要背景色 */
+  --app-main-bg: #f7f9fb;
 }
 
 // 暗黑模式变量
@@ -125,6 +127,8 @@ html.dark {
   --el-text-color-regular: #d0d0d0;
   --el-border-color: #434343;
   --el-border-color-light: #434343;
+  /* 应用主要背景色 */
+  --app-main-bg: #141414;
 
   /* 侧边栏 */
   --sidebar-bg: #141414;

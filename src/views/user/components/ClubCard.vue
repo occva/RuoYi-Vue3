@@ -1,13 +1,13 @@
 <template>
   <div class="club-card" @click="goToDetail">
-    <img :src="club.image" :alt="club.name" class="club-image" />
+    <img :src="club.logoUrl" :alt="club.clubName" class="club-image" />
     <div class="club-content">
-      <h3 class="club-name">{{ club.name }}</h3>
+      <h3 class="club-name">{{ club.clubName }}</h3>
       <p class="club-desc">{{ club.description }}</p>
       <div class="club-footer">
         <span class="member-count">
           <el-icon><User /></el-icon>
-          {{ club.members }} 人已加入
+          {{ club.memberCount }} 人已加入
         </span>
         <el-button size="small" @click.stop="handleJoin">
           立即加入
@@ -31,11 +31,11 @@ const props = defineProps({
 const router = useRouter()
 
 const goToDetail = () => {
-  router.push(`/user/club/${props.club.id}`)
+  router.push(`/user/club/${props.club.clubId}`)
 }
 
 const handleJoin = () => {
-  ElMessage.info(`申请加入 ${props.club.name}，请先登录完成申请。`)
+  ElMessage.info(`申请加入 ${props.club.clubName}，请先登录完成申请。`)
 }
 </script>
 

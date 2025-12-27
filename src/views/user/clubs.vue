@@ -35,7 +35,7 @@
 
       <!-- 结果网格 -->
       <div v-if="filteredClubs.length > 0" class="club-grid">
-        <ClubCard v-for="club in filteredClubs" :key="club.id" :club="club" />
+        <ClubCard v-for="club in filteredClubs" :key="club.clubId" :club="club" />
       </div>
       <div v-else class="no-results">
         <el-empty description="没有找到匹配的社团">
@@ -47,34 +47,52 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import { MOCK_CLUBS } from './data/mockData'
+import { listClubs } from '@/api/user/club'
+import { listCategories } from '@/api/user/category'
 import ClubCard from './components/ClubCard.vue'
 
 const filter = ref('all')
 const searchTerm = ref('')
+const allClubs = ref([])
+const categories = ref([
+  { id: 'all', label: '全部' }
+])
 
-const categories = [
-  { id: 'all', label: '全部' },
-  { id: 'technology', label: '科技' },
-  { id: 'art', label: '艺术' },
-  { id: 'academic', label: '学术' },
-  { id: 'sports', label: '体育' },
-  { id: 'volunteering', label: '公益' }
-]
+onMounted(() => {
+  getList()
+  getCategories()
+})
+
+const getList = () => {
+  listClubs().then(response => {
+    allClubs.value = response.data
+  })
+}
+
+const getCategories = () => {
+    listCategories().then(response => {
+        // Map the response to the format expected
+        const apiCategories = response.data.map(c => ({
+            id: c.categoryId,
+            label: c.categoryName
+        }))
+        categories.value = [{ id: 'all', label: '全部' }, ...apiCategories]
+    })
+}
 
 const filteredClubs = computed(() => {
-  let result = MOCK_CLUBS
+  let result = allClubs.value
 
   if (filter.value !== 'all') {
-    result = result.filter(club => club.category === filter.value)
+    result = result.filter(club => club.categoryId === filter.value)
   }
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
     result = result.filter(club =>
-      club.name.toLowerCase().includes(term) ||
+      club.clubName.toLowerCase().includes(term) ||
       club.description.toLowerCase().includes(term)
     )
   }
