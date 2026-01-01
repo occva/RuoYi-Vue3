@@ -100,6 +100,11 @@ export const constantRoutes = [
         hidden: true
     },
     {
+        path: '/403_redirect',
+        component: () => import('@admin/views/error/403_redirect'),
+        hidden: true
+    },
+    {
         path: '/401',
         component: () => import('@admin/views/error/401'),
         hidden: true
@@ -114,20 +119,6 @@ export const constantRoutes = [
                 component: () => import('@admin/views/index'),
                 name: 'Index',
                 meta: { title: '首页', icon: 'dashboard', affix: true }
-            }
-        ]
-    },
-    {
-        path: '/user-profile',
-        component: Layout,
-        hidden: true,
-        redirect: 'noredirect',
-        children: [
-            {
-                path: 'profile',
-                component: () => import('@admin/views/system/user/profile/index'),
-                name: 'Profile',
-                meta: { title: '个人中心', icon: 'user' }
             }
         ]
     }

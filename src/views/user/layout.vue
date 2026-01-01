@@ -38,9 +38,9 @@
                   </div>
                 </div>
                 
-                <el-dropdown-item command="profile">
-                  <el-icon><User /></el-icon>
-                  <span>个人中心</span>
+                <el-dropdown-item command="settings">
+                  <el-icon><Setting /></el-icon>
+                  <span>设置中心</span>
                 </el-dropdown-item>
                 
                 <el-divider />
@@ -59,6 +59,9 @@
       </div>
     </header>
 
+    <!-- 设置弹窗 -->
+    <SettingsDialog v-model="settingsVisible" />
+
     <!-- 移动端导航 -->
     <transition name="slide-down">
       <div v-if="mobileMenuOpen" class="mobile-nav">
@@ -71,7 +74,7 @@
           <el-button type="primary" @click="$router.push('/register'); mobileMenuOpen = false">注册</el-button>
         </div>
         <div class="mobile-user" v-else>
-          <div class="mobile-user-info" @click="handleMobileProfile">
+          <div class="mobile-user-info" @click="handleMobileSettings">
             <img :src="userStore.avatar" class="mobile-avatar" />
             <span>{{ userStore.nickName }}</span>
           </div>
@@ -122,20 +125,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu, User, SwitchButton, CaretBottom } from '@element-plus/icons-vue'
+import { Menu, User, SwitchButton, CaretBottom, Setting } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
+import SettingsDialog from './components/SettingsDialog.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const mobileMenuOpen = ref(false)
+const settingsVisible = ref(false)
 
 onMounted(() => {
   if (userStore.token && !userStore.name) {
-    userStore.getInfo().catch(() => {
-      // 如果获取信息失败，可能 token 已过期
-    })
+    userStore.getInfo().catch(() => {})
   }
 })
 
@@ -148,17 +151,17 @@ function handleCommand(command) {
     case "logout":
       logout()
       break
-    case "profile":
-      window.location.href = '/user-profile/profile'
+    case "settings":
+      settingsVisible.value = true
       break
     default:
       break
   }
 }
 
-function handleMobileProfile() {
+function handleMobileSettings() {
   mobileMenuOpen.value = false
-  window.location.href = '/user-profile/profile'
+  settingsVisible.value = true
 }
 
 function logout() {

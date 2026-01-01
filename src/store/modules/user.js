@@ -24,8 +24,9 @@ const useUserStore = defineStore(
         const password = userInfo.password
         const code = userInfo.code
         const uuid = userInfo.uuid
+        const clientType = userInfo.clientType
         return new Promise((resolve, reject) => {
-          login(username, password, code, uuid).then(res => {
+          login(username, password, code, uuid, clientType).then(res => {
             setToken(res.token)
             this.token = res.token
             resolve()
@@ -54,16 +55,16 @@ const useUserStore = defineStore(
             this.nickName = user.nickName
             this.avatar = avatar
             /* 初始密码提示 */
-            if(res.isDefaultModifyPwd) {
-              ElMessageBox.confirm('您的密码还是初始密码，请修改密码！',  '安全提示', {  confirmButtonText: '确定',  cancelButtonText: '取消',  type: 'warning' }).then(() => {
+            if (res.isDefaultModifyPwd) {
+              ElMessageBox.confirm('您的密码还是初始密码，请修改密码！', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }).then(() => {
                 router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
-              }).catch(() => {})
+              }).catch(() => { })
             }
             /* 过期密码提示 */
-            if(!res.isDefaultModifyPwd && res.isPasswordExpired) {
-              ElMessageBox.confirm('您的密码已过期，请尽快修改密码！',  '安全提示', {  confirmButtonText: '确定',  cancelButtonText: '取消',  type: 'warning' }).then(() => {
+            if (!res.isDefaultModifyPwd && res.isPasswordExpired) {
+              ElMessageBox.confirm('您的密码已过期，请尽快修改密码！', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }).then(() => {
                 router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
-              }).catch(() => {})
+              }).catch(() => { })
             }
             resolve(res)
           }).catch(error => {
