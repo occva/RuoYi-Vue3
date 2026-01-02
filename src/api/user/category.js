@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取分类列表
 export function listCategories() {
     return request({
-        url: '/api/user/category/list',
+        url: '/api/app/category/list',
         method: 'get'
     })
 }
@@ -11,7 +11,7 @@ export function listCategories() {
 // 获取分类详情
 export function getCategory(id) {
     return request({
-        url: '/api/user/category/' + id,
+        url: '/api/app/category/' + id,
         method: 'get'
     })
 }

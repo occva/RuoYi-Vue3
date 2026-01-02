@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取公告列表
 export function listNotices(query) {
     return request({
-        url: '/api/user/notice/list',
+        url: '/api/app/notice/list',
         method: 'get',
         params: query
     })
@@ -12,7 +12,7 @@ export function listNotices(query) {
 // 获取社团的公告列表
 export function listNoticesByClub(clubId) {
     return request({
-        url: '/api/user/notice/club/' + clubId,
+        url: '/api/app/notice/club/' + clubId,
         method: 'get'
     })
 }
@@ -20,7 +20,7 @@ export function listNoticesByClub(clubId) {
 // 获取公告详情
 export function getNotice(id) {
     return request({
-        url: '/api/user/notice/' + id,
+        url: '/api/app/notice/' + id,
         method: 'get'
     })
 }

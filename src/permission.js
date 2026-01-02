@@ -50,15 +50,26 @@ router.beforeEach(async (to, from, next) => {
         ['admin', 'club_admin', 'president', 'vice_president'].includes(role)
       )
 
-      // 排除不需要检查管理权限的路径（用户路径 /user/**、提示页、空白首页）
+      // 根路径智能重定向
+      if (to.path === '/') {
+        if (hasAdminAccess) {
+          next({ path: '/index' })  // 管理员跳转到管理端首页
+        } else {
+          next({ path: '/user/home' })  // 普通用户跳转到用户端首页
+        }
+        NProgress.done()
+        return
+      }
+
+      // 排除不需要检查管理权限的路径（用户路径 /user/**、提示页）
       const isUserPath = to.path.startsWith('/user') ||
         to.path === '/403_redirect' ||
-        to.path === '/index' ||
-        to.path === '/'
+        to.path === '/login' ||
+        to.path === '/register'
 
       // 如果没有管理权限，且尝试访问的是真正的管理功能模块（由动态路由生成的路径）
       if (!hasAdminAccess && !isUserPath) {
-        next({ path: '/403_redirect' })
+        next({ path: '/user/home' })  // 重定向到用户首页
         NProgress.done()
         return
       }

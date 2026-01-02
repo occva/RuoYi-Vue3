@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter } from 'vue-router'
+﻿import { createWebHistory, createRouter } from 'vue-router'
 
 /* Layout */
 import Layout from '@admin/layout'
@@ -108,11 +108,17 @@ export const constantRoutes = [
         path: '/401',
         component: () => import('@admin/views/error/401'),
         hidden: true
-    },
+    }
+]
+
+// 动态路由，基于用户权限动态去加载
+export const dynamicRoutes = [
+    // 管理端首页（需要管理员权限）
     {
         path: '',
         component: Layout,
-        redirect: '/user/home',
+        redirect: '/index',
+        roles: ['admin', 'club_admin', 'president', 'vice_president'],
         children: [
             {
                 path: '/index',
@@ -121,11 +127,98 @@ export const constantRoutes = [
                 meta: { title: '首页', icon: 'dashboard', affix: true }
             }
         ]
-    }
-]
-
-// 动态路由，基于用户权限动态去加载
-export const dynamicRoutes = [
+    },
+    // 管理端个人中心（需要登录）
+    {
+        path: '/user-profile',
+        component: Layout,
+        hidden: true,
+        redirect: 'noredirect',
+        roles: ['admin', 'club_admin', 'president', 'vice_president'],
+        children: [
+            {
+                path: 'profile',
+                component: () => import('@admin/views/system/user/profile/index'),
+                name: 'Profile',
+                meta: { title: '个人中心', icon: 'user' }
+            }
+        ]
+    },
+    {
+        path: '/club-info',
+        component: Layout,
+        hidden: false,
+        name: 'ClubInfo',
+        meta: { title: '社团信息', icon: 'peoples' },
+        permissions: ['system:club:list'],
+        children: [
+            {
+                path: 'category',
+                component: () => import('@/views/club/category/index'),
+                name: 'ClubCategory',
+                meta: { title: '社团分类', icon: 'category' },
+                permissions: ['system:category:list']
+            },
+            {
+                path: 'list',
+                component: () => import('@/views/club/list/index'),
+                name: 'ClubList',
+                meta: { title: '社团列表', icon: 'list' },
+                permissions: ['system:club:list']
+            },
+            {
+                path: 'achievement',
+                component: () => import('@/views/club/achievement/index'),
+                name: 'ClubAchievement',
+                meta: { title: '荣誉管理', icon: 'star' },
+                permissions: ['system:achievement:list']
+            },
+            {
+                path: 'application',
+                component: () => import('@/views/club/application/index'),
+                name: 'ClubApplication',
+                meta: { title: '入社申请', icon: 'edit' },
+                permissions: ['club:application:list']
+            },
+            {
+                path: 'member',
+                component: () => import('@/views/club/member/index'),
+                name: 'ClubMember',
+                meta: { title: '成员管理', icon: 'peoples' },
+                permissions: ['club:member:list']
+            }
+        ]
+    },
+    {
+        path: '/club-promotion',
+        component: Layout,
+        name: 'ClubPromotion',
+        meta: { title: '社团宣传', icon: 'message' },
+        permissions: ['system:notice:list'],
+        children: [
+            {
+                path: 'notice',
+                component: () => import('@/views/club/notice/index'),
+                name: 'ClubNotice',
+                meta: { title: '公告管理', icon: 'message' },
+                permissions: ['system:notice:list']
+            },
+            {
+                path: 'activity',
+                component: () => import('@/views/club/activity/index'),
+                name: 'ClubActivity',
+                meta: { title: '活动管理', icon: 'date' },
+                permissions: ['system:activity:list']
+            },
+            {
+                path: 'registration',
+                component: () => import('@/views/club/registration/index'),
+                name: 'ClubRegistration',
+                meta: { title: '报名管理', icon: 'checkbox' },
+                permissions: ['club:registration:list']
+            }
+        ]
+    },
     {
         path: '/system/user-auth',
         component: Layout,
