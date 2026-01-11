@@ -42,3 +42,13 @@ export function delMember(memberId) {
         method: 'delete'
     })
 }
+
+// TODO: 导出社团成员
+// export function exportMember(query) {
+//     return request({
+//         url: '/club/member/export',
+//         method: 'post',
+//         params: query,
+//         responseType: 'blob'
+//     })
+// }

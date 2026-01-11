@@ -50,13 +50,9 @@ router.beforeEach(async (to, from, next) => {
         ['admin', 'club_admin', 'president', 'vice_president'].includes(role)
       )
 
-      // 根路径智能重定向
+      // 根路径智能重定向：默认进入用户端首页
       if (to.path === '/') {
-        if (hasAdminAccess) {
-          next({ path: '/index' })  // 管理员跳转到管理端首页
-        } else {
-          next({ path: '/user/home' })  // 普通用户跳转到用户端首页
-        }
+        next({ path: '/user/home' })
         NProgress.done()
         return
       }

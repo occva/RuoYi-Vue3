@@ -267,7 +267,7 @@ const showActivityDetail = (activity) => {
 }
 
 const signUpActivity = (activity) => {
-  // Mock logic
+  // TODO: 调用 registerActivity(activity.activityId) 接口
   ElMessage.success('报名成功: ' + activity.activityTitle)
 }
 

@@ -203,6 +203,7 @@ const getBtnText = (status) => {
 }
 
 const handleSignUp = () => {
+    // TODO: 调用 registerActivity(activity.value.activityId) 接口
     ElMessage.success('报名成功！请准时参加。')
 }
 </script>
