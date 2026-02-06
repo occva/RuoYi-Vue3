@@ -418,7 +418,7 @@ function handleLogout() {
   padding: 0 !important;
   box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1), 0 2px 4px rgba(15, 15, 15, 0.1), 
               0 4px 8px rgba(15, 15, 15, 0.1), 0 8px 16px rgba(15, 15, 15, 0.1) !important;
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   overflow: hidden;
 
   .el-dialog__header { display: none; }
@@ -602,11 +602,11 @@ function handleLogout() {
 .notion-pwd-dialog {
 
   width: 350px !important;      
-  height: 470px !important;    
+  height: 510px !important;    
 
   display: flex !important;
   flex-direction: column;
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   overflow: hidden;
 
   /* 内部布局控制 */
@@ -654,7 +654,7 @@ function handleLogout() {
         background-color: #f7f7f5 !important;
         box-shadow: none !important;
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 4px 10px;
         &:hover { background-color: #eeeeec !important; }
         &.is-focus { 
@@ -678,7 +678,7 @@ function handleLogout() {
       background: #2383e2;
       border: none;
       margin-top: 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       &:hover { background: #0070df; }
     }
 

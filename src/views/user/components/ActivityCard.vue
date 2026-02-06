@@ -52,7 +52,7 @@
           <el-icon><User /></el-icon>
           <span>{{ activity.registerCount || 0 }} 人已报名</span>
         </div>
-        <el-button type="primary" size="small" round class="action-btn">
+        <el-button type="primary" size="small" class="action-btn">
           查看详情
         </el-button>
       </div>

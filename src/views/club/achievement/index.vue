@@ -384,6 +384,12 @@ getList();
           font-size: 18px;
           font-weight: 700;
         }
+
+        .header-operations {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
       }
     }
   }

@@ -250,7 +250,17 @@ getList();
     background: #ffffff;
     :deep(.el-card__header) {
       padding: 20px 24px; border-bottom: 1px solid var(--el-border-color-lighter);
-      .card-header { display: flex; justify-content: space-between; align-items: center; .title { font-size: 18px; font-weight: 700; } }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .title { font-size: 18px; font-weight: 700; }
+        .header-operations {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+      }
     }
   }
 

@@ -34,7 +34,7 @@
       </div>
 
       <div class="club-footer">
-        <el-button type="primary" plain round class="join-btn" @click.stop="handleJoin">
+        <el-button type="primary" plain class="join-btn" @click.stop="handleJoin">
           申请加入
         </el-button>
         <div class="view-detail">

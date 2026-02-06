@@ -66,7 +66,7 @@
         <div v-else class="no-results">
           <el-empty description="暂无相关活动">
             <template #extra>
-              <el-button type="primary" plain round @click="clearFilters">查看全部活动</el-button>
+              <el-button type="primary" plain @click="clearFilters">查看全部活动</el-button>
             </template>
           </el-empty>
         </div>
@@ -250,7 +250,7 @@ const clearFilters = () => {
     color: white;
     border: none;
     padding: 0.75rem 1.75rem;
-    border-radius: 14px;
+    border-radius: 8px;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
