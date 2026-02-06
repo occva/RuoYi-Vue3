@@ -415,7 +415,7 @@ function handleLogout() {
 
 <style lang="scss">
 .notion-settings-dialog {
-  --el-dialog-bg-color: transparent;
+  padding: 0 !important;
   box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1), 0 2px 4px rgba(15, 15, 15, 0.1), 
               0 4px 8px rgba(15, 15, 15, 0.1), 0 8px 16px rgba(15, 15, 15, 0.1) !important;
   border-radius: 12px !important;
@@ -432,7 +432,6 @@ function handleLogout() {
   color: #37352f;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   overflow: hidden;
-  border-radius: 12px; 
 }
 
 .sidebar {
@@ -443,6 +442,7 @@ function handleLogout() {
   flex-direction: column;
   gap: 8px; 
   user-select: none;
+  margin: 0 !important; // 强制消除外边距，确保紧贴左侧
   margin-bottom: 0 !important; // 覆盖全局 index.scss 中的 aside 样式
 
   .section-title {

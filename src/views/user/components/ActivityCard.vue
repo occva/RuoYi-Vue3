@@ -1,27 +1,60 @@
 <template>
   <div class="activity-card" @click="viewDetail">
     <div class="card-image">
-      <img :src="activity.coverUrl || activity.cover || defaultImage" alt="Activity Cover" />
+      <el-image :src="activity.coverUrl || activity.cover" fit="cover" class="activity-img">
+        <template #error>
+          <div class="image-placeholder">
+            <el-icon><Calendar /></el-icon>
+          </div>
+        </template>
+      </el-image>
       <div class="status-badge" :class="statusClass">
+        <span class="pulse-dot" v-if="statusText === '进行中'"></span>
         {{ statusText }}
       </div>
-    </div>
-    <div class="card-content">
-      <div class="activity-meta">
-        <span class="club-name" v-if="activity.clubName">
-          <el-icon><School /></el-icon> {{ activity.clubName }}
-        </span>
+      <div class="activity-type" v-if="activity.categoryName">
+        {{ activity.categoryName }}
       </div>
-      <h3 class="activity-title">{{ activity.activityTitle || activity.title }}</h3>
-      <div class="activity-info">
-        <div class="info-item">
-          <el-icon><Calendar /></el-icon>
-          <span>{{ formatDate(activity.startTime) }}</span>
+    </div>
+    
+    <div class="card-content">
+      <div class="activity-header">
+        <span class="club-tag" v-if="activity.clubName">
+          {{ activity.clubName }}
+        </span>
+        <h3 class="activity-title line-clamp-2">{{ activity.activityTitle || activity.title }}</h3>
+      </div>
+
+      <div class="activity-details">
+        <div class="detail-item">
+          <div class="icon-box date">
+            <el-icon><Calendar /></el-icon>
+          </div>
+          <div class="detail-text">
+            <div class="label">活动时间</div>
+            <div class="value">{{ formatDate(activity.startTime) }}</div>
+          </div>
         </div>
-        <div class="info-item">
-          <el-icon><Location /></el-icon>
-          <span>{{ activity.address || '线上活动' }}</span>
+        
+        <div class="detail-item">
+          <div class="icon-box location">
+            <el-icon><Location /></el-icon>
+          </div>
+          <div class="detail-text">
+            <div class="label">活动地点</div>
+            <div class="value">{{ activity.address || '线上活动' }}</div>
+          </div>
         </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="participant-info">
+          <el-icon><User /></el-icon>
+          <span>{{ activity.registerCount || 0 }} 人已报名</span>
+        </div>
+        <el-button type="primary" size="small" round class="action-btn">
+          查看详情
+        </el-button>
       </div>
     </div>
   </div>
@@ -30,8 +63,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Calendar, Location, School } from '@element-plus/icons-vue'
-import defaultImage from '@/assets/images/profile.jpg' // Fallback image
+import { Calendar, Location, School, User } from '@element-plus/icons-vue'
 
 const props = defineProps({
   activity: {
@@ -47,17 +79,20 @@ const viewDetail = () => {
 }
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return 'TBD'
+    if (!dateStr) return '待定'
     const date = new Date(dateStr)
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${month}月${day}日 ${hours}:${minutes}`
 }
 
 const statusText = computed(() => {
     if (!props.activity.startTime) return props.activity.status === '2' ? '已结束' : (props.activity.status === '1' ? '进行中' : '即将开始')
     const now = new Date()
     const start = new Date(props.activity.startTime)
-    // If no endTime, assume 2 hours
-    const end = props.activity.endTime ? new Date(props.activity.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000)
+    const end = props.activity.endTime ? new Date(props.activity.endTime) : new Date(start.getTime() + 4 * 60 * 60 * 1000)
     
     if (now < start) return '即将开始'
     if (now >= start && now <= end) return '进行中'
@@ -75,49 +110,71 @@ const statusClass = computed(() => {
 <style lang="scss" scoped>
 .activity-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
+  border: 1px solid #f1f5f9;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     border-color: transparent;
+
+    .activity-img {
+      transform: scale(1.08);
+    }
+    
+    .action-btn {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
   }
 }
 
 .card-image {
-  height: 160px;
+  height: 180px;
   width: 100%;
   position: relative;
   overflow: hidden;
+  background-color: #f8fafc;
 
-  img {
+  .activity-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s ease;
   }
+}
 
-  .activity-card:hover & img {
-    transform: scale(1.05);
-  }
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 2.5rem;
 }
 
 .status-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
+  top: 14px;
+  right: 14px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   
   &.upcoming {
     background: rgba(59, 130, 246, 0.9);
@@ -130,55 +187,145 @@ const statusClass = computed(() => {
   }
   
   &.ended {
-    background: rgba(107, 114, 128, 0.9);
+    background: rgba(100, 116, 139, 0.9);
     color: white;
   }
 }
 
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+.activity-type {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.6);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  backdrop-filter: blur(4px);
+}
+
 .card-content {
-  padding: 1.25rem;
+  padding: 1.5rem;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.activity-meta {
-  margin-bottom: 0.5rem;
+.activity-header {
+  margin-bottom: 1.25rem;
   
-  .club-name {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.85rem;
-    color: #6b7280;
-    font-weight: 500;
+  .club-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
   }
 }
 
 .activity-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0 0 1rem 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
   line-height: 1.4;
-  flex: 1;
+  height: 3.2rem;
 }
 
-.activity-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
-  .info-item {
+.activity-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  .icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: #4b5563;
+    justify-content: center;
+    font-size: 14px;
+    
+    &.date { background: #eff6ff; color: #3b82f6; }
+    &.location { background: #fdf2f8; color: #db2777; }
+  }
 
-    .el-icon {
-      color: #9ca3af;
+  .detail-text {
+    min-width: 0;
+    .label {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .value {
+      font-size: 0.9rem;
+      color: #334155;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+  
+  .el-icon {
+    font-size: 1rem;
+    color: #94a3b8;
+  }
+}
+
+.action-btn {
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 </style>

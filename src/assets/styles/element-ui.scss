@@ -46,12 +46,91 @@
   }
 }
 
-// to fixed https://github.com/ElemeFE/element/issues/2461
+// Premium Dialog Redesign
 .el-dialog {
-  transform: none;
-  left: 0;
-  position: relative;
-  margin: 0 auto;
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  border: none !important;
+  background-color: var(--el-bg-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .el-dialog__header {
+    padding: 24px 32px 16px !important;
+    margin-right: 0 !important;
+    text-align: left;
+    
+    .el-dialog__title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--el-text-color-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .el-dialog__headerbtn {
+      top: 24px;
+      right: 24px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--el-fill-color-light);
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        background: var(--el-fill-color);
+        transform: rotate(90deg);
+        .el-dialog__close { color: var(--el-color-primary); }
+      }
+      
+      .el-dialog__close {
+        font-size: 18px;
+        color: var(--el-text-color-regular);
+      }
+    }
+  }
+
+  .el-dialog__body {
+    padding: 16px 32px 32px !important;
+    color: var(--el-text-color-regular);
+    font-size: 15px;
+    line-height: 1.6;
+    
+    /* Custom scrollbar for long content */
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: var(--el-border-color-lighter); border-radius: 10px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+  }
+
+  .el-dialog__footer {
+    padding: 16px 32px 24px !important;
+    border-top: 1px solid var(--el-border-color-lighter);
+    background-color: var(--el-fill-color-extra-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    
+    .el-button {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 10px 20px;
+      transition: all 0.2s;
+      margin-left: 0 !important;
+    }
+  }
+}
+
+// Ensure centered dialogs are truly centered with new styles
+.el-overlay-dialog {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  .el-dialog {
+    margin: 0 !important;
+  }
 }
 
 // refine element ui upload
