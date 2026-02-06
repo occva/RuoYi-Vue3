@@ -43,12 +43,12 @@ export function delAchievement(achievementId) {
     })
 }
 
-// TODO: 导出社团荣誉
-// export function exportAchievement(query) {
-//     return request({
-//         url: '/system/achievement/export',
-//         method: 'post',
-//         params: query,
-//         responseType: 'blob'
-//     })
-// }
+// 导出社团荣誉
+export function exportAchievement(query) {
+    return request({
+        url: '/system/achievement/export',
+        method: 'post',
+        params: query,
+        responseType: 'blob'
+    })
+}

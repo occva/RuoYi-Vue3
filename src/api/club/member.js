@@ -43,12 +43,12 @@ export function delMember(memberId) {
     })
 }
 
-// TODO: 导出社团成员
-// export function exportMember(query) {
-//     return request({
-//         url: '/club/member/export',
-//         method: 'post',
-//         params: query,
-//         responseType: 'blob'
-//     })
-// }
+// 导出社团成员
+export function exportMember(query) {
+    return request({
+        url: '/club/member/export',
+        method: 'post',
+        params: query,
+        responseType: 'blob'
+    })
+}

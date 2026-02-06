@@ -160,14 +160,15 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, OfficeBuilding, Clock, Calendar, Location, Star, StarFilled, Phone, Message } from '@element-plus/icons-vue'
 import { getClub, joinClub } from '@/api/user/club'
-import { listActivitiesByClub } from '@/api/user/activity'
+import { listActivitiesByClub, registerActivity } from '@/api/user/activity'
 import { listNoticesByClub } from '@/api/user/notice'
 
 const route = useRoute()
+const router = useRouter()
 const club = ref(null)
 const loading = ref(true)
 const isFavorite = ref(false)
@@ -260,15 +261,16 @@ const getStatusText = (status) => {
   return texts[status] || status
 }
 
-const router = useRouter()
-
 const showActivityDetail = (activity) => {
   router.push(`/user/activity/${activity.activityId}`)
 }
 
 const signUpActivity = (activity) => {
-  // TODO: 调用 registerActivity(activity.activityId) 接口
-  ElMessage.success('报名成功: ' + activity.activityTitle)
+  registerActivity(activity.activityId).then(response => {
+    ElMessage.success(response.msg || '报名成功: ' + activity.activityTitle)
+  }).catch(error => {
+    // 错误已由request拦截器处理
+  })
 }
 
 const viewNotice = (notice) => {

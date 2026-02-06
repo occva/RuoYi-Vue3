@@ -203,8 +203,11 @@ const getBtnText = (status) => {
 }
 
 const handleSignUp = () => {
-    // TODO: 调用 registerActivity(activity.value.activityId) 接口
-    ElMessage.success('报名成功！请准时参加。')
+    registerActivity(activity.value.activityId).then(response => {
+        ElMessage.success(response.msg || '报名成功！请准时参加。')
+    }).catch(error => {
+        // 错误已由request拦截器处理
+    })
 }
 </script>
 

@@ -34,12 +34,12 @@ export function delApplication(applicationId) {
     })
 }
 
-// TODO: 导出入社申请
-// export function exportApplication(query) {
-//     return request({
-//         url: '/club/application/export',
-//         method: 'post',
-//         params: query,
-//         responseType: 'blob'
-//     })
-// }
+// 导出入社申请
+export function exportApplication(query) {
+    return request({
+        url: '/club/application/export',
+        method: 'post',
+        params: query,
+        responseType: 'blob'
+    })
+}
