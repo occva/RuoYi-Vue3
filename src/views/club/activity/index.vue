@@ -136,100 +136,111 @@
     </el-card>
 
     <!-- 发布/修改活动对话框 -->
-    <el-dialog :title="title" v-model="open" width="800px" append-to-body class="premium-dialog">
-      <el-form ref="activityRef" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="所属社团" prop="clubId">
-              <el-select v-model="form.clubId" placeholder="请选择社团" style="width: 100%">
-                <el-option
-                  v-for="item in clubOptions"
-                  :key="item.clubId"
-                  :label="item.clubName"
-                  :value="item.clubId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="活动类型" prop="activityType">
-              <el-select v-model="form.activityType" placeholder="请选择类型" style="width: 100%">
-                <el-option
-                  v-for="dict in activity_type"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="活动名称" prop="activityTitle">
-              <el-input v-model="form.activityTitle" placeholder="请输入活动名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="活动地点" prop="location">
-              <el-input v-model="form.location" placeholder="请输入活动地点" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="开始时间" prop="startTime">
-              <el-date-picker
-                v-model="form.startTime"
-                type="datetime"
-                placeholder="选择开始时间"
-                style="width: 100%"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="结束时间" prop="endTime">
-              <el-date-picker
-                v-model="form.endTime"
-                type="datetime"
-                placeholder="选择结束时间"
-                style="width: 100%"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="人数上限" prop="maxParticipants">
-              <el-input-number v-model="form.maxParticipants" :min="0" style="width: 100%" />
-              <div class="form-tip">0 表示不限制</div>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="活动状态" prop="status">
-              <el-select v-model="form.status" placeholder="状态" style="width: 100%">
-                <el-option
-                  v-for="dict in activity_status"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="封面图">
-              <image-upload v-model="form.coverUrl" :limit="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="活动详情">
-              <editor v-model="form.description" :min-height="192" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="备注" prop="remark">
-              <el-input v-model="form.remark" type="textarea" placeholder="请输入备注" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+    <el-dialog :title="title" v-model="open" width="80%" append-to-body class="premium-dialog activity-edit-dialog">
+      <div class="dialog-content-wrapper">
+        <el-form ref="activityRef" :model="form" :rules="rules" label-width="100px">
+          <el-row :gutter="30">
+            <!-- Top Section: Image vs Info -->
+            <el-col :span="6">
+              <div class="image-upload-section">
+                <el-form-item label="活动封面" label-position="top">
+                  <image-upload v-model="form.coverUrl" :limit="1" />
+                </el-form-item>
+              </div>
+            </el-col>
+            <el-col :span="18">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <el-form-item label="所属社团" prop="clubId">
+                    <el-select v-model="form.clubId" placeholder="请选择社团" style="width: 100%">
+                      <el-option
+                        v-for="item in clubOptions"
+                        :key="item.clubId"
+                        :label="item.clubName"
+                        :value="item.clubId"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="活动类型" prop="activityType">
+                    <el-select v-model="form.activityType" placeholder="请选择类型" style="width: 100%">
+                      <el-option
+                        v-for="dict in activity_type"
+                        :key="dict.value"
+                        :label="dict.label"
+                        :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="活动名称" prop="activityTitle">
+                    <el-input v-model="form.activityTitle" placeholder="请输入活动名称" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="活动地点" prop="location">
+                    <el-input v-model="form.location" placeholder="请输入活动地点" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="开始时间" prop="startTime">
+                    <el-date-picker
+                      v-model="form.startTime"
+                      type="datetime"
+                      placeholder="开始时间"
+                      style="width: 100%"
+                      value-format="YYYY-MM-DD HH:mm:ss"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="结束时间" prop="endTime">
+                    <el-date-picker
+                      v-model="form.endTime"
+                      type="datetime"
+                      placeholder="结束时间"
+                      style="width: 100%"
+                      value-format="YYYY-MM-DD HH:mm:ss"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="人数上限" prop="maxParticipants">
+                    <el-input-number v-model="form.maxParticipants" :min="0" style="width: 100%" />
+                    <div class="form-tip">0 表示不限制</div>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="活动状态" prop="status">
+                    <el-select v-model="form.status" placeholder="状态" style="width: 100%">
+                      <el-option
+                        v-for="dict in activity_status"
+                        :key="dict.value"
+                        :label="dict.label"
+                        :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-col>
+
+            <!-- Bottom Section: Editor and Remark -->
+            <el-col :span="24">
+              <el-form-item label="活动详情">
+                <editor v-model="form.description" :min-height="240" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="备注" prop="remark">
+                <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="请输入备注" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button class="premium-btn secondary" @click="cancel">取 消</el-button>
@@ -459,6 +470,37 @@ getList();
   .premium-table {
     border-radius: 12px;
     overflow: hidden;
+  }
+}
+
+:deep(.activity-edit-dialog) {
+  .el-dialog {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10vh !important;
+    
+    .el-dialog__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+    }
+
+    .dialog-content-wrapper {
+      height: 100%;
+    }
+
+    .image-upload-section {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px dashed #e2e8f0;
+    }
+    
+    .el-form-item__label {
+      font-weight: 600;
+      color: #334155;
+    }
   }
 }
 </style>

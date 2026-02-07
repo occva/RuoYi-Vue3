@@ -145,11 +145,11 @@ export const dynamicRoutes = [
         ]
     },
     {
-        path: '/club-info',
+        path: '/club-operation',
         component: Layout,
         hidden: false,
-        name: 'ClubInfo',
-        meta: { title: '社团信息', icon: 'peoples' },
+        name: 'ClubOperation',
+        meta: { title: '社团运营', icon: 'peoples' },
         permissions: ['system:club:list'],
         children: [
             {
@@ -178,6 +178,13 @@ export const dynamicRoutes = [
                 component: () => import('@/views/club/application/index'),
                 name: 'ClubApplication',
                 meta: { title: '入社申请', icon: 'edit' },
+                permissions: ['club:application:list']
+            },
+            {
+                path: 'application-stat',
+                component: () => import('@/views/club/application/stat'),
+                name: 'ApplicationStat',
+                meta: { title: '申请统计', icon: 'chart' },
                 permissions: ['club:application:list']
             },
             {

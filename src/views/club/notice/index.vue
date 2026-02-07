@@ -129,76 +129,88 @@
     </el-card>
 
     <!-- 发布/修改公告对话框 -->
-    <el-dialog :title="title" v-model="open" width="800px" append-to-body class="premium-dialog">
-      <el-form ref="noticeRef" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="所属社团" prop="clubId">
-              <el-select v-model="form.clubId" placeholder="请选择社团" style="width: 100%">
-                <el-option
-                  v-for="item in clubOptions"
-                  :key="item.clubId"
-                  :label="item.clubName"
-                  :value="item.clubId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="公告类型" prop="noticeType">
-              <el-select v-model="form.noticeType" placeholder="请选择类型" style="width: 100%">
-                <el-option
-                  v-for="dict in club_notice_type"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="公告标题" prop="noticeTitle">
-              <el-input v-model="form.noticeTitle" placeholder="请输入公告标题" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="封面图">
-              <image-upload v-model="form.coverUrl" :limit="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="发布状态">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                  v-for="dict in club_notice_status"
-                  :key="dict.value"
-                  :label="dict.value"
-                >{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="置顶">
-              <el-switch v-model="form.isTop" active-value="1" inactive-value="0" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="重要">
-              <el-switch v-model="form.isImportant" active-value="1" inactive-value="0" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="公告内容">
-              <editor v-model="form.noticeContent" :min-height="192" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="备注" prop="remark">
-              <el-input v-model="form.remark" type="textarea" placeholder="请输入备注" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+    <el-dialog :title="title" v-model="open" width="80%" append-to-body class="premium-dialog notice-edit-dialog">
+      <div class="dialog-content-wrapper">
+        <el-form ref="noticeRef" :model="form" :rules="rules" label-width="100px">
+          <el-row :gutter="30">
+            <!-- Top Section: Image vs Info -->
+            <el-col :span="6">
+              <div class="image-upload-section">
+                <el-form-item label="公告封面" label-position="top">
+                  <image-upload v-model="form.coverUrl" :limit="1" />
+                </el-form-item>
+              </div>
+            </el-col>
+            <el-col :span="18">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <el-form-item label="所属社团" prop="clubId">
+                    <el-select v-model="form.clubId" placeholder="请选择社团" style="width: 100%">
+                      <el-option
+                        v-for="item in clubOptions"
+                        :key="item.clubId"
+                        :label="item.clubName"
+                        :value="item.clubId"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="公告类型" prop="noticeType">
+                    <el-select v-model="form.noticeType" placeholder="请选择类型" style="width: 100%">
+                      <el-option
+                        v-for="dict in club_notice_type"
+                        :key="dict.value"
+                        :label="dict.label"
+                        :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="公告标题" prop="noticeTitle">
+                    <el-input v-model="form.noticeTitle" placeholder="请输入公告标题" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="发布状态">
+                    <el-select v-model="form.status" style="width: 100%">
+                      <el-option
+                        v-for="dict in club_notice_status"
+                        :key="dict.value"
+                        :label="dict.label"
+                        :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="公告置顶">
+                    <el-switch v-model="form.isTop" active-value="1" inactive-value="0" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="重要公告">
+                    <el-switch v-model="form.isImportant" active-value="1" inactive-value="0" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-col>
+
+            <!-- Bottom Section: Editor and Remark -->
+            <el-col :span="24">
+              <el-form-item label="公告内容">
+                <editor v-model="form.noticeContent" :min-height="240" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="备注" prop="remark">
+                <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="请输入备注" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button class="premium-btn secondary" @click="cancel">取 消</el-button>
@@ -412,6 +424,37 @@ getList();
   .premium-table {
     border-radius: 12px;
     overflow: hidden;
+  }
+}
+
+:deep(.notice-edit-dialog) {
+  .el-dialog {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10vh !important;
+    
+    .el-dialog__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+    }
+
+    .dialog-content-wrapper {
+      height: 100%;
+    }
+
+    .image-upload-section {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px dashed #e2e8f0;
+    }
+    
+    .el-form-item__label {
+      font-weight: 600;
+      color: #334155;
+    }
   }
 }
 </style>

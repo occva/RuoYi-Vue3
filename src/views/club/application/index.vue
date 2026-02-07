@@ -63,10 +63,10 @@
             <dict-tag :options="application_status" :value="scope.row.status" />
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="240" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-button link type="primary" icon="InfoFilled" @click="handleDetail(scope.row)">详情</el-button>
-            <el-button link type="success" icon="Checked" v-if="scope.row.status === '0'" @click="handleReview(scope.row)" v-hasPermi="['club:application:review']">审核</el-button>
+            <el-button link type="success" icon="CircleCheck" v-if="scope.row.status === '0'" @click="handleReview(scope.row)" v-hasPermi="['club:application:review']">审核</el-button>
             <el-button link type="danger" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['club:application:remove']">删除</el-button>
           </template>
         </el-table-column>
@@ -76,26 +76,80 @@
     </el-card>
 
     <!-- 详情对话框 -->
-    <el-dialog title="申请详情" v-model="detailOpen" width="700px" append-to-body class="premium-dialog">
-      <el-descriptions :column="2" border>
-        <el-descriptions-item label="真实姓名">{{ form.realName }}</el-descriptions-item>
-        <el-descriptions-item label="学号">{{ form.studentId }}</el-descriptions-item>
-        <el-descriptions-item label="性别">{{ form.gender == '0' ? '男' : (form.gender == '1' ? '女' : '未知') }}</el-descriptions-item>
-        <el-descriptions-item label="手机号">{{ form.phone }}</el-descriptions-item>
-        <el-descriptions-item label="专业">{{ form.major }}</el-descriptions-item>
-        <el-descriptions-item label="班级">{{ form.className }}</el-descriptions-item>
-        <el-descriptions-item label="自我介绍" :span="2">{{ form.selfIntroduction }}</el-descriptions-item>
-        <el-descriptions-item label="申请理由" :span="2">{{ form.applyReason }}</el-descriptions-item>
-        <el-descriptions-item label="特长" :span="2">{{ form.specialSkills }}</el-descriptions-item>
-      </el-descriptions>
-      <div v-if="form.status !== '0'" class="review-result mt20">
-        <h4>审核信息</h4>
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="审核人">{{ form.reviewerName }}</el-descriptions-item>
-          <el-descriptions-item label="审核时间">{{ parseTime(form.reviewTime) }}</el-descriptions-item>
-          <el-descriptions-item label="审核意见" :span="2">{{ form.reviewComment }}</el-descriptions-item>
-        </el-descriptions>
+    <el-dialog title="申请详情" v-model="detailOpen" width="800px" append-to-body class="premium-dialog application-detail-dialog">
+      <div class="detail-container">
+        <!-- Basic Information Header Section -->
+        <div class="section-container basic-info-section">
+          <div class="section-title">
+            <el-icon><User /></el-icon>
+            <span>基础信息</span>
+          </div>
+          <el-descriptions :column="2" border class="custom-descriptions">
+            <el-descriptions-item label="真实姓名">
+              <span class="highlight-text">{{ form.realName }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="学号">{{ form.studentId }}</el-descriptions-item>
+            <el-descriptions-item label="性别">
+              <el-tag :type="form.gender == '0' ? '' : 'danger'" size="small">
+                {{ form.gender == '0' ? '男' : (form.gender == '1' ? '女' : '未知') }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="手机号">{{ form.phone }}</el-descriptions-item>
+            <el-descriptions-item label="专业">{{ form.major }}</el-descriptions-item>
+            <el-descriptions-item label="班级">{{ form.className }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+
+        <!-- Personal Qualities Section -->
+        <div class="section-container personal-section mt20">
+          <div class="section-title">
+            <el-icon><Document /></el-icon>
+            <span>申请资料</span>
+          </div>
+          <div class="data-cards-grid">
+            <div class="data-card">
+              <div class="card-label">自我介绍</div>
+              <div class="card-content">{{ form.selfIntroduction || '暂无内容' }}</div>
+            </div>
+            <div class="data-card">
+              <div class="card-label">申请理由</div>
+              <div class="card-content">{{ form.applyReason || '暂无内容' }}</div>
+            </div>
+            <div class="data-card full-width">
+              <div class="card-label">特长 / 技能</div>
+              <div class="card-content">
+                <div class="skill-tags" v-if="form.specialSkills">
+                  <el-tag v-for="skill in (form.specialSkills || '').split('，')" :key="skill" size="small" effect="plain" class="skill-tag">
+                    {{ skill }}
+                  </el-tag>
+                </div>
+                <span v-else>暂无内容</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Information Section (Condition) -->
+        <div v-if="form.status !== '0'" class="section-container review-section mt20">
+          <div class="section-title review">
+            <el-icon><Stamp /></el-icon>
+            <span>审核结论</span>
+          </div>
+          <el-descriptions :column="2" border class="custom-descriptions review">
+            <el-descriptions-item label="审核结果">
+              <dict-tag :options="application_status" :value="form.status" />
+            </el-descriptions-item>
+            <el-descriptions-item label="审核人">{{ form.reviewerName }}</el-descriptions-item>
+            <el-descriptions-item label="审核时间">{{ parseTime(form.reviewTime) }}</el-descriptions-item>
+            <el-descriptions-item label="审核意见" :span="2">{{ form.reviewComment || '无明确意见' }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
       </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button class="premium-btn primary" type="primary" @click="detailOpen = false">确 定</el-button>
+        </div>
+      </template>
     </el-dialog>
 
     <!-- 审核对话框 -->
@@ -248,5 +302,111 @@ getList();
 
   .premium-table { border-radius: 12px; overflow: hidden; }
   .mt20 { margin-top: 20px; }
+}
+
+.application-detail-dialog {
+  :deep(.el-dialog__body) {
+    padding: 30px 40px !important;
+    background-color: #fcfdfe;
+  }
+
+  .section-container {
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--el-color-primary);
+      position: relative;
+      padding-left: 12px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 4px;
+        height: 16px;
+        background: var(--el-color-primary);
+        border-radius: 2px;
+      }
+
+      &.review {
+        color: var(--el-color-warning);
+        &::before { background: var(--el-color-warning); }
+      }
+    }
+  }
+
+  .custom-descriptions {
+    :deep(.el-descriptions__label) {
+      width: 120px;
+      background-color: #f8fafc !important;
+      font-weight: 600;
+      color: #64748b;
+    }
+    :deep(.el-descriptions__content) {
+      color: #334155;
+    }
+    
+    &.review {
+      :deep(.el-descriptions__label) { background-color: #fffbeb !important; }
+    }
+  }
+
+  .highlight-text {
+    font-weight: 700;
+    color: var(--el-text-color-primary);
+    font-size: 15px;
+  }
+
+  .data-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    .data-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--el-color-primary-light-5);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      }
+
+      &.full-width { grid-column: span 2; }
+
+      .card-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #94a3b8;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .card-content {
+        color: #1e293b;
+        line-height: 1.6;
+        font-size: 14px;
+        white-space: pre-wrap;
+      }
+    }
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    
+    .skill-tag {
+      border-radius: 6px;
+      font-weight: 500;
+    }
+  }
 }
 </style>

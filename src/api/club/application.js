@@ -43,3 +43,11 @@ export function exportApplication(query) {
         responseType: 'blob'
     })
 }
+
+// 获取入社申请统计数据
+export function getApplicationStat() {
+    return request({
+        url: '/club/application/stat',
+        method: 'get'
+    })
+}

@@ -138,87 +138,96 @@
     </el-card>
 
     <!-- 添加或修改社团对话框 -->
-    <el-dialog :title="title" v-model="open" width="700px" append-to-body class="premium-dialog">
-      <el-form ref="clubRef" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="社团Logo">
-              <image-upload v-model="form.logoUrl" :limit="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="社团名称" prop="clubName">
-              <el-input v-model="form.clubName" placeholder="请输入社团名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="社团分类" prop="categoryId">
-              <el-select v-model="form.categoryId" placeholder="请选择分类" style="width: 100%">
-                <el-option
-                  v-for="item in categoryOptions"
-                  :key="item.categoryId"
-                  :label="item.categoryName"
-                  :value="item.categoryId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="社团编码" prop="clubCode">
-              <el-input v-model="form.clubCode" placeholder="请输入社团编码" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="社长ID/姓名">
-              <el-input v-model="form.presidentName" placeholder="请输入社长姓名" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="最大成员数" prop="maxMembers">
-              <el-input-number v-model="form.maxMembers" :min="0" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="显示顺序" prop="sortOrder">
-              <el-input-number v-model="form.sortOrder" :min="0" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="招新状态">
-              <el-radio-group v-model="form.isRecruiting">
-                <el-radio label="1">招新中</el-radio>
-                <el-radio label="0">停止招新</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="状态">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                  v-for="dict in club_status"
-                  :key="dict.value"
-                  :label="dict.value"
-                >{{ dict.label }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="活动地点" prop="location">
-              <el-input v-model="form.location" placeholder="请输入活动地点" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="社团简介" prop="description">
-              <el-input v-model="form.description" type="textarea" :rows="3" placeholder="请输入简介" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="封面图">
-              <image-upload v-model="form.coverUrl" :limit="1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+    <el-dialog :title="title" v-model="open" width="80%" append-to-body class="premium-dialog club-edit-dialog">
+      <div class="dialog-content-wrapper">
+        <el-form ref="clubRef" :model="form" :rules="rules" label-width="100px">
+          <el-row :gutter="30">
+            <!-- Left Side: Images -->
+            <el-col :span="6">
+              <div class="image-upload-section">
+                <el-form-item label="社团Logo" label-position="top">
+                  <image-upload v-model="form.logoUrl" :limit="1" />
+                </el-form-item>
+                <el-form-item label="封面图" label-position="top" class="mt-20">
+                  <image-upload v-model="form.coverUrl" :limit="1" />
+                </el-form-item>
+              </div>
+            </el-col>
+
+            <!-- Right Side: Form Fields -->
+            <el-col :span="18">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <el-form-item label="社团名称" prop="clubName">
+                    <el-input v-model="form.clubName" placeholder="请输入社团名称" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="社团分类" prop="categoryId">
+                    <el-select v-model="form.categoryId" placeholder="请选择分类" style="width: 100%">
+                      <el-option
+                        v-for="item in categoryOptions"
+                        :key="item.categoryId"
+                        :label="item.categoryName"
+                        :value="item.categoryId"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="社团编码" prop="clubCode">
+                    <el-input v-model="form.clubCode" placeholder="请输入社团编码" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="社长姓名">
+                    <el-input v-model="form.presidentName" placeholder="请输入社长姓名" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="最大成员数" prop="maxMembers">
+                    <el-input-number v-model="form.maxMembers" :min="0" style="width: 100%" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="显示顺序" prop="sortOrder">
+                    <el-input-number v-model="form.sortOrder" :min="0" style="width: 100%" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="招新状态">
+                    <el-select v-model="form.isRecruiting" style="width: 100%">
+                      <el-option label="招新中" value="1" />
+                      <el-option label="停止招新" value="0" />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="状态">
+                    <el-radio-group v-model="form.status">
+                      <el-radio
+                        v-for="dict in club_status"
+                        :key="dict.value"
+                        :label="dict.value"
+                      >{{ dict.label }}</el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="活动地点" prop="location">
+                    <el-input v-model="form.location" placeholder="请输入活动地点" icon="Location" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="社团简介" prop="description">
+                    <el-input v-model="form.description" type="textarea" :rows="5" placeholder="请输入简介" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button class="premium-btn secondary" @click="cancel">取 消</el-button>
@@ -478,6 +487,41 @@ getList();
     padding: 0 12px;
     font-weight: 600;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+}
+
+:deep(.club-edit-dialog) {
+  .el-dialog {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10vh !important;
+    
+    .el-dialog__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+    }
+
+    .dialog-content-wrapper {
+      height: 100%;
+    }
+
+    .image-upload-section {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px dashed #e2e8f0;
+
+      .mt-20 {
+        margin-top: 20px;
+      }
+    }
+    
+    .el-form-item__label {
+      font-weight: 600;
+      color: #334155;
+    }
   }
 }
 </style>
