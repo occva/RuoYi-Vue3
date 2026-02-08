@@ -59,6 +59,12 @@ export const constantRoutes = [
                 meta: { title: '创建社团' }
             },
             {
+                path: 'my-clubs',
+                name: 'UserMyClubs',
+                component: () => import('@/views/user/my-clubs.vue'),
+                meta: { title: '我的社团' }
+            },
+            {
                 path: 'activities',
                 name: 'UserActivities',
                 component: () => import('@/views/user/activities.vue'),
