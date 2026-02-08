@@ -288,6 +288,7 @@ const handleApply = () => {
             submitLoading.value = true
             const data = {
                 clubId: club.value.clubId,
+                clubName: club.value.clubName, // Add clubName to ensure proper data storage
                 ...applicationForm.value
             }
             joinClub(data).then(res => {
@@ -305,12 +306,12 @@ const handleApply = () => {
 
 <style lang="scss" scoped>
 .club-detail-page {
-  background: #f9fafb;
+  background: #f8fafc;
   min-height: 100vh;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -371,7 +372,7 @@ const handleApply = () => {
 .club-profile-image {
   width: 100%;
   height: 200px;
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   object-fit: cover;
 }
@@ -432,11 +433,61 @@ const handleApply = () => {
 .club-content-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.5rem;
+  gap: 2rem;
   padding-bottom: 4rem;
+  align-items: start; /* Ensure sidebar doesn't stretch */
 
   @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: minmax(0, 1fr) 320px; /* Fixed width sidebar for better proportion */
+    gap: 3rem;
+  }
+}
+
+.club-main-column {
+  min-width: 0; /* Prevent grid blowout */
+}
+
+.club-sidebar {
+  background: transparent !important; /* Force remove background as requested */
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Gap between sidebar items */
+  position: sticky;
+  top: 2rem; /* Sticky sidebar */
+}
+
+/* Remove margin-bottom from sidebar sections as the flex gap handles it now */
+.sidebar-section {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 0; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Add subtle shadow */
+}
+
+.recruit-card {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  margin-bottom: 0;
+}
+
+.recruit-btn {
+  width: 100%;
+  background: white !important;
+  color: #2563eb !important;
+  font-weight: 700;
+  border: none !important;
+  margin-top: 1rem;
+
+  &:hover {
+    background: #f8fafc !important;
   }
 }
 
@@ -444,14 +495,27 @@ const handleApply = () => {
   text-align: left;
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
+  font-weight: 700;
   color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 24px;
+    background: #2563eb;
+    border-radius: 2px;
+  }
 }
 
 .activity-card {
   display: flex;
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   margin-bottom: 1.5rem;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -537,14 +601,6 @@ const handleApply = () => {
   gap: 0.75rem;
 }
 
-.sidebar-section {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
 .sidebar-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -595,39 +651,5 @@ const handleApply = () => {
   color: #9ca3af;
   font-style: italic;
   font-size: 0.9rem;
-}
-
-.recruit-card {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-  margin-bottom: 1.5rem;
-}
-
-.recruit-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.recruit-desc {
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.9;
-}
-
-.recruit-btn {
-  width: 100%;
-  background: white !important;
-  color: #2563eb !important;
-  font-weight: 700;
-  border: none !important;
-
-  &:hover {
-    background: #f8fafc !important;
-  }
 }
 </style>
