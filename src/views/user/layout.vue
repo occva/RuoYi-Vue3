@@ -12,7 +12,7 @@
           <router-link to="/user/home" class="nav-link">首页</router-link>
           <router-link to="/user/clubs" class="nav-link">全部社团</router-link>
           <router-link to="/user/activities" class="nav-link">校园活动</router-link>
-          <a href="#" class="nav-link">关于我们</a>
+          <router-link to="/user/my-clubs" class="nav-link">我的社团</router-link>
         </nav>
         
         <div class="right-section" v-if="!userStore.token">
@@ -68,7 +68,7 @@
         <router-link to="/user/home" class="mobile-nav-link" @click="mobileMenuOpen = false">首页</router-link>
         <router-link to="/user/clubs" class="mobile-nav-link" @click="mobileMenuOpen = false">全部社团</router-link>
         <a href="#" class="mobile-nav-link">校园活动</a>
-        <a href="#" class="mobile-nav-link">关于我们</a>
+        <router-link to="/user/my-clubs" class="mobile-nav-link" @click="mobileMenuOpen = false">我的社团</router-link>
         <div class="mobile-auth" v-if="!userStore.token">
           <el-button @click="() => { handleLogin(); mobileMenuOpen = false }">登录</el-button>
           <el-button type="primary" @click="$router.push('/register'); mobileMenuOpen = false">注册</el-button>

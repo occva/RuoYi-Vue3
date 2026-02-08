@@ -1,0 +1,722 @@
+<template>
+  <div class="my-clubs-page">
+    <!-- 页面头部 Hero Section -->
+    <header class="page-header">
+      <div class="header-content container">
+        <div class="header-text">
+          <h1 class="page-title">我的<span class="highlight">社团</span>空间</h1>
+          <p class="page-subtitle">管理你的社团，查看申请进度，收藏感兴趣的组织</p>
+        </div>
+      </div>
+      <div class="header-bg-decoration">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+      </div>
+    </header>
+
+    <div class="main-content container">
+      <div v-if="loading" class="loading-state">
+        <el-skeleton :rows="3" animated />
+      </div>
+
+      <div v-else class="content-wrapper">
+        <el-tabs v-model="activeTab" class="custom-tabs">
+          <!-- 1. 我的社团 (Joined + Managed) -->
+          <el-tab-pane label="我的社团" name="joined">
+            
+            <!-- Managed Clubs Section -->
+            <section v-if="managedClubs.length > 0" class="section-block animate-in">
+              <h2 class="section-title">
+                <el-icon><Management /></el-icon>
+                我管理的社团
+              </h2>
+              <div class="clubs-grid">
+                <div 
+                  v-for="(club, index) in managedClubs" 
+                  :key="club.clubId" 
+                  class="club-card"
+                  :style="{ '--delay': index * 0.05 + 's' }"
+                  @click="goToManagedDetail(club)"
+                >
+                  <div class="card-image-wrapper">
+                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                      <template #error>
+                        <div class="image-placeholder">
+                          <el-icon><Picture /></el-icon>
+                        </div>
+                      </template>
+                    </el-image>
+                    <div class="role-badge manager">社长</div>
+                  </div>
+                  
+                  <div class="club-content">
+                    <div class="club-info-top">
+                      <h3 class="club-name">{{ club.clubName }}</h3>
+                      <span class="category-tag" v-if="club.categoryName">{{ club.categoryName }}</span>
+                    </div>
+                    
+                    <p class="club-desc line-clamp-2">{{ club.description }}</p>
+                    
+                    <div class="club-footer">
+                       <div class="view-detail">
+                        进入管理 <el-icon><ArrowRight /></el-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Joined Clubs Section -->
+            <section v-if="joinedClubs.length > 0" class="section-block animate-in" :style="{ '--delay': '0.2s' }">
+              <h2 class="section-title">
+                <el-icon><UserFilled /></el-icon>
+                我加入的社团
+              </h2>
+              <div class="clubs-grid">
+                <div 
+                  v-for="(club, index) in joinedClubs" 
+                  :key="club.clubId" 
+                  class="club-card"
+                  :style="{ '--delay': (index * 0.05 + 0.2) + 's' }"
+                  @click="goToDetail(club)"
+                >
+                  <div class="card-image-wrapper">
+                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                      <template #error>
+                        <div class="image-placeholder">
+                          <el-icon><Picture /></el-icon>
+                        </div>
+                      </template>
+                    </el-image>
+                     <div class="role-badge member">成员</div>
+                  </div>
+                  
+                  <div class="club-content">
+                    <div class="club-info-top">
+                      <h3 class="club-name">{{ club.clubName }}</h3>
+                      <span class="category-tag" v-if="club.categoryName">{{ club.categoryName }}</span>
+                    </div>
+                    
+                    <p class="club-desc line-clamp-2">{{ club.description }}</p>
+
+                    <div class="club-footer">
+                      <div class="view-detail">
+                        查看详情 <el-icon><ArrowRight /></el-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Empty State -->
+            <div v-if="managedClubs.length === 0 && joinedClubs.length === 0" class="empty-state">
+              <el-empty description="您还没有加入任何社团">
+                <template #extra>
+                  <el-button type="primary" plain @click="$router.push('/user/clubs')">去浏览社团</el-button>
+                </template>
+              </el-empty>
+            </div>
+          </el-tab-pane>
+
+          <!-- 2. 我的收藏 -->
+          <el-tab-pane label="我的收藏" name="favorites">
+            <div v-if="favoriteClubs.length > 0" class="clubs-grid animate-in">
+               <div 
+                  v-for="(club, index) in favoriteClubs" 
+                  :key="club.clubId" 
+                  class="club-card"
+                  :style="{ '--delay': index * 0.05 + 's' }"
+                  @click="goToDetail(club)"
+                >
+                  <div class="card-image-wrapper">
+                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                      <template #error>
+                        <div class="image-placeholder">
+                          <el-icon><Picture /></el-icon>
+                        </div>
+                      </template>
+                    </el-image>
+                     <div class="role-badge favorite">已收藏</div>
+                  </div>
+                  
+                  <div class="club-content">
+                    <div class="club-info-top">
+                      <h3 class="club-name">{{ club.clubName }}</h3>
+                    </div>
+                    
+                    <p class="club-desc line-clamp-2">{{ club.description || '暂无简介' }}</p>
+                    
+                    <div class="club-footer">
+                       <div class="view-detail">
+                        查看详情 <el-icon><ArrowRight /></el-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div v-else class="empty-state">
+               <el-empty description="您还没有收藏任何社团">
+                  <template #extra>
+                    <el-button type="primary" plain @click="$router.push('/user/clubs')">去浏览社团</el-button>
+                  </template>
+               </el-empty>
+            </div>
+          </el-tab-pane>
+
+          <!-- 3. 我的申请 -->
+          <el-tab-pane label="我的申请" name="applications">
+            <div v-if="applications.length > 0" class="applications-list animate-in">
+              <div v-for="(app, index) in applications" :key="app.applicationId" class="app-card" :style="{ '--delay': index * 0.05 + 's' }">
+                  <div class="app-header">
+                      <div class="app-club-info">
+                          <el-image :src="app.logoUrl" class="app-logo" fit="cover">
+                            <template #error><el-icon><Picture/></el-icon></template>
+                          </el-image>
+                          <h3 class="app-club-name" @click="$router.push(`/user/club/${app.clubId}`)">{{ app.clubName }}</h3>
+                      </div>
+                      <el-tag :type="getStatusType(app.status)" effect="light" round>{{ getStatusText(app.status) }}</el-tag>
+                  </div>
+                  <div class="app-info">
+                      <div class="info-item">
+                          <label>申请时间</label>
+                          <span>{{ app.applicationTime }}</span>
+                      </div>
+                      <div class="info-item full-width">
+                          <label>申请理由</label>
+                          <p>{{ app.applyReason }}</p>
+                      </div>
+                      <div v-if="app.reviewComment" class="info-item full-width review-comment">
+                          <label>审核意见</label>
+                          <p>{{ app.reviewComment }}</p>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div v-else class="empty-state">
+              <el-empty description="暂无申请记录">
+                 <template #extra>
+                   <el-button type="primary" plain @click="$router.push('/user/clubs')">去申请加入</el-button>
+                 </template>
+              </el-empty>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getMyClubs } from '@/api/user/club'
+import { Management, UserFilled, Picture, ArrowRight } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+
+const router = useRouter()
+const loading = ref(true)
+const activeTab = ref('joined')
+
+const managedClubs = ref([])
+const joinedClubs = ref([])
+const favoriteClubs = ref([])
+const applications = ref([])
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const res = await getMyClubs()
+    if (res.code === 200) {
+      managedClubs.value = res.managed || []
+      joinedClubs.value = res.joined || []
+      favoriteClubs.value = res.favorites || []
+      applications.value = res.applications || []
+    } else {
+      ElMessage.error(res.msg || '获取数据失败')
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+       // redirect handled by permission guard
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const goToDetail = (club) => {
+  router.push(`/user/club/${club.clubId}`)
+}
+
+const goToManagedDetail = (club) => {
+  router.push(`/user/club/${club.clubId}`)
+}
+
+const getStatusType = (status) => {
+    // 0: Pending, 1: Approved, 2: Rejected
+    const map = { '0': 'warning', '1': 'success', '2': 'danger' }
+    return map[status] || 'info'
+}
+
+const getStatusText = (status) => {
+    const map = { '0': '审核中', '1': '已通过', '2': '已拒绝' }
+    return map[status] || '未知状态'
+}
+
+onMounted(() => {
+  fetchData()
+})
+</script>
+
+<style lang="scss" scoped>
+.my-clubs-page {
+  min-height: 100vh;
+  padding-bottom: 5rem;
+  background: #f8fafc;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Page Header / Hero Section */
+.page-header {
+  position: relative;
+  background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+  color: white;
+  padding: 1rem 0 8rem;
+  overflow: hidden;
+  text-align: center;
+  margin-bottom: -6rem; /* Overlap with content */
+}
+
+.header-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-title {
+  font-size: 3.5rem; /* Matched to clubs.vue */
+  font-weight: 900;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+  
+  .highlight {
+    background: linear-gradient(120deg, #818cf8 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.page-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.8; /* Matched to clubs.vue */
+  max-width: 600px;
+  margin: 0 auto 2.5rem; /* Matched to clubs.vue */
+  line-height: 1.6;
+  color: #e0e7ff;
+}
+
+.header-bg-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+}
+
+.blob-1 {
+  width: 400px;
+  height: 400px;
+  background: #818cf8;
+  top: -100px;
+  right: -50px;
+}
+
+.blob-2 {
+  width: 300px;
+  height: 300px;
+  background: #c084fc;
+  bottom: -50px;
+  left: -50px;
+}
+
+/* Main Content Area */
+.main-content {
+  position: relative;
+  z-index: 20;
+}
+
+.content-wrapper {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+.section-block {
+  margin-bottom: 3.5rem;
+  
+  &:last-child {
+      margin-bottom: 0;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  
+  .el-icon {
+    color: #4f46e5;
+    background: #e0e7ff;
+    padding: 6px;
+    border-radius: 8px;
+  }
+}
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Matched minmax to clubs.vue */
+  gap: 2rem;
+}
+
+/* Club Cards - Matched to ClubCard.vue */
+.club-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #e2e8f0;
+
+    .club-image {
+      transform: scale(1.05);
+    }
+    
+    .view-detail {
+        color: #4f46e5;
+    }
+  }
+}
+
+.card-image-wrapper {
+  height: 200px; /* Matched to ClubCard.vue */
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.club-image {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 2rem;
+}
+
+.role-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    border-radius: 20px; /* Matched rounded style */
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    &.manager {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    }
+    
+    &.member {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    &.favorite {
+        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+}
+
+.club-content {
+  padding: 1.5rem; /* Matched to ClubCard.vue */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.club-info-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 12px;
+}
+
+.club-name {
+  font-size: 1.25rem; /* Matched to ClubCard.vue */
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  flex: 1;
+}
+
+.category-tag {
+  background: #eff6ff; /* Matched to ClubCard.vue */
+  color: #3b82f6; /* Matched to ClubCard.vue */
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.club-desc {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5; /* Matched to ClubCard.vue */
+  height: 2.7rem; /* Matched to ClubCard.vue */
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.club-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+}
+
+.view-detail {
+  font-size: 0.85rem; /* Matched to ClubCard.vue */
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #4f46e5;
+  }
+}
+
+.loading-state {
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 20px;
+}
+
+.empty-state {
+  padding: 6rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Applications List Styles */
+.applications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.app-card {
+    border: 1px solid #f1f5f9;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+    
+    &:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    
+    .app-club-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .app-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #f8fafc;
+            flex-shrink: 0;
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: transform 0.2s;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .app-club-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e293b;
+            margin: 0;
+            transition: color 0.2s;
+
+            &:hover {
+                color: #4f46e5;
+            }
+        }
+    }
+}
+
+.app-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    &.full-width {
+        grid-column: 1 / -1;
+    }
+    
+    label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    span, p {
+        font-size: 1rem;
+        color: #334155;
+        margin: 0;
+        line-height: 1.6;
+    }
+    
+    &.review-comment {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #4f46e5;
+    }
+}
+
+/* Tabs Stylings Override */
+:deep(.custom-tabs) {
+    .el-tabs__nav-wrap::after {
+        height: 2px;
+        background-color: #f1f5f9;
+        z-index: 1;
+    }
+    
+    .el-tabs__item {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #64748b;
+        height: 54px;
+        line-height: 54px;
+        transition: all 0.3s;
+        
+        &.is-active {
+             font-weight: 700;
+             color: #4f46e5;
+        }
+
+        &:hover {
+            color: #4f46e5;
+        }
+    }
+    
+    .el-tabs__active-bar {
+        background-color: #4f46e5;
+        height: 3px;
+        border-radius: 3px;
+    }
+}
+
+/* Animations */
+.animate-in {
+  animation: slideInUp 0.6s ease forwards;
+  opacity: 0;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
