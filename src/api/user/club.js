@@ -9,6 +9,14 @@ export function listClubs(query) {
   })
 }
 
+// 获取我的社团
+export function getMyClubs() {
+  return request({
+    url: '/api/app/club/my',
+    method: 'get'
+  })
+}
+
 // 获取社团详情
 export function getClub(id) {
   return request({
@@ -41,5 +49,13 @@ export function joinClub(data) {
     url: '/api/app/club/join',
     method: 'post',
     data: data
+  })
+}
+
+// 收藏/取消收藏社团
+export function toggleFavorite(clubId) {
+  return request({
+    url: '/api/app/club/favorite/' + clubId,
+    method: 'post'
   })
 }
