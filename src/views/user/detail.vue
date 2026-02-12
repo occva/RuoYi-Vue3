@@ -55,15 +55,15 @@
           <h2 class="section-title-left">社团活动</h2>
 
           <template v-if="club.activities && club.activities.length > 0">
-            <div v-for="activity in club.activities" :key="activity.activityId" class="activity-card">
+            <div v-for="activity in displayedActivities" :key="activity.activityId" class="activity-card">
               <div class="activity-date-box">
                 <span class="activity-month">{{ getMonth(activity.startTime) }}月</span>
                 <span class="activity-day">{{ getDay(activity.startTime) }}</span>
               </div>
               <div class="activity-content">
                 <div class="activity-tags">
-                  <el-tag :type="getStatusType(getComputedStatus(activity))" size="small">
-                    {{ getStatusText(getComputedStatus(activity)) }}
+                  <el-tag :type="getStatusType(activity.status)" size="small">
+                    {{ getStatusText(activity.status) }}
                   </el-tag>
                 </div>
                 <h3 class="activity-title">{{ activity.activityTitle }}</h3>
@@ -75,7 +75,7 @@
                   <el-button size="small" @click="showActivityDetail(activity)">查看详情</el-button>
                   <!-- 只有进行中或未来的活动可以报名 -->
                   <el-button 
-                    v-if="getComputedStatus(activity) === '0' || getComputedStatus(activity) === '1'" 
+                    v-if="activity.status === '0' || activity.status === '1'" 
                     type="primary" 
                     size="small" 
                     @click="signUpActivity(activity)"
@@ -84,6 +84,11 @@
                   </el-button>
                 </div>
               </div>
+            </div>
+
+            <!-- 加载更多 -->
+            <div v-if="activityDisplayCount < club.activities.length" class="load-more">
+              <el-button @click="loadMoreActivities">加载更多活动 ({{ club.activities.length - activityDisplayCount }} 条剩余)</el-button>
             </div>
           </template>
 
@@ -94,7 +99,18 @@
         <!-- 右侧：侧边栏 -->
         <aside class="club-sidebar">
           <!-- 招募卡片 -->
-          <div class="recruit-card">
+          <!-- 已是成员 -->
+          <div v-if="club.member" class="recruit-card member-card">
+            <h3 class="recruit-title">你已是成员</h3>
+            <p class="recruit-desc">你已经是 {{ club.clubName }} 的一份子了！</p>
+          </div>
+          <!-- 已申请待审核 -->
+          <div v-else-if="club.hasApplied" class="recruit-card pending-card">
+            <h3 class="recruit-title">申请审核中</h3>
+            <p class="recruit-desc">你的加入申请正在审核中，请耐心等待。</p>
+          </div>
+          <!-- 未加入也未申请 -->
+          <div v-else class="recruit-card">
             <h3 class="recruit-title">加入我们!</h3>
             <p class="recruit-desc">成为 {{ club.clubName }} 的一员，开启你的精彩旅程。</p>
             <el-button type="primary" class="recruit-btn" @click="isModalOpen = true">
@@ -103,19 +119,16 @@
           </div>
 
           <!-- 公告 -->
-          <div class="sidebar-section">
+          <div class="sidebar-section" v-if="club.notices && club.notices.length > 0">
             <h3 class="sidebar-title">社团公告</h3>
-            <template v-if="club.notices && club.notices.length > 0">
-              <div v-for="notice in club.notices" :key="notice.noticeId" class="notice-item">
-                <div class="notice-date">{{ notice.publishTime }}</div>
-                <div class="notice-link" @click="viewNotice(notice)">{{ notice.noticeTitle }}</div>
-              </div>
-            </template>
-            <div v-else class="no-notices">暂无最新公告</div>
+            <div v-for="notice in club.notices" :key="notice.noticeId" class="notice-item">
+              <div class="notice-date">{{ notice.publishTime }}</div>
+              <div class="notice-link" @click="viewNotice(notice)">{{ notice.noticeTitle }}</div>
+            </div>
           </div>
 
           <!-- 联系方式 -->
-          <div class="sidebar-section">
+          <div class="sidebar-section" v-if="club.contactPhone || club.contactEmail">
               <h3 class="sidebar-title">联系我们</h3>
               <div class="contact-info">
                   <div v-if="club.contactPhone" class="contact-item">
@@ -159,11 +172,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, OfficeBuilding, Clock, Calendar, Location, Star, StarFilled, Phone, Message } from '@element-plus/icons-vue'
-import { getClub, joinClub } from '@/api/user/club'
+import { getClub, joinClub, toggleFavorite as toggleFavoriteApi } from '@/api/user/club'
 import { listActivitiesByClub, registerActivity } from '@/api/user/activity'
 import { listNoticesByClub } from '@/api/user/notice'
 
@@ -175,6 +188,16 @@ const isFavorite = ref(false)
 const isModalOpen = ref(false)
 const submitLoading = ref(false)
 const applyFormRef = ref(null)
+const activityDisplayCount = ref(10)
+
+const displayedActivities = computed(() => {
+  if (!club.value?.activities) return []
+  return club.value.activities.slice(0, activityDisplayCount.value)
+})
+
+const loadMoreActivities = () => {
+  activityDisplayCount.value += 10
+}
 
 const applicationForm = ref({
   clubId: undefined,
@@ -211,8 +234,8 @@ const loadClub = () => {
     }
     
     club.value = clubData
-    // Check if favorite (mock)
-    isFavorite.value = false 
+    // Read favorite status from backend
+    isFavorite.value = clubData.favorite || false
     loading.value = false
   }).catch(() => {
     club.value = null
@@ -223,9 +246,19 @@ const loadClub = () => {
 onMounted(loadClub)
 watch(() => route.params.id, loadClub)
 
-const toggleFavorite = () => {
-  isFavorite.value = !isFavorite.value
-  ElMessage.success(isFavorite.value ? '已添加到收藏' : '已取消收藏')
+const toggleFavorite = async () => {
+  if (!club.value) return
+  try {
+    const res = await toggleFavoriteApi(club.value.clubId)
+    if (res.code === 200) {
+      isFavorite.value = !isFavorite.value
+      ElMessage.success(res.msg || (isFavorite.value ? '已添加到收藏' : '已取消收藏'))
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (error) {
+    ElMessage.error('操作失败，请先登录')
+  }
 }
 
 const formatDate = (dateStr) => {
@@ -235,21 +268,6 @@ const formatDate = (dateStr) => {
 
 const getMonth = (date) => new Date(date).getMonth() + 1
 const getDay = (date) => new Date(date).getDate()
-
-const getComputedStatus = (activity) => {
-    const now = new Date()
-    // Parse times. Note: assuming DB stores as string 'YYYY-MM-DD HH:mm:ss' or ISO
-    // If times are null, fallback to DB status or '0' (Upcoming)
-    if (!activity.startTime) return activity.status || '0'
-    
-    const start = new Date(activity.startTime)
-    // If no endTime, maybe assume 2 hours duration or just use start time
-    const end = activity.endTime ? new Date(activity.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000)
-    
-    if (now < start) return '0' // Upcoming
-    if (now >= start && now <= end) return '1' // Ongoing
-    return '2' // Ended
-}
 
 const getStatusType = (status) => {
   const types = { '0': 'primary', '1': 'success', '2': 'info', '3': 'danger' } 
@@ -456,6 +474,7 @@ const handleApply = () => {
   gap: 1.5rem; /* Gap between sidebar items */
   position: sticky;
   top: 2rem; /* Sticky sidebar */
+  padding-top: 4.5rem; /* Align recruit-card with first activity-card */
 }
 
 /* Remove margin-bottom from sidebar sections as the flex gap handles it now */
@@ -476,6 +495,16 @@ const handleApply = () => {
   text-align: center;
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
   margin-bottom: 0;
+}
+
+.recruit-card.member-card {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.3);
+}
+
+.recruit-card.pending-card {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.3);
 }
 
 .recruit-btn {
@@ -651,5 +680,10 @@ const handleApply = () => {
   color: #9ca3af;
   font-style: italic;
   font-size: 0.9rem;
+}
+
+.load-more {
+  text-align: center;
+  padding: 1.5rem 0;
 }
 </style>

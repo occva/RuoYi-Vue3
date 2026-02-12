@@ -11,8 +11,8 @@
         <img :src="activity.coverUrl || defaultCover" class="header-bg-img" />
         <div class="container header-content">
           <div class="header-text">
-            <el-tag :type="getStatusType(getComputedStatus(activity))" class="status-tag">
-              {{ getStatusText(getComputedStatus(activity)) }}
+            <el-tag :type="getStatusType(activity.status)" class="status-tag">
+              {{ getStatusText(activity.status) }}
             </el-tag>
             <h1 class="page-title">{{ activity.activityTitle }}</h1>
             <div class="header-meta">
@@ -92,10 +92,10 @@
                 type="primary" 
                 size="large" 
                 class="action-btn"
-                :disabled="getComputedStatus(activity) !== '0' && getComputedStatus(activity) !== '1'"
+                :disabled="activity.status !== '0' && activity.status !== '1'"
                 @click="handleSignUp"
               >
-                {{ getBtnText(getComputedStatus(activity)) }}
+                {{ getBtnText(activity.status) }}
               </el-button>
             </div>
             
@@ -175,15 +175,7 @@ const formatContent = (text) => {
 }
 
 const getComputedStatus = (act) => {
-    if (!act) return '2'
-    const now = new Date()
-    if (!act.startTime) return act.status || '0'
-    const start = new Date(act.startTime)
-    const end = act.endTime ? new Date(act.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000)
-    
-    if (now < start) return '0' 
-    if (now >= start && now <= end) return '1'
-    return '2'
+    return act ? (act.status || '0') : '0'
 }
 
 const getStatusType = (status) => {
@@ -375,6 +367,9 @@ const handleSignUp = () => {
 
 .sidebar-column {
   position: relative;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0;
 }
 
 .action-card {

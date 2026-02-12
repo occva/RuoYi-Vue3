@@ -89,21 +89,13 @@ const formatDate = (dateStr) => {
 }
 
 const statusText = computed(() => {
-    if (!props.activity.startTime) return props.activity.status === '2' ? '已结束' : (props.activity.status === '1' ? '进行中' : '即将开始')
-    const now = new Date()
-    const start = new Date(props.activity.startTime)
-    const end = props.activity.endTime ? new Date(props.activity.endTime) : new Date(start.getTime() + 4 * 60 * 60 * 1000)
-    
-    if (now < start) return '即将开始'
-    if (now >= start && now <= end) return '进行中'
-    return '已结束'
+    const statusMap = { '0': '即将开始', '1': '进行中', '2': '已结束', '3': '已取消' }
+    return statusMap[props.activity.status] || '即将开始'
 })
 
 const statusClass = computed(() => {
-    const status = statusText.value
-    if (status === '即将开始') return 'upcoming'
-    if (status === '进行中') return 'ongoing'
-    return 'ended'
+    const classMap = { '0': 'upcoming', '1': 'ongoing', '2': 'ended', '3': 'ended' }
+    return classMap[props.activity.status] || 'upcoming'
 })
 </script>
 

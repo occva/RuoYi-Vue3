@@ -29,16 +29,7 @@
         </div>
         <div class="stat-item">
           <el-icon><Calendar /></el-icon>
-          <span>{{ club.activityCount || 0 }} 活动</span>
-        </div>
-      </div>
-
-      <div class="club-footer">
-        <el-button type="primary" plain class="join-btn" @click.stop="handleJoin">
-          申请加入
-        </el-button>
-        <div class="view-detail">
-          详情 <el-icon><ArrowRight /></el-icon>
+          <span>{{ club.ongoingActivityCount || 0 }} 活动进行中</span>
         </div>
       </div>
     </div>
@@ -48,7 +39,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Calendar, Picture, StarFilled, ArrowRight } from '@element-plus/icons-vue'
+import { User, Calendar, Picture, StarFilled } from '@element-plus/icons-vue'
 
 const props = defineProps({
   club: {
@@ -63,9 +54,7 @@ const goToDetail = () => {
   router.push(`/user/club/${props.club.clubId}`)
 }
 
-const handleJoin = () => {
-  router.push(`/user/club/${props.club.clubId}`)
-}
+
 </script>
 
 <style lang="scss" scoped>
@@ -88,11 +77,6 @@ const handleJoin = () => {
 
     .club-image {
       transform: scale(1.05);
-    }
-
-    .join-btn {
-      background-color: var(--el-color-primary);
-      color: white;
     }
   }
 }
@@ -188,7 +172,6 @@ const handleJoin = () => {
 .club-stats {
   display: flex;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .stat-item {
@@ -201,31 +184,6 @@ const handleJoin = () => {
   .el-icon {
     font-size: 1rem;
     color: #94a3b8;
-  }
-}
-
-.club-footer {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 1rem;
-}
-
-.join-btn {
-  transition: all 0.3s ease;
-}
-
-.view-detail {
-  font-size: 0.85rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s;
-
-  &:hover {
-    color: var(--el-color-primary);
   }
 }
 </style>
