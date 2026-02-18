@@ -45,9 +45,10 @@ export function exportApplication(query) {
 }
 
 // 获取入社申请统计数据
-export function getApplicationStat() {
+export function getApplicationStat(query) {
     return request({
         url: '/club/application/stat',
-        method: 'get'
+        method: 'get',
+        params: query
     })
 }

@@ -1,16 +1,34 @@
 <template>
   <div class="app-container application-stat">
+    <!-- Date Range Filter -->
+    <div class="filter-wrapper">
+      <div class="date-picker-container">
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="YYYY-MM-DD"
+          :shortcuts="dateShortcuts"
+          @change="handleDateChange"
+          clearable
+          style="width: 100%"
+        />
+      </div>
+    </div>
+
     <!-- Top Statistics Cards -->
     <el-row :gutter="20" class="stat-cards">
       <el-col :span="6" v-for="card in statCards" :key="card.title">
-        <el-card class="premium-card stat-card" :body-style="{ padding: '0px' }">
+        <el-card class="premium-card stat-card" :body-style="{ padding: '0px' }" @click="handleCardClick(card)">
           <div class="card-inner" :class="card.type">
             <div class="card-content">
               <div class="stat-title">{{ card.title }}</div>
               <div class="stat-value">{{ card.value }}</div>
-              <div class="stat-trend" :class="card.trend > 0 ? 'up' : 'down'">
-                <el-icon><CaretTop v-if="card.trend > 0" /><CaretBottom v-else /></el-icon>
-                <span>{{ Math.abs(card.trend) }}% 环比昨日</span>
+              <div class="stat-trend" :class="card.trend > 0 ? 'up' : 'neutral'">
+                <el-icon v-if="card.trend > 0"><CaretTop /></el-icon>
+                <span>{{ card.trend > 0 ? '+' : '' }}{{ card.trend }} 今日新增</span>
               </div>
             </div>
             <div class="card-icon">
@@ -64,7 +82,7 @@
     </el-row>
 
     <!-- Application List Dialog -->
-    <el-dialog v-model="applicationDialogVisible" :title="'入社申请列表 - ' + selectedClubName" width="80%" destroy-on-close>
+    <el-dialog v-model="applicationDialogVisible" :title="dialogTitle" width="80%" destroy-on-close class="stat-dialog">
       <el-table :data="applicationList" v-loading="applicationLoading" stripe border>
         <el-table-column prop="applicationId" label="申请ID" width="80" />
         <el-table-column prop="userName" label="用户名" width="100" />
@@ -112,12 +130,20 @@ const statusChartRef = ref(null);
 const clubChartRef = ref(null);
 const trendTimeRange = ref('7');
 
+// Date range filter
+const dateRange = ref(null);
+const dateShortcuts = [
+  { text: '最近一周', value: () => { const end = new Date(); const start = new Date(); start.setDate(start.getDate() - 6); return [start, end]; } },
+  { text: '最近一个月', value: () => { const end = new Date(); const start = new Date(); start.setMonth(start.getMonth() - 1); return [start, end]; } },
+  { text: '最近三个月', value: () => { const end = new Date(); const start = new Date(); start.setMonth(start.getMonth() - 3); return [start, end]; } }
+];
+
 // Data
 const statCards = ref([
-  { title: '总申请数', value: '0', trend: 0, icon: 'Document', type: 'primary' },
-  { title: '待审核', value: '0', trend: 0, icon: 'Timer', type: 'warning' },
-  { title: '已通过', value: '0', trend: 0, icon: 'CircleCheck', type: 'success' },
-  { title: '被驳回', value: '0', trend: 0, icon: 'CircleClose', type: 'danger' }
+  { title: '总申请数', value: '0', trend: 0, icon: 'Document', type: 'primary', status: null },
+  { title: '待审核', value: '0', trend: 0, icon: 'Timer', type: 'warning', status: '0' },
+  { title: '已通过', value: '0', trend: 0, icon: 'CircleCheck', type: 'success', status: '1' },
+  { title: '被驳回', value: '0', trend: 0, icon: 'CircleClose', type: 'danger', status: '2' }
 ]);
 
 const rawTrendData = ref([]);
@@ -127,35 +153,42 @@ const clubRankingData = ref([]);
 
 // Dialog data
 const applicationDialogVisible = ref(false);
-const selectedClubName = ref('');
-const selectedClubId = ref(null);
+const dialogTitle = ref('');
 const applicationList = ref([]);
 const applicationLoading = ref(false);
 const applicationTotal = ref(0);
 const applicationQueryParams = ref({
   pageNum: 1,
   pageSize: 10,
-  clubId: null
+  clubId: null,
+  status: null
 });
+const totalApplicationCount = ref(0);
+
+// Date change handler
+const handleDateChange = () => {
+  fetchData();
+};
 
 // Fetch Data
 const fetchData = async () => {
-  const response = await getApplicationStat();
+  const query = {};
+  if (dateRange.value && dateRange.value.length === 2) {
+    query.beginTime = dateRange.value[0];
+    query.endTime = dateRange.value[1];
+  }
+  const response = await getApplicationStat(query);
   if (response.code === 200) {
     const data = response.data;
     
-    // 1. Map Status Stats to Cards with Day-over-Day Comparison
+    // 1. Map Status Stats to Cards
     const statusStat = data.statusStat || [];
-    const yesterdayStatusStat = data.yesterdayStatusStat || [];
+    const todayStats = data.todayStats || {};
+    
     let total = 0;
     let pending = 0;
     let approved = 0;
     let rejected = 0;
-    
-    let yesterdayTotal = 0;
-    let yesterdayPending = 0;
-    let yesterdayApproved = 0;
-    let yesterdayRejected = 0;
     
     statusStat.forEach(item => {
       const count = parseInt(item.count);
@@ -165,27 +198,15 @@ const fetchData = async () => {
       else if (item.status === '2') rejected = count;
     });
     
-    yesterdayStatusStat.forEach(item => {
-      const count = parseInt(item.count);
-      yesterdayTotal += count;
-      if (item.status === '0') yesterdayPending = count;
-      else if (item.status === '1') yesterdayApproved = count;
-      else if (item.status === '2') yesterdayRejected = count;
-    });
-    
-    // Calculate day-over-day trends
-    const calculateTrend = (today, yesterday) => {
-      if (yesterday === 0) return today > 0 ? 100 : 0;
-      return Math.round(((today - yesterday) / yesterday) * 100);
-    };
-    
     statCards.value = [
-      { title: '总申请数', value: total.toLocaleString(),  trend: calculateTrend(total, yesterdayTotal), icon: 'Document', type: 'primary' },
-      { title: '待审核', value: pending.toLocaleString(), trend: calculateTrend(pending, yesterdayPending), icon: 'Timer', type: 'warning' },
-      { title: '已通过', value: approved.toLocaleString(), trend: calculateTrend(approved, yesterdayApproved), icon: 'CircleCheck', type: 'success' },
-      { title: '被驳回', value: rejected.toLocaleString(), trend: calculateTrend(rejected, yesterdayRejected), icon: 'CircleClose', type: 'danger' }
+      { title: '总申请数', value: total.toLocaleString(), trend: todayStats.totalNew || 0, icon: 'Document', type: 'primary', status: null },
+      { title: '待审核', value: pending.toLocaleString(), trend: todayStats.pendingNew || 0, icon: 'Timer', type: 'warning', status: '0' },
+      { title: '已通过', value: approved.toLocaleString(), trend: todayStats.approvedNew || 0, icon: 'CircleCheck', type: 'success', status: '1' },
+      { title: '被驳回', value: rejected.toLocaleString(), trend: todayStats.rejectedNew || 0, icon: 'CircleClose', type: 'danger', status: '2' }
     ];
     
+    totalApplicationCount.value = total;
+
     // 2. Trend Data
     rawTrendData.value = data.trendStat || [];
     trendDataByClub.value = data.trendStatByClub || [];
@@ -198,7 +219,24 @@ const fetchData = async () => {
       { value: pending, name: '待审核', itemStyle: { color: '#f59e0b' } },
       { value: rejected, name: '被驳回', itemStyle: { color: '#ef4444' } }
     ];
-    statusChart?.setOption({ series: [{ data: pieData }] });
+    statusChart?.setOption({
+      title: {
+        text: total.toLocaleString(),
+        subtext: '总申请数',
+        left: 'center',
+        top: '43%', // Adjust to optical center
+        textStyle: {
+          fontSize: 28,
+          fontWeight: 'bold',
+          color: '#333'
+        },
+        subtextStyle: {
+          fontSize: 14,
+          color: '#999'
+        }
+      },
+      series: [{ data: pieData }]
+    });
     statusChart?.hideLoading();
     
     // 4. Club Ranking
@@ -302,6 +340,25 @@ const initCharts = () => {
       legend: { bottom: '5%', left: 'center', icon: 'circle' },
       series: [{ type: 'pie', radius: ['40%', '70%'], itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 }, label: { show: false }, data: [] }]
     });
+    statusChart.on('mouseover', (params) => {
+      const { name, value, percent } = params;
+      statusChart.setOption({
+        title: {
+          text: value,
+          subtext: name + ' (' + percent + '%)',
+          subtextStyle: { fontSize: 14, color: '#666' }
+        }
+      });
+    });
+    statusChart.on('mouseout', () => {
+      statusChart.setOption({
+        title: {
+          text: totalApplicationCount.value.toLocaleString(),
+          subtext: '总申请数',
+          subtextStyle: { fontSize: 14, color: '#999' }
+        }
+      });
+    });
     statusChart.showLoading();
   }
   
@@ -347,17 +404,27 @@ watch(trendTimeRange, () => {
   updateTrendChart();
 });
 
+// Handle stat card click
+const handleCardClick = (card) => {
+  dialogTitle.value = card.title;
+  applicationQueryParams.value.status = card.status;
+  applicationQueryParams.value.clubId = null;
+  applicationQueryParams.value.pageNum = 1;
+  applicationDialogVisible.value = true;
+  handleApplicationQuery();
+};
+
 // Handle club ranking click
 const handleClubClick = async (clubName, clubId) => {
-  selectedClubName.value = clubName;
-  selectedClubId.value = clubId;
+  dialogTitle.value = '入社申请列表 - ' + clubName;
   applicationQueryParams.value.clubId = clubId;
+  applicationQueryParams.value.status = null;
   applicationQueryParams.value.pageNum = 1;
   applicationDialogVisible.value = true;
   await handleApplicationQuery();
 };
 
-// Fetch application list for selected club
+// Fetch application list for dialog
 const handleApplicationQuery = async () => {
   applicationLoading.value = true;
   try {
@@ -378,11 +445,30 @@ const handleApplicationQuery = async () => {
   min-height: calc(100vh - 84px);
   padding: 24px;
 
+  .filter-wrapper {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+
+    .date-picker-container {
+      width: 320px; /* Set fixed width for the date picker wrapper */
+      
+      :deep(.el-range-editor.el-input__inner) {
+        width: 100%;
+      }
+    }
+  }
+
   .stat-cards {
     .stat-card {
       border: none;
-      transition: transform 0.3s;
-      &:hover { transform: translateY(-5px); }
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
       
       .card-inner {
         padding: 24px;
@@ -421,6 +507,7 @@ const handleApplicationQuery = async () => {
 
         &.up { color: #10b981; }
         &.down { color: #ef4444; }
+        &.neutral { color: #94a3b8; }
       }
 
       .card-icon {
@@ -458,5 +545,23 @@ const handleApplicationQuery = async () => {
   border-radius: 20px;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
   background: #ffffff;
+}
+</style>
+
+<style lang="scss">
+/* Dialog size: 80% width x 80% viewport height */
+.stat-dialog {
+  width: 80% !important;
+  height: 80vh !important;
+  margin-top: 10vh !important; /* Vertically center roughly */
+  display: flex !important;
+  flex-direction: column !important;
+  
+  .el-dialog__body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
+    padding: 20px !important;
+  }
 }
 </style>
