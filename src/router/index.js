@@ -233,6 +233,36 @@ export const dynamicRoutes = [
         ]
     },
     {
+        path: '/statistics',
+        component: Layout,
+        name: 'Statistics',
+        meta: { title: '数据统计', icon: 'chart' },
+        permissions: ['system:club:list'],
+        children: [
+            {
+                path: 'club-stat',
+                component: () => import('@/views/statistics/club-stat/index.vue'),
+                name: 'ClubStat',
+                meta: { title: '社团统计', icon: 'peoples' },
+                permissions: ['system:club:list']
+            },
+            {
+                path: 'member-stat',
+                component: () => import('@/views/statistics/member-stat/index.vue'),
+                name: 'MemberStat',
+                meta: { title: '成员统计', icon: 'user' },
+                permissions: ['club:member:list']
+            },
+            {
+                path: 'activity-stat',
+                component: () => import('@/views/statistics/activity-stat/index.vue'),
+                name: 'ActivityStat',
+                meta: { title: '活动统计', icon: 'date' },
+                permissions: ['system:activity:list']
+            }
+        ]
+    },
+    {
         path: '/system/user-auth',
         component: Layout,
         hidden: true,

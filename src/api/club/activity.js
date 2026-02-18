@@ -42,3 +42,12 @@ export function delActivity(activityId) {
         method: 'delete'
     })
 }
+
+// 获取活动统计数据
+export function getActivityStat(query) {
+    return request({
+        url: '/club/activity/stat',
+        method: 'get',
+        params: query
+    })
+}

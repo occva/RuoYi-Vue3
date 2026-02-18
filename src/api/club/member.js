@@ -52,3 +52,12 @@ export function exportMember(query) {
         responseType: 'blob'
     })
 }
+
+// 获取成员统计数据
+export function getMemberStat(query) {
+    return request({
+        url: '/club/member/stat',
+        method: 'get',
+        params: query
+    })
+}

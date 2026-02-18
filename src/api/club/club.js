@@ -78,3 +78,12 @@ export function exportClub(query) {
         responseType: 'blob'
     })
 }
+
+// 获取社团统计数据
+export function getClubStat(query) {
+    return request({
+        url: '/system/club/stat',
+        method: 'get',
+        params: query
+    })
+}
