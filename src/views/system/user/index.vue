@@ -415,7 +415,7 @@ function handleResetPwd(row) {
       }
     },
   }).then(({ value }) => {
-    resetUserPwd(row.userId, value).then(response => {
+    resetUserPwd(row.userId, value).then(() => {
       proxy.$modal.msgSuccess("修改成功，新密码是：" + value)
     })
   }).catch(() => {})
@@ -524,7 +524,7 @@ function handleUpdate(row) {
     form.value.roleIds = response.roleIds
     open.value = true
     title.value = "修改用户"
-    form.password = ""
+    form.value.password = ""
   })
 }
 
@@ -533,13 +533,13 @@ function submitForm() {
   proxy.$refs["userRef"].validate(valid => {
     if (valid) {
       if (form.value.userId != undefined) {
-        updateUser(form.value).then(response => {
+        updateUser(form.value).then(() => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
           getList()
         })
       } else {
-        addUser(form.value).then(response => {
+        addUser(form.value).then(() => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
           getList()

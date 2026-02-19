@@ -180,14 +180,28 @@ html.dark {
     }
   }
 
+  .topmenu-container {
+    .el-menu-item,
+    .el-sub-menu .el-sub-menu__title {
+      color: var(--el-text-color-regular) !important;
+    }
+  }
+
+  .topbar-menu.el-menu--horizontal > .el-sub-menu .el-sub-menu__title{
+    color: var(--el-text-color-regular) !important;
+  }
+
   /* 顶部栏栏菜单覆盖 */
   .el-menu--horizontal {
-    .el-menu-item {
+    .el-menu-item, .el-sub-menu {
       &:not(.is-disabled) {
 
         &:hover,
         &:focus {
           background-color: var(--navbar-hover) !important;
+          .el-sub-menu__title {
+            background-color: var(--navbar-hover) !important;
+          }
         }
       }
     }
@@ -215,6 +229,33 @@ html.dark {
         background-color: var(--splitpanes-border);
       }
     }
+  }
+
+  /* 按钮样式覆盖 */
+  .el-button--primary.is-plain {
+    background-color: var(--primary-bg);
+    border: 1px solid var(--el-color-primary-light-2);
+    color: var(--el-color-primary-light-2);
+
+    &:hover {
+      background-color: var(--el-button-hover-bg-color);
+      border-color: var(--el-button-hover-border-color);
+      color: var(--el-button-hover-text-color);
+    }
+
+    &.is-disabled {
+      background-color: var(--link-active-bg-color);
+      border-color: var(--el-color-primary-light-3);
+      color: var(--el-color-primary-light-3);
+      opacity: 0.5;
+    }
+  }
+
+  /* primary tag 样式覆盖 */
+  .el-tag--primary {
+    background-color: var(--primary-bg);
+    border: 1px solid var(--el-border-color-light);
+    color: var(--el-color-primary);
   }
 
   /* 表格样式覆盖 */
