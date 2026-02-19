@@ -148,7 +148,7 @@ const generateResponse = (query) => {
 
 .ai-chat-window {
   position: fixed;
-  bottom: 6rem;
+  bottom: 1rem;
   right: 2rem;
   width: 25vw;
   min-width: 320px;
@@ -290,7 +290,7 @@ const generateResponse = (query) => {
     width: 90vw;
     height: 70vh;
     right: 5vw;
-    bottom: 5rem;
+    bottom: 1rem;
   }
 }
 </style>
