@@ -211,7 +211,7 @@ function getList() {
   loading.value = true
   listType(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
     typeList.value = response.rows
-    total.value = response.total
+    total.value = Number(response.total) || 0
     loading.value = false
   })
 }

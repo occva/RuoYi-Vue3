@@ -157,8 +157,8 @@
       <el-form ref="reviewRef" :model="reviewForm" label-width="80px">
         <el-form-item label="审批结果">
           <el-radio-group v-model="reviewForm.status">
-            <el-radio label="1">通过 (加入社团)</el-radio>
-            <el-radio label="2">拒绝</el-radio>
+            <el-radio value="1">通过 (加入社团)</el-radio>
+            <el-radio value="2">拒绝</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="审批意见">
@@ -213,7 +213,7 @@ function getList() {
   loading.value = true;
   listApplication(queryParams.value).then(response => {
     applicationList.value = response.rows;
-    total.value = response.total;
+    total.value = Number(response.total) || 0;
     loading.value = false;
   });
 }

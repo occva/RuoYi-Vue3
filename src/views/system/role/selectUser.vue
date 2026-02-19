@@ -106,7 +106,7 @@ function handleSelectionChange(selection) {
 function getList() {
   unallocatedUserList(queryParams).then(res => {
     userList.value = res.rows
-    total.value = res.total
+    total.value = Number(res.total) || 0
   })
 }
 

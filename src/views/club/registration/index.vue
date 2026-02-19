@@ -108,7 +108,7 @@ function getList() {
   loading.value = true;
   listRegistration(queryParams.value).then(response => {
     registrationList.value = response.rows;
-    total.value = response.total;
+    total.value = Number(response.total) || 0;
     loading.value = false;
   });
 }

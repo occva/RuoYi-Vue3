@@ -129,7 +129,7 @@ const getList = () => {
   listClubs(queryParams.value).then(response => {
     if (response.rows) {
         clubList.value = response.rows
-        total.value = response.total
+        total.value = Number(response.total) || 0
     } else if (Array.isArray(response.data)) {
         clubList.value = response.data
         total.value = response.data.length

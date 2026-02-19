@@ -183,7 +183,7 @@ function getList() {
   loading.value = true
   listPost(queryParams.value).then(response => {
     postList.value = response.rows
-    total.value = response.total
+    total.value = Number(response.total) || 0
     loading.value = false
   })
 }

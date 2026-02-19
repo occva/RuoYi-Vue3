@@ -227,7 +227,7 @@ function getList() {
   loading.value = true;
   listAchievement(queryParams.value).then(response => {
     achievementList.value = response.rows;
-    total.value = response.total;
+    total.value = Number(response.total) || 0;
     loading.value = false;
   });
 }

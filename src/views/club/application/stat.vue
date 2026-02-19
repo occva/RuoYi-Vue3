@@ -47,8 +47,8 @@
             <div class="card-header">
               <span class="title">申请趋势统计</span>
               <el-radio-group v-model="trendTimeRange" size="small">
-                <el-radio-button label="7">近7天</el-radio-button>
-                <el-radio-button label="30">近30天</el-radio-button>
+                <el-radio-button value="7">近7天</el-radio-button>
+                <el-radio-button value="30">近30天</el-radio-button>
               </el-radio-group>
             </div>
           </template>
@@ -83,6 +83,7 @@
 
     <!-- Application List Dialog -->
     <el-dialog v-model="applicationDialogVisible" :title="dialogTitle" width="80%" destroy-on-close class="stat-dialog">
+      <div class="stat-dialog__table">
       <el-table :data="applicationList" v-loading="applicationLoading" stripe border>
         <el-table-column prop="applicationId" label="申请ID" width="80" />
         <el-table-column prop="userName" label="用户名" width="100" />
@@ -100,6 +101,7 @@
         </el-table-column>
         <el-table-column prop="applyReason" label="申请理由" show-overflow-tooltip />
       </el-table>
+      </div>
       <el-pagination
         v-model:current-page="applicationQueryParams.pageNum"
         v-model:page-size="applicationQueryParams.pageSize"
@@ -108,7 +110,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleApplicationQuery"
         @current-change="handleApplicationQuery"
-        class="mt20"
+        class="stat-dialog__pagination"
       />
     </el-dialog>
   </div>
@@ -431,7 +433,7 @@ const handleApplicationQuery = async () => {
     const response = await listApplication(applicationQueryParams.value);
     if (response.code === 200) {
       applicationList.value = response.rows;
-      applicationTotal.value = response.total;
+      applicationTotal.value = Number(response.total) || 0;
     }
   } finally {
     applicationLoading.value = false;
@@ -559,9 +561,25 @@ const handleApplicationQuery = async () => {
   
   .el-dialog__body {
     flex: 1 !important;
-    overflow-y: auto !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
     min-height: 0 !important;
     padding: 20px !important;
+  }
+
+  .stat-dialog__table {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .stat-dialog__pagination {
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 12px;
+    padding-top: 12px;
   }
 }
 </style>

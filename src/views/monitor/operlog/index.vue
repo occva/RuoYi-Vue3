@@ -235,7 +235,7 @@ function getList() {
   loading.value = true
   list(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
     operlogList.value = response.rows
-    total.value = response.total
+    total.value = Number(response.total) || 0
     loading.value = false
   })
 }

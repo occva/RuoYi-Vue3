@@ -127,11 +127,11 @@
           </template>
           <div class="body">
             <ul class="todo-list">
-              <li><el-checkbox label="社团荣誉/成就体系建设" /></li>
-              <li><el-checkbox label="社团财务管理模块 (会费/报销)" /></li>
-              <li><el-checkbox label="AI 智能社团助手 (自动答疑)" /></li>
-              <li><el-checkbox label="活动数据可视化大屏" /></li>
-              <li><el-checkbox label="移动端/小程序适配" /></li>
+              <li><el-checkbox>社团荣誉/成就体系建设</el-checkbox></li>
+              <li><el-checkbox>社团财务管理模块 (会费/报销)</el-checkbox></li>
+              <li><el-checkbox>AI 智能社团助手 (自动答疑)</el-checkbox></li>
+              <li><el-checkbox>活动数据可视化大屏</el-checkbox></li>
+              <li><el-checkbox>移动端/小程序适配</el-checkbox></li>
             </ul>
           </div>
         </el-card>

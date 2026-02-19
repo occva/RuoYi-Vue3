@@ -208,7 +208,7 @@
                       <el-radio
                         v-for="dict in club_status"
                         :key="dict.value"
-                        :label="dict.value"
+                        :value="dict.value"
                       >{{ dict.label }}</el-radio>
                     </el-radio-group>
                   </el-form-item>
@@ -277,7 +277,7 @@ function getList() {
   loading.value = true;
   listClub(queryParams.value).then(response => {
     clubList.value = response.rows;
-    total.value = response.total;
+    total.value = Number(response.total) || 0;
     loading.value = false;
   });
 }
