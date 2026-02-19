@@ -95,7 +95,7 @@ const loginRules = {
 const codeUrl = ref("")
 const loading = ref(false)
 // 验证码开关
-const captchaEnabled = ref(true)
+const captchaEnabled = ref(false)
 // 注册开关
 const register = ref(false)
 const redirect = ref(undefined)
@@ -142,11 +142,21 @@ function handleLogin() {
 
 function getCode() {
   getCodeImg().then(res => {
-    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
+    captchaEnabled.value = res.captchaEnabled === undefined
+      ? true
+      : res.captchaEnabled === true || res.captchaEnabled === "true"
     if (captchaEnabled.value) {
       codeUrl.value = "data:image/gif;base64," + res.img
       loginForm.value.uuid = res.uuid
+    } else {
+      codeUrl.value = ""
+      loginForm.value.uuid = ""
     }
+  }).catch(() => {
+    captchaEnabled.value = false
+    codeUrl.value = ""
+    loginForm.value.uuid = ""
+    proxy.$modal.msgError("获取验证码失败，请稍后重试")
   })
 }
 

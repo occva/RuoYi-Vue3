@@ -120,7 +120,7 @@ const registerRules = {
 
 const codeUrl = ref("")
 const loading = ref(false)
-const captchaEnabled = ref(true)
+const captchaEnabled = ref(false)
 
 function handleRegister() {
   proxy.$refs.registerRef.validate(valid => {
@@ -136,7 +136,7 @@ function handleRegister() {
         }).catch(() => {})
       }).catch(() => {
         loading.value = false
-        if (captchaEnabled) {
+        if (captchaEnabled.value) {
           getCode()
         }
       })
@@ -146,11 +146,21 @@ function handleRegister() {
 
 function getCode() {
   getCodeImg().then(res => {
-    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
+    captchaEnabled.value = res.captchaEnabled === undefined
+      ? true
+      : res.captchaEnabled === true || res.captchaEnabled === "true"
     if (captchaEnabled.value) {
       codeUrl.value = "data:image/gif;base64," + res.img
       registerForm.value.uuid = res.uuid
+    } else {
+      codeUrl.value = ""
+      registerForm.value.uuid = ""
     }
+  }).catch(() => {
+    captchaEnabled.value = false
+    codeUrl.value = ""
+    registerForm.value.uuid = ""
+    proxy.$modal.msgError("获取验证码失败，请稍后重试")
   })
 }
 
