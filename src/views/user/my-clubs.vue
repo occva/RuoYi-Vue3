@@ -101,6 +101,14 @@
                     <p class="club-desc line-clamp-2">{{ club.description }}</p>
 
                     <div class="club-footer">
+                      <el-button 
+                        type="danger" 
+                        link 
+                        size="small"
+                        @click.stop="handleQuit(club)"
+                      >
+                        退出社团
+                      </el-button>
                       <div class="view-detail">
                         查看详情 <el-icon><ArrowRight /></el-icon>
                       </div>
@@ -212,9 +220,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getMyClubs } from '@/api/user/club'
+import { getMyClubs, quitClub } from '@/api/user/club'
 import { Management, UserFilled, Picture, ArrowRight } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const router = useRouter()
 const loading = ref(true)
@@ -263,6 +271,32 @@ const getStatusType = (status) => {
 const getStatusText = (status) => {
     const map = { '0': '审核中', '1': '已通过', '2': '已拒绝' }
     return map[status] || '未知状态'
+}
+
+const handleQuit = (club) => {
+  ElMessageBox.confirm(
+    `确定要退出社团 "${club.clubName}" 吗？退出后再次加入可能需要重新审核。`,
+    '退出确认',
+    {
+      confirmButtonText: '确认退出',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      const res = await quitClub(club.clubId)
+      if (res.code === 200) {
+        ElMessage.success('退出成功')
+        fetchData()
+      } else {
+        ElMessage.error(res.msg || '退出失败')
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }).catch(() => {
+    // cancelled
+  })
 }
 
 onMounted(() => {
@@ -536,7 +570,7 @@ onMounted(() => {
   margin-top: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   border-top: 1px solid #f1f5f9;
   padding-top: 1rem;
 }
@@ -548,6 +582,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   transition: color 0.2s;
+  margin-left: auto;
 
   &:hover {
     color: #4f46e5;

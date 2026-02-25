@@ -59,3 +59,11 @@ export function toggleFavorite(clubId) {
     method: 'post'
   })
 }
+
+// 退出社团
+export function quitClub(clubId) {
+  return request({
+    url: '/api/app/club/quit/' + clubId,
+    method: 'post'
+  })
+}
