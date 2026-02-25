@@ -307,7 +307,9 @@ const handleApply = () => {
             const data = {
                 clubId: club.value.clubId,
                 clubName: club.value.clubName, // Add clubName to ensure proper data storage
-                ...applicationForm.value
+                studentId: applicationForm.value.studentId,
+                realName: applicationForm.value.name,
+                applyReason: applicationForm.value.reason
             }
             joinClub(data).then(res => {
                 ElMessage.success(res.msg || '申请已提交')
