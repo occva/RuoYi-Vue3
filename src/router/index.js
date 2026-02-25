@@ -251,7 +251,7 @@ export const dynamicRoutes = [
                 component: () => import('@/views/statistics/member-stat/index.vue'),
                 name: 'MemberStat',
                 meta: { title: '成员统计', icon: 'user' },
-                permissions: ['club:member:list']
+                permissions: ['system:statistics:member']
             },
             {
                 path: 'activity-stat',

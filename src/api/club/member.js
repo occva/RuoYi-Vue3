@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询社团成员列表
 export function listMember(query) {
     return request({
-        url: '/club/member/list',
+        url: '/system/member/list',
         method: 'get',
         params: query
     })
@@ -12,7 +12,7 @@ export function listMember(query) {
 // 查询社团成员详细
 export function getMember(memberId) {
     return request({
-        url: '/club/member/' + memberId,
+        url: '/system/member/' + memberId,
         method: 'get'
     })
 }
@@ -20,7 +20,7 @@ export function getMember(memberId) {
 // 新增社团成员
 export function addMember(data) {
     return request({
-        url: '/club/member',
+        url: '/system/member',
         method: 'post',
         data: data
     })
@@ -29,7 +29,7 @@ export function addMember(data) {
 // 修改社团成员
 export function updateMember(data) {
     return request({
-        url: '/club/member',
+        url: '/system/member',
         method: 'put',
         data: data
     })
@@ -38,7 +38,7 @@ export function updateMember(data) {
 // 删除社团成员
 export function delMember(memberId) {
     return request({
-        url: '/club/member/' + memberId,
+        url: '/system/member/' + memberId,
         method: 'delete'
     })
 }
@@ -46,7 +46,7 @@ export function delMember(memberId) {
 // 导出社团成员
 export function exportMember(query) {
     return request({
-        url: '/club/member/export',
+        url: '/system/member/export',
         method: 'post',
         params: query,
         responseType: 'blob'
@@ -56,7 +56,7 @@ export function exportMember(query) {
 // 获取成员统计数据
 export function getMemberStat(query) {
     return request({
-        url: '/club/member/stat',
+        url: '/system/member/stat',
         method: 'get',
         params: query
     })

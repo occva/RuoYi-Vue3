@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询入社申请列表
 export function listApplication(query) {
     return request({
-        url: '/club/application/list',
+        url: '/system/application/list',
         method: 'get',
         params: query
     })
@@ -12,7 +12,7 @@ export function listApplication(query) {
 // 查询入社申请详细
 export function getApplication(applicationId) {
     return request({
-        url: '/club/application/' + applicationId,
+        url: '/system/application/' + applicationId,
         method: 'get'
     })
 }
@@ -20,7 +20,7 @@ export function getApplication(applicationId) {
 // 审核入社申请
 export function reviewApplication(data) {
     return request({
-        url: '/club/application/review',
+        url: '/system/application/review',
         method: 'put',
         data: data
     })
@@ -29,7 +29,7 @@ export function reviewApplication(data) {
 // 删除入社申请
 export function delApplication(applicationId) {
     return request({
-        url: '/club/application/' + applicationId,
+        url: '/system/application/' + applicationId,
         method: 'delete'
     })
 }
@@ -37,7 +37,7 @@ export function delApplication(applicationId) {
 // 导出入社申请
 export function exportApplication(query) {
     return request({
-        url: '/club/application/export',
+        url: '/system/application/export',
         method: 'post',
         params: query,
         responseType: 'blob'
@@ -47,7 +47,7 @@ export function exportApplication(query) {
 // 获取入社申请统计数据
 export function getApplicationStat(query) {
     return request({
-        url: '/club/application/stat',
+        url: '/system/application/stat',
         method: 'get',
         params: query
     })
