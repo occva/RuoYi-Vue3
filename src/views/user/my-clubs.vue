@@ -175,40 +175,132 @@
 
           <!-- 3. 我的申请 -->
           <el-tab-pane label="我的申请" name="applications">
-            <div v-if="applications.length > 0" class="applications-list animate-in">
-              <div v-for="(app, index) in applications" :key="app.applicationId" class="app-card" :style="{ '--delay': index * 0.05 + 's' }">
-                  <div class="app-header">
-                      <div class="app-club-info">
-                          <el-image :src="app.logoUrl" class="app-logo" fit="cover">
-                            <template #error><el-icon><Picture/></el-icon></template>
-                          </el-image>
-                          <h3 class="app-club-name" @click="$router.push(`/user/club/${app.clubId}`)">{{ app.clubName }}</h3>
+            <el-tabs v-model="applicationSubTab" class="application-sub-tabs">
+              <el-tab-pane :label="`加入社团申请 (${joinApplications.length})`" name="join">
+                <div v-if="joinApplications.length > 0" class="applications-list animate-in">
+                  <article
+                    v-for="(app, index) in joinApplications"
+                    :key="app.applicationId"
+                    class="app-card"
+                    :style="{ '--delay': index * 0.05 + 's' }"
+                  >
+                    <div class="app-header">
+                      <div class="app-title">
+                        <h3 class="app-club-name clickable" @click="$router.push(`/user/club/${app.clubId}`)">
+                          {{ app.clubName }}
+                        </h3>
+                        <el-tag size="small" effect="plain" type="info">加入社团</el-tag>
                       </div>
-                      <el-tag :type="getStatusType(app.status)" effect="light" round>{{ getStatusText(app.status) }}</el-tag>
-                  </div>
-                  <div class="app-info">
-                      <div class="info-item">
-                          <label>申请时间</label>
-                          <span>{{ app.applicationTime }}</span>
+                      <el-tag :type="getJoinStatusType(app.status)" effect="light" round>
+                        {{ getJoinStatusText(app.status) }}
+                      </el-tag>
+                    </div>
+                    <div class="app-meta">
+                      <div class="meta-item">
+                        <span>申请时间</span>
+                        <strong>{{ formatTime(app.applicationTime) }}</strong>
                       </div>
-                      <div class="info-item full-width">
-                          <label>申请理由</label>
-                          <p>{{ app.applyReason }}</p>
+                      <div class="meta-item">
+                        <span>社团 ID</span>
+                        <strong>#{{ app.clubId }}</strong>
                       </div>
-                      <div v-if="app.reviewComment" class="info-item full-width review-comment">
-                          <label>审核意见</label>
-                          <p>{{ app.reviewComment }}</p>
+                      <div class="meta-item">
+                        <span>联系电话</span>
+                        <strong>{{ app.phone || '-' }}</strong>
                       </div>
-                  </div>
-              </div>
-            </div>
-            <div v-else class="empty-state">
-              <el-empty description="暂无申请记录">
-                 <template #extra>
-                   <el-button type="primary" plain @click="$router.push('/user/clubs')">去申请加入</el-button>
-                 </template>
-              </el-empty>
-            </div>
+                    </div>
+                    <div class="app-content">
+                      <div class="content-block">
+                        <label>申请理由</label>
+                        <p>{{ app.applyReason || '暂无' }}</p>
+                      </div>
+                      <div v-if="app.reviewComment" class="content-block review-comment">
+                        <label>审核意见</label>
+                        <p>{{ app.reviewComment }}</p>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+                <div v-else class="empty-state application-empty">
+                  <el-empty description="暂无加入社团申请记录">
+                    <template #extra>
+                      <el-button type="primary" plain @click="$router.push('/user/clubs')">去申请加入</el-button>
+                    </template>
+                  </el-empty>
+                </div>
+              </el-tab-pane>
+
+              <el-tab-pane :label="`创建社团申请 (${createApplications.length})`" name="create">
+                <div v-if="createApplications.length > 0" class="applications-list animate-in">
+                  <article
+                    v-for="(app, index) in createApplications"
+                    :key="app.applyId"
+                    class="app-card"
+                    :style="{ '--delay': index * 0.05 + 's' }"
+                  >
+                    <div class="app-header">
+                      <div class="app-title">
+                        <h3 class="app-club-name">
+                          {{ app.clubName }}
+                        </h3>
+                        <el-tag size="small" effect="plain" type="success">创建社团</el-tag>
+                      </div>
+                      <el-tag :type="getCreateStatusType(app.status)" effect="light" round>
+                        {{ getCreateStatusText(app.status) }}
+                      </el-tag>
+                    </div>
+                    <div class="app-meta">
+                      <div class="meta-item">
+                        <span>申请时间</span>
+                        <strong>{{ formatTime(app.applyTime) }}</strong>
+                      </div>
+                      <div class="meta-item">
+                        <span>社团分类</span>
+                        <strong>{{ app.categoryName || '-' }}</strong>
+                      </div>
+                      <div class="meta-item">
+                        <span>联系电话</span>
+                        <strong>{{ app.contactPhone || '-' }}</strong>
+                      </div>
+                    </div>
+                    <div class="app-content">
+                      <div class="content-block">
+                        <label>社团简介</label>
+                        <p>{{ app.description || '暂无' }}</p>
+                      </div>
+                      <div class="content-block">
+                        <label>申请理由</label>
+                        <p>{{ app.applyReason || '暂无' }}</p>
+                      </div>
+                      <div v-if="app.reviewComment" class="content-block review-comment">
+                        <label>审核意见</label>
+                        <p>{{ app.reviewComment }}</p>
+                      </div>
+                    </div>
+                    <div v-if="app.status === '1'" class="app-actions">
+                      <el-button
+                        v-if="app.approvedClubId"
+                        link
+                        type="primary"
+                        @click="goToApprovedClub(app)"
+                      >
+                        查看已创建社团
+                      </el-button>
+                      <span v-if="app.adminUserName" class="account-text">
+                        社长后台账号：{{ app.adminUserName }}
+                      </span>
+                    </div>
+                  </article>
+                </div>
+                <div v-else class="empty-state application-empty">
+                  <el-empty description="暂无创建社团申请记录">
+                    <template #extra>
+                      <el-button type="primary" plain @click="$router.push('/user/club-apply')">去申请创建</el-button>
+                    </template>
+                  </el-empty>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
           </el-tab-pane>
         </el-tabs>
 
@@ -227,11 +319,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const router = useRouter()
 const loading = ref(true)
 const activeTab = ref('joined')
+const applicationSubTab = ref('join')
 
 const managedClubs = ref([])
 const joinedClubs = ref([])
 const favoriteClubs = ref([])
-const applications = ref([])
+const joinApplications = ref([])
+const createApplications = ref([])
 
 const fetchData = async () => {
   loading.value = true
@@ -241,7 +335,8 @@ const fetchData = async () => {
       managedClubs.value = res.managed || []
       joinedClubs.value = res.joined || []
       favoriteClubs.value = res.favorites || []
-      applications.value = res.applications || []
+      joinApplications.value = res.applications || []
+      createApplications.value = res.createApplications || []
     } else {
       ElMessage.error(res.msg || '获取数据失败')
     }
@@ -262,15 +357,37 @@ const goToManagedDetail = (club) => {
   router.push(`/user/club/${club.clubId}`)
 }
 
-const getStatusType = (status) => {
-    // 0: Pending, 1: Approved, 2: Rejected
-    const map = { '0': 'warning', '1': 'success', '2': 'danger' }
-    return map[status] || 'info'
+const getJoinStatusType = (status) => {
+  const map = { '0': 'warning', '1': 'success', '2': 'danger', '3': 'info' }
+  return map[status] || 'info'
 }
 
-const getStatusText = (status) => {
-    const map = { '0': '审核中', '1': '已通过', '2': '已拒绝' }
-    return map[status] || '未知状态'
+const getJoinStatusText = (status) => {
+  const map = { '0': '审核中', '1': '已通过', '2': '已拒绝', '3': '已撤回' }
+  return map[status] || '未知状态'
+}
+
+const getCreateStatusType = (status) => {
+  const map = { '0': 'warning', '1': 'success', '2': 'danger' }
+  return map[status] || 'info'
+}
+
+const getCreateStatusText = (status) => {
+  const map = { '0': '审核中', '1': '已通过', '2': '已拒绝' }
+  return map[status] || '未知状态'
+}
+
+const formatTime = (value) => {
+  if (!value) return '--'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  const pad = (num) => String(num).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+const goToApprovedClub = (app) => {
+  if (!app.approvedClubId) return
+  router.push(`/user/club/${app.approvedClubId}`)
 }
 
 const handleQuit = (club) => {
@@ -602,106 +719,140 @@ onMounted(() => {
 }
 
 /* Applications List Styles */
+.application-sub-tabs {
+  margin-top: 0.5rem;
+}
+
 .applications-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.application-empty {
+  padding: 3rem 0;
 }
 
 .app-card {
-    border: 1px solid #f1f5f9;
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.3s;
-    position: relative;
-    
-    &:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-        transform: translateY(-2px);
-    }
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 12px 20px -12px rgba(79, 70, 229, 0.35);
+    transform: translateY(-1px);
+  }
 }
 
 .app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
-    
-    .app-club-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-
-        .app-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            background: #f8fafc;
-            flex-shrink: 0;
-            border: 1px solid #f1f5f9;
-            cursor: pointer;
-            transition: transform 0.2s;
-
-            &:hover {
-                transform: scale(1.05);
-            }
-        }
-
-        .app-club-name {
-            font-size: 1.15rem;
-            font-weight: 700;
-            cursor: pointer;
-            color: #1e293b;
-            margin: 0;
-            transition: color 0.2s;
-
-            &:hover {
-                color: #4f46e5;
-            }
-        }
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.app-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    
-    &.full-width {
-        grid-column: 1 / -1;
+.app-club-name {
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+
+  &.clickable {
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #4f46e5;
     }
-    
-    label {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    span, p {
-        font-size: 1rem;
-        color: #334155;
-        margin: 0;
-        line-height: 1.6;
-    }
-    
-    &.review-comment {
-        background: #f8fafc;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #4f46e5;
-    }
+  }
+}
+
+.app-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.meta-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  span {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  strong {
+    font-size: 0.92rem;
+    color: #0f172a;
+    font-weight: 600;
+  }
+}
+
+.app-content {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.content-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.8rem;
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+  }
+
+  p {
+    margin: 0;
+    color: #334155;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &.review-comment {
+    border-left: 3px solid #6366f1;
+    background: #eef2ff;
+  }
+}
+
+.app-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+}
+
+.account-text {
+  font-size: 0.88rem;
+  color: #334155;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
 }
 
 /* Tabs Stylings Override */
@@ -735,6 +886,25 @@ onMounted(() => {
         height: 3px;
         border-radius: 3px;
     }
+}
+
+:deep(.application-sub-tabs) {
+  .el-tabs__item {
+    font-size: 0.96rem;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  .el-tabs__nav-wrap::after {
+    background-color: #e2e8f0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Animations */
