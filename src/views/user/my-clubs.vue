@@ -423,9 +423,13 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .my-clubs-page {
+  --hero-header-overlap: 72px;
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
   min-height: 100vh;
   padding-bottom: 5rem;
-  background: #f8fafc;
+  background: linear-gradient(180deg, #f6f5ff 0%, #f7f8ff 40%, #ffffff 100%);
 }
 
 .container {
@@ -437,12 +441,37 @@ onMounted(() => {
 /* Page Header / Hero Section */
 .page-header {
   position: relative;
-  background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
-  color: white;
-  padding: 1rem 0 8rem;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.24), transparent 46%),
+    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.14), transparent 42%),
+    linear-gradient(120deg, #eef2ff 0%, #f5f3ff 46%, #f0f9ff 100%);
+  color: #0b1224;
+  margin-top: calc(-1 * var(--hero-header-overlap));
+  padding: calc(1rem + var(--hero-header-overlap)) 0 8rem;
   overflow: hidden;
   text-align: center;
   margin-bottom: -6rem; /* Overlap with content */
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    background-image: radial-gradient(rgba(99, 102, 241, 0.16) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+    opacity: 0.28;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.46), transparent 88%);
+  }
+
+  &::after {
+    inset: auto 0 -1px;
+    height: 128px;
+    background: linear-gradient(180deg, rgba(247, 248, 255, 0), #f7f8ff 70%, #f7f8ff 100%);
+  }
 }
 
 .header-content {
@@ -457,6 +486,7 @@ onMounted(() => {
   font-size: 3.5rem; /* Matched to clubs.vue */
   font-weight: 900;
   margin-bottom: 1rem;
+  color: #0b1224;
   letter-spacing: -0.025em;
   
   .highlight {
@@ -468,11 +498,10 @@ onMounted(() => {
 
 .page-subtitle {
   font-size: 1.25rem;
-  opacity: 0.8; /* Matched to clubs.vue */
+  color: #3b4760;
   max-width: 600px;
   margin: 0 auto 2.5rem; /* Matched to clubs.vue */
   line-height: 1.6;
-  color: #e0e7ff;
 }
 
 .header-bg-decoration {
@@ -487,25 +516,27 @@ onMounted(() => {
 
 .blob {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
+  filter: blur(18px);
+  opacity: 0.42;
 }
 
 .blob-1 {
-  width: 400px;
-  height: 400px;
-  background: #818cf8;
-  top: -100px;
-  right: -50px;
+  width: 300px;
+  height: 220px;
+  right: 10%;
+  top: 20%;
+  border-radius: 28px;
+  transform: rotate(-14deg);
+  background: linear-gradient(140deg, rgba(99, 102, 241, 0.28), rgba(99, 102, 241, 0.06));
 }
 
 .blob-2 {
-  width: 300px;
-  height: 300px;
-  background: #c084fc;
-  bottom: -50px;
-  left: -50px;
+  width: 260px;
+  height: 260px;
+  left: -120px;
+  top: -88px;
+  border-radius: 40% 60% 58% 42% / 44% 36% 64% 56%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0));
 }
 
 /* Main Content Area */
@@ -515,7 +546,8 @@ onMounted(() => {
 }
 
 .content-wrapper {
-    background: white;
+    background: linear-gradient(180deg, #ffffff, #fcfdff);
+    border: 1px solid rgba(226, 232, 240, 0.78);
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
@@ -901,6 +933,24 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .my-clubs-page {
+    --hero-header-overlap: 64px;
+  }
+
+  .blob-1 {
+    width: 220px;
+    height: 160px;
+    right: -46px;
+    top: 24%;
+  }
+
+  .blob-2 {
+    width: 190px;
+    height: 190px;
+    left: -92px;
+    top: -50px;
+  }
+
   .app-header {
     flex-direction: column;
     align-items: flex-start;

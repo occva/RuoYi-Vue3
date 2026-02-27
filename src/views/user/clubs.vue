@@ -175,9 +175,13 @@ const clearFilters = () => {
 
 <style lang="scss" scoped>
 .club-list-page {
+  --hero-header-overlap: 72px;
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
   padding-bottom: 5rem;
   min-height: 100vh;
-  background: #f8fafc;
+  background: linear-gradient(180deg, #f4f8ff 0%, #f8fbff 42%, #ffffff 100%);
 }
 
 .container {
@@ -189,12 +193,36 @@ const clearFilters = () => {
 /* Page Header / Hero Section */
 .page-header {
   position: relative;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-  color: white;
-  padding: 1rem 0 8rem;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(59, 130, 246, 0.24), transparent 46%),
+    radial-gradient(circle at 86% 10%, rgba(6, 182, 212, 0.18), transparent 44%),
+    linear-gradient(120deg, rgba(219, 234, 254, 0.92) 0%, rgba(239, 246, 255, 0.92) 38%, rgba(240, 253, 250, 0.8) 100%);
+  color: #0b1224;
+  margin-top: calc(-1 * var(--hero-header-overlap));
+  padding: calc(1rem + var(--hero-header-overlap)) 0 8rem;
   overflow: hidden;
   text-align: center;
   margin-bottom: -6rem; /* Overlap with content */
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    background-image: linear-gradient(125deg, rgba(59, 130, 246, 0.09) 0 22%, transparent 22% 50%, rgba(14, 116, 144, 0.07) 50% 72%, transparent 72% 100%);
+    opacity: 0.46;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 88%);
+  }
+
+  &::after {
+    inset: auto 0 -1px;
+    height: 130px;
+    background: linear-gradient(180deg, rgba(248, 251, 255, 0), #f8fbff 70%, #f8fbff 100%);
+  }
 }
 
 .header-content {
@@ -209,6 +237,7 @@ const clearFilters = () => {
   font-size: 3.5rem;
   font-weight: 900;
   margin-bottom: 1rem;
+  color: #0b1224;
   letter-spacing: -0.025em;
   
   .highlight {
@@ -220,7 +249,7 @@ const clearFilters = () => {
 
 .page-subtitle {
   font-size: 1.25rem;
-  opacity: 0.8;
+  color: #3b4760;
   max-width: 600px;
   margin: 0 auto 2.5rem;
   line-height: 1.6;
@@ -234,26 +263,26 @@ const clearFilters = () => {
   .search-container {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.84);
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(186, 207, 245, 0.82);
     border-radius: 20px;
     padding: 0.5rem;
     padding-left: 1.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 24px 56px -40px rgba(20, 70, 166, 0.82), 0 8px 24px -16px rgba(14, 72, 168, 0.32);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
     &:focus-within {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(88, 132, 226, 0.44);
       transform: translateY(-2px);
-      box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 30px 60px -40px rgba(20, 70, 166, 0.95);
     }
   }
 
   .search-icon {
     font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: #7f90af;
     margin-right: 1rem;
   }
 
@@ -262,13 +291,13 @@ const clearFilters = () => {
     background: transparent;
     border: none;
     outline: none;
-    color: white;
+    color: #1f2f4d;
     font-size: 1.1rem;
     font-weight: 500;
     padding: 0.75rem 0;
     
     &::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: #8da0be;
     }
   }
 
@@ -311,25 +340,26 @@ const clearFilters = () => {
 
 .blob {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
+  filter: blur(24px);
+  opacity: 0.55;
 }
 
 .blob-1 {
-  width: 400px;
-  height: 400px;
-  background: #3b82f6;
-  top: -100px;
-  right: -50px;
+  width: 340px;
+  height: 220px;
+  right: 8%;
+  top: 24%;
+  border-radius: 48% 52% 62% 38% / 42% 38% 62% 58%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.36), rgba(96, 165, 250, 0.08));
 }
 
 .blob-2 {
   width: 300px;
   height: 300px;
-  background: #6366f1;
-  bottom: -50px;
-  left: -50px;
+  left: -70px;
+  top: -90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.18), rgba(14, 165, 233, 0));
 }
 
 /* Main Content Area */
@@ -431,5 +461,25 @@ const clearFilters = () => {
 /* Custom Element Plus Pagination Styling */
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
   background-color: #3b82f6;
+}
+
+@media (max-width: 768px) {
+  .club-list-page {
+    --hero-header-overlap: 64px;
+  }
+
+  .blob-1 {
+    width: 250px;
+    height: 180px;
+    right: -28px;
+    top: 28%;
+  }
+
+  .blob-2 {
+    width: 230px;
+    height: 230px;
+    left: -92px;
+    top: -56px;
+  }
 }
 </style>

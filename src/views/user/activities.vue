@@ -145,9 +145,13 @@ const clearFilters = () => {
 
 <style lang="scss" scoped>
 .activities-page {
+  --hero-header-overlap: 72px;
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
   min-height: 100vh;
   padding-bottom: 5rem;
-  background: #f8fafc;
+  background: linear-gradient(180deg, #f3fbf7 0%, #f7fcfa 42%, #ffffff 100%);
 }
 
 .container {
@@ -159,12 +163,36 @@ const clearFilters = () => {
 /* Page Header / Hero Section */
 .page-header {
   position: relative;
-  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
-  color: white;
-  padding: 1rem 0 8rem;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(16, 185, 129, 0.24), transparent 46%),
+    radial-gradient(circle at 84% 12%, rgba(251, 191, 36, 0.16), transparent 42%),
+    linear-gradient(120deg, #ecfdf5 0%, #f0fdf4 40%, #fffbeb 100%);
+  color: #0b1224;
+  margin-top: calc(-1 * var(--hero-header-overlap));
+  padding: calc(1rem + var(--hero-header-overlap)) 0 8rem;
   overflow: hidden;
   text-align: center;
   margin-bottom: -6rem; /* Overlap with content */
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    background-image: repeating-linear-gradient(118deg, rgba(16, 185, 129, 0.09) 0 14px, transparent 14px 34px);
+    opacity: 0.3;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.46), transparent 88%);
+  }
+
+  &::after {
+    inset: auto 0 -1px;
+    height: 124px;
+    background: linear-gradient(180deg, rgba(247, 252, 250, 0), #f7fcfa 70%, #f7fcfa 100%);
+  }
 }
 
 .header-content {
@@ -179,6 +207,7 @@ const clearFilters = () => {
   font-size: 3.5rem;
   font-weight: 900;
   margin-bottom: 1rem;
+  color: #0b1224;
   letter-spacing: -0.025em;
   
   .highlight {
@@ -190,7 +219,7 @@ const clearFilters = () => {
 
 .page-subtitle {
   font-size: 1.25rem;
-  opacity: 0.8;
+  color: #3b4760;
   max-width: 600px;
   margin: 0 auto 2.5rem;
   line-height: 1.6;
@@ -204,26 +233,26 @@ const clearFilters = () => {
   .search-container {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.84);
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(167, 243, 208, 0.85);
     border-radius: 20px;
     padding: 0.5rem;
     padding-left: 1.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 24px 56px -40px rgba(4, 120, 87, 0.62), 0 8px 24px -16px rgba(5, 150, 105, 0.32);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
     &:focus-within {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(16, 185, 129, 0.46);
       transform: translateY(-2px);
-      box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 30px 60px -40px rgba(4, 120, 87, 0.88);
     }
   }
 
   .search-icon {
     font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: #7f90af;
     margin-right: 1rem;
   }
 
@@ -232,13 +261,13 @@ const clearFilters = () => {
     background: transparent;
     border: none;
     outline: none;
-    color: white;
+    color: #1f2f4d;
     font-size: 1.1rem;
     font-weight: 500;
     padding: 0.75rem 0;
     
     &::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: #8da0be;
     }
   }
 
@@ -281,25 +310,26 @@ const clearFilters = () => {
 
 .blob {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.2;
+  filter: blur(22px);
+  opacity: 0.5;
 }
 
 .blob-1 {
-  width: 400px;
-  height: 400px;
-  background: #34d399;
+  width: 360px;
+  height: 230px;
+  right: -70px;
   top: -100px;
-  right: -50px;
+  border-radius: 58% 42% 38% 62% / 54% 35% 65% 46%;
+  background: linear-gradient(140deg, rgba(16, 185, 129, 0.3), rgba(20, 184, 166, 0.08));
 }
 
 .blob-2 {
-  width: 300px;
-  height: 300px;
-  background: #10b981;
-  bottom: -50px;
-  left: -50px;
+  width: 280px;
+  height: 180px;
+  left: 6%;
+  bottom: 44px;
+  border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+  background: linear-gradient(120deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0));
 }
 
 /* Main Content Area */
@@ -395,5 +425,25 @@ const clearFilters = () => {
 /* Custom Element Plus Pagination Styling */
 :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
   background-color: #10b981;
+}
+
+@media (max-width: 768px) {
+  .activities-page {
+    --hero-header-overlap: 64px;
+  }
+
+  .blob-1 {
+    width: 250px;
+    height: 170px;
+    right: -74px;
+    top: -56px;
+  }
+
+  .blob-2 {
+    width: 210px;
+    height: 150px;
+    left: -26px;
+    bottom: 28px;
+  }
 }
 </style>
