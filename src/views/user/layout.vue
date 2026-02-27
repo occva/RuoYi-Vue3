@@ -1,11 +1,14 @@
 <template>
   <div class="user-layout">
     <!-- 顶部导航 -->
-    <header class="user-header">
+    <header class="user-header" :class="{ 'is-open': mobileMenuOpen }">
       <div class="header-container">
         <router-link to="/user/home" class="logo">
-          <el-icon :size="28"><Connection /></el-icon>
-          <span>社团中心</span>
+          <span class="logo-icon">
+            <el-icon :size="20"><Connection /></el-icon>
+          </span>
+          <span class="logo-text">社团中心</span>
+          <span class="logo-badge">用户端</span>
         </router-link>
         
         <nav class="nav-links">
@@ -67,7 +70,7 @@
       <div v-if="mobileMenuOpen" class="mobile-nav">
         <router-link to="/user/home" class="mobile-nav-link" @click="mobileMenuOpen = false">首页</router-link>
         <router-link to="/user/clubs" class="mobile-nav-link" @click="mobileMenuOpen = false">全部社团</router-link>
-        <a href="#" class="mobile-nav-link">校园活动</a>
+        <router-link to="/user/activities" class="mobile-nav-link" @click="mobileMenuOpen = false">校园活动</router-link>
         <router-link to="/user/my-clubs" class="mobile-nav-link" @click="mobileMenuOpen = false">我的社团</router-link>
         <div class="mobile-auth" v-if="!userStore.token">
           <el-button @click="() => { handleLogin(); mobileMenuOpen = false }">登录</el-button>
@@ -100,7 +103,7 @@
             <el-icon :size="24"><Connection /></el-icon>
             <span>社团中心</span>
           </div>
-          <p class="footer-desc">发现、加入并领导符合你兴趣的学生组织</p>
+          <p class="footer-desc">发现、加入并领导符合你兴趣的社团组织</p>
         </div>
         <div class="footer-links">
           <div class="footer-section">
@@ -115,7 +118,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 社团中心. All rights reserved.</p>
+          <p>&copy; 2024 社团中心 版权所有</p>
         </div>
       </div>
     </footer>
@@ -125,8 +128,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu, User, SwitchButton, CaretBottom, Setting } from '@element-plus/icons-vue'
-import { getToken } from '@/utils/auth'
+import { Menu, SwitchButton, CaretBottom, Setting } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
@@ -180,59 +182,142 @@ function logout() {
 
 <style lang="scss" scoped>
 .user-layout {
+  --header-border: rgba(255, 255, 255, 0.12);
+  --header-surface: rgba(245, 250, 255, 0.44);
+  --header-accent: #1d4ed8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9fafb;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  background: #f5f8ff;
 }
 
 .user-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e5e7eb;
   position: sticky;
   top: 0;
   z-index: 1000;
+  background: var(--header-surface);
+  backdrop-filter: blur(8px) saturate(114%);
+  -webkit-backdrop-filter: blur(8px) saturate(114%);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: 0 8px 20px -24px rgba(24, 66, 148, 0.26);
+  transition: box-shadow 0.25s ease;
+}
+
+.user-header.is-open {
+  box-shadow: 0 10px 22px -22px rgba(17, 66, 176, 0.32);
 }
 
 .header-container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
+  padding: 0.82rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
+  gap: 0.9rem;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
+  gap: 0.6rem;
+  width: fit-content;
   font-weight: 700;
-  color: #3b82f6;
+  color: #123465;
   text-decoration: none;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: #f8fbff;
+  background: linear-gradient(152deg, #2459cf, #4a7ff2);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 12px 24px -18px rgba(16, 56, 148, 0.92), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -12px -10px 15px 8px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0));
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  :deep(.el-icon) {
+    transform: translateY(0.5px);
+    pointer-events: none;
+  }
+}
+
+.logo-text {
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+.logo-badge {
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(76, 122, 230, 0.22);
+  background: rgba(233, 242, 255, 0.9);
+  color: #2850af;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .nav-links {
   display: none;
-  gap: 1.5rem;
 
   @media (min-width: 768px) {
-    display: flex;
+    display: inline-flex;
+    justify-self: center;
+    gap: 0.3rem;
+    border-radius: 999px;
+    padding: 0.3rem;
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(153, 179, 235, 0.22);
+    box-shadow: 0 14px 26px -22px rgba(34, 81, 187, 0.95);
   }
 }
 
 .nav-link {
-  color: #6b7280;
-  font-weight: 500;
+  color: #576581;
+  font-size: 0.92rem;
+  font-weight: 600;
   text-decoration: none;
-  transition: color 0.2s;
-  padding: 0.5rem 0;
+  transition: all 0.2s ease;
+  padding: 0.52rem 0.92rem;
+  border-radius: 999px;
 
-  &:hover,
+  &:hover {
+    color: #153b82;
+    background: rgba(242, 247, 255, 0.96);
+  }
+
   &.router-link-active {
-    color: #3b82f6;
+    color: #111827;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 12px 20px -22px rgba(39, 88, 193, 0.45);
   }
 }
 
@@ -242,39 +327,49 @@ function logout() {
   @media (min-width: 768px) {
     display: flex;
     align-items: center;
+    justify-self: end;
   }
 }
 
 .auth-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.6rem;
+  border-radius: 999px;
+  padding: 0.2rem;
+  border: 1px solid rgba(156, 182, 235, 0.26);
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 14px 26px -26px rgba(17, 63, 169, 0.9);
 
   .login-btn {
-    border: none;
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 8px;
+    border: 1px solid transparent;
+    height: 34px;
+    padding: 0 15px;
+    border-radius: 999px;
     font-weight: 600;
-    color: #4b5563;
-    transition: all 0.2s;
+    color: #2d4067;
+    background: transparent;
+    transition: all 0.2s ease;
     
     &:hover {
-      color: #3b82f6;
-      background: #eff6ff;
+      color: #18439f;
+      border-color: rgba(24, 67, 159, 0.2);
+      background: rgba(237, 245, 255, 0.9);
     }
   }
 
   .register-btn {
-    height: 36px;
-    padding: 0 20px;
-    border-radius: 8px; // Premium radius
+    height: 34px;
+    padding: 0 18px;
+    border-radius: 999px;
     font-weight: 600;
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+    border: none;
+    background: linear-gradient(135deg, #1d4ed8, #4674ed);
+    box-shadow: 0 16px 26px -20px rgba(29, 78, 216, 0.95);
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 12px -1px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 14px 24px -16px rgba(25, 71, 177, 0.95);
     }
     
     &:active {
@@ -289,33 +384,41 @@ function logout() {
   .avatar-wrapper {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem;
-    border-radius: 9999px;
+    gap: 0.45rem;
+    padding: 0.24rem 0.46rem 0.24rem 0.24rem;
+    border-radius: 999px;
+    border: 1px solid rgba(155, 182, 235, 0.28);
+    background: rgba(255, 255, 255, 0.67);
+    box-shadow: 0 16px 30px -25px rgba(25, 76, 191, 0.95);
     transition: all 0.2s;
 
     &:hover {
-      background: #f3f4f6;
+      transform: translateY(-1px);
+      border-color: rgba(31, 80, 185, 0.35);
+      background: rgba(248, 251, 255, 0.95);
     }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 20px -14px rgba(15, 47, 107, 0.95);
     }
 
     .el-icon--right {
       font-size: 12px;
-      color: #9ca3af;
+      color: #7f90af;
     }
   }
 }
 
 .mobile-menu-btn {
   display: flex;
+  border: 1px solid rgba(143, 171, 227, 0.36);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 16px 26px -20px rgba(30, 84, 194, 0.9);
 
   @media (min-width: 768px) {
     display: none;
@@ -323,9 +426,14 @@ function logout() {
 }
 
 .mobile-nav {
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 1rem;
+  margin: 0 0.75rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem;
+  border-radius: 0 0 18px 18px;
+  border: 1px solid rgba(146, 173, 227, 0.2);
+  border-top: none;
+  background: linear-gradient(175deg, rgba(255, 255, 255, 0.98), rgba(243, 248, 255, 0.92));
+  box-shadow: 0 18px 30px -24px rgba(24, 70, 172, 0.85);
 
   @media (min-width: 768px) {
     display: none;
@@ -334,51 +442,101 @@ function logout() {
 
 .mobile-nav-link {
   display: block;
-  padding: 0.75rem 0;
-  color: #374151;
+  padding: 0.78rem 0.8rem;
+  color: #344563;
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
-  border-bottom: 1px solid #f3f4f6;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #3b82f6;
+    color: #2150bc;
+    background: rgba(232, 241, 255, 0.76);
+  }
+
+  &.router-link-active {
+    color: #18419a;
+    background: rgba(227, 238, 255, 0.9);
   }
 }
 
 .mobile-auth {
-  margin-top: 1rem;
+  margin-top: 0.7rem;
   display: flex;
   gap: 0.5rem;
+
+  .el-button {
+    flex: 1;
+    border-radius: 10px;
+    height: 36px;
+    font-weight: 600;
+  }
 }
 
 .mobile-user {
-  margin-top: 1rem;
-  padding: 1rem 0;
-  border-top: 1px solid #f3f4f6;
+  margin-top: 0.8rem;
+  padding: 0.8rem;
+  border-top: 1px dashed rgba(129, 158, 217, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.7rem;
+  border-radius: 12px;
+  background: rgba(250, 252, 255, 0.8);
 
   .mobile-user-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
+    border-radius: 10px;
+    padding: 0.3rem 0.2rem;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(228, 238, 255, 0.72);
+    }
 
     .mobile-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
     span {
       font-weight: 600;
-      color: #374151;
+      color: #293a5b;
     }
   }
 
   .mobile-logout {
     width: 100%;
+    border-radius: 10px;
+    font-weight: 600;
+    height: 36px;
+  }
+}
+
+@media (min-width: 768px) {
+  .header-container {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-container {
+    padding: 0.75rem 1rem;
+  }
+
+  .logo-badge {
+    display: none;
+  }
+
+  .mobile-nav {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
   }
 }
 

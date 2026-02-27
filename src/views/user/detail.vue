@@ -21,7 +21,7 @@
           </div>
 
           <div class="club-header-info">
-            <span class="club-badge">学生社团</span>
+            <span class="club-badge">校园社团</span>
             <h1 class="club-title">{{ club.clubName }}</h1>
             <div class="club-meta-grid">
               <div class="club-meta-item">
