@@ -97,28 +97,97 @@
 
     <!-- 页脚 -->
     <footer class="user-footer">
+      <div class="footer-bg-decoration"></div>
       <div class="footer-container">
-        <div class="footer-content">
-          <div class="footer-brand">
-            <el-icon :size="24"><Connection /></el-icon>
-            <span>社团中心</span>
+        <div class="footer-main">
+          <!-- 品牌区域 -->
+          <div class="footer-brand-section">
+            <div class="footer-brand">
+              <div class="footer-logo">
+                <el-icon :size="22"><Connection /></el-icon>
+              </div>
+              <div class="brand-text">
+                <span class="brand-name">社团中心</span>
+                <span class="brand-tag">Campus Clubs</span>
+              </div>
+            </div>
+            <p class="footer-desc">发现、加入并领导符合你兴趣的社团组织，让大学生活更精彩</p>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="微信" title="微信">
+                <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M664.250054 368.541681c10.015098 0 19.892049 0.732687 29.67281 1.795902-26.647917-122.810047-159.358451-214.077703-310.826188-214.077703-169.353083 0-308.085774 114.232694-308.085774 259.274068 0 83.708494 46.165436 152.460344 123.281791 205.78483l-30.80868 91.730191 107.688651-53.455469c38.558178 7.53665 69.459978 15.308661 107.924012 15.308661 9.66308 0 19.230993-0.470721 28.752858-1.225921-6.025227-20.36584-9.521864-41.723264-9.521864-63.862493C402.328693 476.632491 517.908058 368.541681 664.250054 368.541681zM498.62897 285.87389c23.200398 0 38.557154 15.120372 38.557154 38.061874 0 22.846334-15.356756 38.156018-38.557154 38.156018-23.107277 0-46.260603-15.309684-46.260603-38.156018C452.368366 300.994262 475.522716 285.87389 498.62897 285.87389zM283.016307 362.090758c-23.107277 0-46.402843-15.309684-46.402843-38.156018 0-22.941502 23.295566-38.061874 46.402843-38.061874 23.081695 0 38.46301 15.120372 38.46301 38.061874C321.479317 346.782098 306.098002 362.090758 283.016307 362.090758zM945.448458 606.151333c0-121.888048-123.258255-221.236753-261.683954-221.236753-146.57838 0-262.015505 99.348706-262.015505 221.236753 0 122.06508 115.437126 221.200938 262.015505 221.200938 30.66644 0 61.617359-7.609305 92.423993-15.262612l84.513836 45.786813-23.178909-76.17082C899.379213 735.776599 945.448458 674.90216 945.448458 606.151333zM598.803483 567.994292c-15.332197 0-30.807656-15.096836-30.807656-30.501688 0-15.190981 15.47546-30.477129 30.807656-30.477129 23.295566 0 38.558178 15.286148 38.558178 30.477129C637.361661 552.897456 622.099049 567.994292 598.803483 567.994292zM768.25071 567.994292c-15.213493 0-30.594809-15.096836-30.594809-30.501688 0-15.190981 15.381315-30.477129 30.594809-30.477129 23.107277 0 38.558178 15.286148 38.558178 30.477129C806.808888 552.897456 791.357987 567.994292 768.25071 567.994292z"/></svg>
+              </a>
+              <a href="#" class="social-link" aria-label="QQ" title="QQ">
+                <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z"/></svg>
+              </a>
+              <a href="#" class="social-link" aria-label="邮箱" title="邮箱">
+                <el-icon :size="18"><Message /></el-icon>
+              </a>
+            </div>
           </div>
-          <p class="footer-desc">发现、加入并领导符合你兴趣的社团组织</p>
-        </div>
-        <div class="footer-links">
+
+          <!-- 快速链接 -->
           <div class="footer-section">
-            <h4>快速链接</h4>
-            <router-link to="/user/home">首页</router-link>
-            <router-link to="/user/clubs">社团列表</router-link>
+            <h4 class="section-title">探索</h4>
+            <router-link to="/user/home" class="footer-link">
+              <span>首页</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </router-link>
+            <router-link to="/user/clubs" class="footer-link">
+              <span>全部社团</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </router-link>
+            <router-link to="/user/activities" class="footer-link">
+              <span>校园活动</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </router-link>
           </div>
+
+          <!-- 我的社团 -->
           <div class="footer-section">
-            <h4>帮助与支持</h4>
-            <a href="#">常见问题</a>
-            <a href="#">联系我们</a>
+            <h4 class="section-title">我的</h4>
+            <router-link to="/user/my-clubs" class="footer-link">
+              <span>我的社团</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </router-link>
+            <a href="#" class="footer-link">
+              <span>我的申请</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </a>
+            <a href="#" class="footer-link">
+              <span>活动记录</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </a>
+          </div>
+
+          <!-- 帮助支持 -->
+          <div class="footer-section">
+            <h4 class="section-title">帮助</h4>
+            <a href="#" class="footer-link">
+              <span>常见问题</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </a>
+            <a href="#" class="footer-link">
+              <span>联系客服</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </a>
+            <a href="#" class="footer-link">
+              <span>意见反馈</span>
+              <el-icon class="link-icon"><ArrowRight /></el-icon>
+            </a>
           </div>
         </div>
+
+        <!-- 底部版权 -->
         <div class="footer-bottom">
-          <p>&copy; 2024 社团中心 版权所有</p>
+          <div class="footer-bottom-content">
+            <p class="copyright">
+              <span class="copyright-symbol">©</span>
+              <span>2026</span>
+              <span class="brand-highlight">社团中心</span>
+              <span class="divider">|</span>
+              <span>让校园生活更精彩</span>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
@@ -128,7 +197,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu, SwitchButton, CaretBottom, Setting } from '@element-plus/icons-vue'
+import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
@@ -545,68 +614,235 @@ function logout() {
 }
 
 .user-footer {
-  background: #1f2937;
-  color: #9ca3af;
+  position: relative;
+  background:
+    linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(59, 130, 246, 0.015) 40px,
+      rgba(59, 130, 246, 0.015) 80px
+    );
+  color: #94a3b8;
   margin-top: auto;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+  }
+
+  .footer-bg-decoration {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 100% 60% at 15% 0%, rgba(59, 130, 246, 0.06), transparent 50%),
+      radial-gradient(ellipse 80% 50% at 85% 0%, rgba(99, 102, 241, 0.05), transparent 50%),
+      radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
 }
 
 .footer-container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 1.5rem;
+  padding: 4rem 1.5rem 2rem;
 }
 
-.footer-content {
-  margin-bottom: 2rem;
+.footer-main {
+  display: grid;
+  grid-template-columns: 1.8fr repeat(3, 1fr);
+  gap: 3rem;
+  margin-bottom: 3rem;
 
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+// 品牌区域
+.footer-brand-section {
   .footer-brand {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: white;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-desc {
-    color: #9ca3af;
-    font-size: 0.9rem;
-  }
-}
-
-.footer-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.footer-section {
-  h4 {
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 600;
+    gap: 0.75rem;
     margin-bottom: 1rem;
   }
 
-  a {
-    display: block;
-    color: #9ca3af;
-    text-decoration: none;
-    margin-bottom: 0.5rem;
+  .footer-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #f8fbff;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .brand-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: 0.02em;
+  }
+
+  .brand-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .footer-desc {
+    color: #64748b;
     font-size: 0.9rem;
+    line-height: 1.65;
+    max-width: 280px;
+    margin-bottom: 1.5rem;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
-      color: white;
+      color: #f1f5f9;
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
     }
   }
 }
 
+// 链接区域
+.footer-section {
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .footer-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+    transition: all 0.2s ease;
+
+    span {
+      flex: 1;
+    }
+
+    .link-icon {
+      font-size: 14px;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: all 0.25s ease;
+    }
+
+    &:hover {
+      color: #f1f5f9;
+      padding-left: 4px;
+
+      .link-icon {
+        opacity: 1;
+        transform: translateX(0);
+        color: #3b82f6;
+      }
+    }
+  }
+}
+
+// 底部版权区
 .footer-bottom {
-  border-top: 1px solid #374151;
-  padding-top: 1.5rem;
-  text-align: center;
-  font-size: 0.875rem;
+  position: relative;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.6);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  }
+
+  .footer-bottom-content {
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .copyright {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #64748b;
+
+    .copyright-symbol {
+      font-size: 1rem;
+    }
+
+    .brand-highlight {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .divider {
+      color: #475569;
+      margin: 0 0.25rem;
+    }
+  }
 }
 
 // 动画
