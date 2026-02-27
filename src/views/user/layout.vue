@@ -41,6 +41,12 @@
                   </div>
                 </div>
                 
+                <!-- 管理端入口 -->
+                <el-dropdown-item v-if="isManager" command="admin">
+                  <el-icon><Monitor /></el-icon>
+                  <span>管理端</span>
+                </el-dropdown-item>
+                
                 <el-dropdown-item command="settings">
                   <el-icon><Setting /></el-icon>
                   <span>设置中心</span>
@@ -81,6 +87,7 @@
             <img :src="userStore.avatar" class="mobile-avatar" />
             <span>{{ userStore.nickName }}</span>
           </div>
+          <el-button v-if="isManager" type="primary" plain class="mobile-admin" @click="$router.push('/index')">管理端</el-button>
           <el-button type="danger" plain class="mobile-logout" @click="logout">退出登录</el-button>
         </div>
       </div>
@@ -195,9 +202,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message } from '@element-plus/icons-vue'
+import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message, Monitor } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
@@ -206,6 +213,10 @@ const router = useRouter()
 const userStore = useUserStore()
 const mobileMenuOpen = ref(false)
 const settingsVisible = ref(false)
+
+const isManager = computed(() => {
+  return userStore.roles.some(role => ['admin', 'club_admin', 'president', 'vice_president'].includes(role))
+})
 
 onMounted(() => {
   if (userStore.token && !userStore.name) {
@@ -219,6 +230,9 @@ const handleLogin = () => {
 
 function handleCommand(command) {
   switch (command) {
+    case "admin":
+      router.push('/index')
+      break
     case "logout":
       logout()
       break
