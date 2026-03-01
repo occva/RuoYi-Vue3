@@ -1,64 +1,101 @@
 <template>
-  <div class="login">
-    <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">{{ title }}</h3>
-      <el-form-item prop="username">
-        <el-input
-          v-model="loginForm.username"
-          type="text"
-          size="large"
-          auto-complete="off"
-          placeholder="账号"
-        >
-          <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input
-          v-model="loginForm.password"
-          type="password"
-          size="large"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter="handleLogin"
-        >
-          <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          v-model="loginForm.code"
-          size="large"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter="handleLogin"
-        >
-          <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
-        </el-input>
-        <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img"/>
+  <div class="auth-page login-page">
+    <div class="auth-grid"></div>
+    <div class="auth-orb auth-orb-left"></div>
+    <div class="auth-orb auth-orb-right"></div>
+
+    <div class="auth-shell">
+      <div class="auth-card">
+        <section class="auth-intro">
+        <span class="intro-pill">校园社团平台</span>
+        <h1 class="intro-title">欢迎回到社团中心</h1>
+        <p class="intro-desc">在这里继续管理社团、报名活动、追踪你的校园成长记录。</p>
+        <div class="intro-metrics">
+          <article class="metric-card">
+            <span class="metric-value">8+</span>
+            <span class="metric-label">活跃社团</span>
+          </article>
+          <article class="metric-card">
+            <span class="metric-value">3</span>
+            <span class="metric-label">进行中活动</span>
+          </article>
+          <article class="metric-card">
+            <span class="metric-value">24h</span>
+            <span class="metric-label">通知同步</span>
+          </article>
         </div>
-      </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
-      <el-form-item style="width:100%;">
-        <el-button
-          :loading="loading"
-          size="large"
-          type="primary"
-          style="width:100%;"
-          @click.prevent="handleLogin"
-        >
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
-        </el-button>
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+        <div class="intro-links">
+          <router-link to="/user/home" class="intro-link">返回首页</router-link>
+          <router-link to="/register" class="intro-link intro-link-ghost">前往注册</router-link>
         </div>
-      </el-form-item>
-    </el-form>
-    <!--  底部  -->
-    <div class="el-login-footer">
+        </section>
+
+        <section class="auth-panel">
+        <div class="panel-head">
+          <h2 class="panel-title">{{ title }}</h2>
+          <p class="panel-subtitle">登录后继续你的校园社团之旅</p>
+        </div>
+
+        <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="auth-form">
+          <el-form-item prop="username">
+            <el-input
+              v-model="loginForm.username"
+              type="text"
+              size="large"
+              auto-complete="off"
+              placeholder="请输入账号"
+            >
+              <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="password">
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              size="large"
+              auto-complete="off"
+              placeholder="请输入密码"
+              @keyup.enter="handleLogin"
+            >
+              <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item v-if="captchaEnabled" prop="code">
+            <div class="captcha-wrap">
+              <el-input
+                v-model="loginForm.code"
+                size="large"
+                auto-complete="off"
+                placeholder="请输入验证码"
+                @keyup.enter="handleLogin"
+              >
+                <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
+              </el-input>
+              <button type="button" class="captcha-box" @click="getCode">
+                <img :src="codeUrl" alt="验证码" class="captcha-img" />
+              </button>
+            </div>
+          </el-form-item>
+
+          <div class="form-meta">
+            <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+            <router-link v-if="register" class="switch-link" :to="'/register'">立即注册</router-link>
+          </div>
+
+          <el-form-item class="submit-item">
+            <el-button :loading="loading" size="large" type="primary" @click.prevent="handleLogin">
+              <span v-if="!loading">登 录</span>
+              <span v-else>登 录 中...</span>
+            </el-button>
+          </el-form-item>
+        </el-form>
+        </section>
+      </div>
+    </div>
+
+    <div class="auth-footer">
       <span>{{ footerContent }}</span>
     </div>
   </div>
@@ -176,172 +213,427 @@ getCookie()
 </script>
 
 <style lang='scss' scoped>
-.login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-size: cover;
+.auth-page {
+  --auth-primary: #1664ff;
+  --auth-primary-soft: #4f7dff;
+  --auth-bg-top: #edf3ff;
+  --auth-bg-bottom: #f8fbff;
+  height: 100vh;
+  min-height: 100vh;
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 300px;
-    height: 300px;
-    background: linear-gradient(135deg, rgba(64, 158, 255, 0.1) 0%, rgba(64, 158, 255, 0) 70%);
-    border-radius: 50%;
-    z-index: 0;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -10%;
-    right: -10%;
-    width: 400px;
-    height: 400px;
-    background: linear-gradient(315deg, rgba(64, 158, 255, 0.08) 0%, rgba(64, 158, 255, 0) 70%);
-    border-radius: 50%;
-    z-index: 0;
-  }
+  padding: clamp(1.2rem, 3vw, 2rem) clamp(1rem, 4vw, 2.2rem) 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(17, 98, 255, 0.16), transparent 38%),
+    radial-gradient(circle at 90% 8%, rgba(12, 201, 186, 0.14), transparent 36%),
+    radial-gradient(circle at 56% 92%, rgba(17, 98, 255, 0.09), transparent 42%),
+    linear-gradient(180deg, var(--auth-bg-top) 0%, var(--auth-bg-bottom) 58%, #ffffff 100%);
 }
 
-.title {
-  margin: 0 auto 40px auto;
-  text-align: center;
-  color: #2c3e50;
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: 1px;
+.auth-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(17, 98, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 98, 255, 0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 84%);
+  pointer-events: none;
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(2px);
+  pointer-events: none;
+  animation: orbFloat 9s ease-in-out infinite;
+}
+
+.auth-orb-left {
+  width: clamp(260px, 26vw, 360px);
+  height: clamp(260px, 26vw, 360px);
+  left: -8%;
+  top: 18%;
+  background: radial-gradient(circle, rgba(79, 125, 255, 0.3), rgba(79, 125, 255, 0));
+}
+
+.auth-orb-right {
+  width: clamp(280px, 30vw, 420px);
+  height: clamp(280px, 30vw, 420px);
+  right: -10%;
+  bottom: 2%;
+  background: radial-gradient(circle, rgba(33, 168, 255, 0.24), rgba(33, 168, 255, 0));
+  animation-delay: 2.4s;
+}
+
+.auth-shell {
+  width: min(1120px, 100%);
+  height: 70%;
   position: relative;
-  
-  &::after {
-    content: "";
-    width: 40px;
-    height: 4px;
-    background: #409eff;
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 2px;
-  }
+  z-index: 2;
+  animation: shellEnter 520ms ease-out;
 }
 
-.login-form {
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  width: 420px;
-  padding: 40px 35px 25px 35px;
-  z-index: 1;
-  transition: all 0.3s ease-in-out;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  
-  /* Scattered Shadow Effect */
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.04),
-    0 20px 48px rgba(0, 0, 0, 0.04),
-    0 1px 4px rgba(0, 0, 0, 0.08);
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 
-      0 20px 35px rgba(0, 0, 0, 0.06),
-      0 30px 60px rgba(0, 0, 0, 0.06),
-      0 1px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .el-input {
-    height: 45px;
-    
-    :deep(.el-input__wrapper) {
-      background-color: #f5f7fa;
-      box-shadow: none !important;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-      border-radius: 8px;
-
-      &.is-focus {
-        background-color: #fff;
-        border-color: #409eff;
-        box-shadow: 0 0 0 1px #409eff !important;
-      }
-    }
-  }
-  
-  .input-icon {
-    height: 39px;
-    width: 14px;
-    margin-left: 2px;
-  }
-
-  .el-button--primary {
-    height: 45px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    margin-top: 10px;
-    background: linear-gradient(90deg, #409eff, #64b5f6);
-    border: none;
-    transition: all 0.3s;
-
-    &:hover {
-      opacity: 0.9;
-      transform: scale(1.01);
-      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
-    }
-  }
+.auth-card {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+  align-items: stretch;
+  border-radius: 24px;
+  border: 1px solid rgba(184, 206, 244, 0.84);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 34px 66px -46px rgba(20, 70, 166, 0.92), 0 12px 28px -20px rgba(14, 72, 168, 0.4);
+  backdrop-filter: blur(10px) saturate(118%);
+  -webkit-backdrop-filter: blur(10px) saturate(118%);
+  overflow: hidden;
 }
 
-.login-tip {
-  font-size: 13px;
-  text-align: center;
-  color: #909399;
+.auth-intro {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 3.4vw, 2.7rem);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(17, 98, 255, 0.12), transparent 45%),
+    linear-gradient(180deg, rgba(248, 252, 255, 0.78) 0%, rgba(241, 247, 255, 0.7) 100%);
+  border-right: 1px solid rgba(185, 207, 245, 0.7);
 }
 
-.login-code {
-  width: 33%;
-  height: 45px;
-  float: right;
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-    border-radius: 8px;
-    transition: opacity 0.2s;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
+.intro-pill {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.46rem 0.88rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 700;
+  color: #1140a1;
+  border: 1px solid rgba(17, 64, 161, 0.17);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 26px -18px rgba(16, 64, 166, 0.8);
+  margin-bottom: 1.1rem;
 }
 
-.el-login-footer {
+.intro-title {
+  margin: 0;
+  color: #0b1224;
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  max-width: 12ch;
+}
+
+.intro-desc {
+  margin: 1.05rem 0 1.55rem;
+  max-width: 48ch;
+  color: #3a4864;
+  line-height: 1.75;
+  font-size: 1.02rem;
+}
+
+.intro-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.2rem;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.8rem 0.88rem;
+  border-radius: 14px;
+  border: 1px solid rgba(180, 203, 242, 0.8);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 40px -34px rgba(20, 70, 166, 0.6);
+}
+
+.metric-value {
+  color: #1f3f8e;
+  font-size: 1.35rem;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.metric-label {
+  color: #5f6f8f;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.intro-links {
+  display: flex;
+  gap: 0.74rem;
+}
+
+.intro-link {
   height: 40px;
-  line-height: 40px;
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  color: #909399;
-  font-family: Arial;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
+  border-radius: 12px;
+  padding: 0 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--auth-primary) 0%, var(--auth-primary-soft) 100%);
+  box-shadow: 0 14px 30px -20px rgba(21, 88, 225, 0.9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-.login-code-img {
-  height: 45px;
-  padding-left: 12px;
-}
-
-.link-type {
-  color: #409eff;
-  font-size: 13px;
-  transition: color 0.2s;
   &:hover {
-    color: #66b1ff;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 26px -14px rgba(21, 88, 225, 0.8);
+  }
+}
+
+.intro-link-ghost {
+  color: #29437a;
+  border: 1px solid rgba(156, 180, 232, 0.56);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+.auth-panel {
+  position: relative;
+  background: rgba(255, 255, 255, 0.86);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+.panel-head {
+  margin-bottom: 1.2rem;
+}
+
+.panel-title {
+  margin: 0;
+  color: #0d1e45;
+  font-size: 1.42rem;
+  font-weight: 700;
+}
+
+.panel-subtitle {
+  margin: 0.45rem 0 0;
+  color: #5f6f8f;
+  font-size: 0.92rem;
+}
+
+.auth-form {
+  :deep(.el-form-item) {
+    margin-bottom: 0.98rem;
+  }
+
+  :deep(.el-form-item__content) {
+    line-height: 1;
+    min-height: 0;
+  }
+
+  :deep(.el-input) {
+    width: 100%;
+    --el-input-height: 46px;
+  }
+
+  :deep(.el-input__wrapper) {
+    height: 46px !important;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(180, 203, 242, 0.84);
+    box-shadow: none;
+    background: rgba(248, 251, 255, 0.86);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  :deep(.el-input__inner) {
+    height: 46px;
+    line-height: 46px;
+    font-size: 15px;
+  }
+
+  :deep(.el-input__wrapper.is-focus) {
+    border-color: rgba(22, 100, 255, 0.7);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(22, 100, 255, 0.11);
+  }
+
+  :deep(.el-button--primary) {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #1664ff 0%, #4f7dff 100%);
+    box-shadow: 0 16px 26px -18px rgba(22, 100, 255, 0.9);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  :deep(.el-button--primary:hover) {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 24px -12px rgba(22, 100, 255, 0.82);
+  }
+}
+
+.input-icon {
+  color: #6f84ad;
+  width: 14px;
+}
+
+.captcha-wrap {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 0.66rem;
+  align-items: center;
+}
+
+.captcha-box {
+  height: 46px;
+  border: 1px solid rgba(177, 199, 236, 0.85);
+  background: rgba(248, 251, 255, 0.95);
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: rgba(22, 100, 255, 0.55);
+    transform: translateY(-1px);
+  }
+}
+
+.captcha-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.form-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.1rem 0 0.82rem;
+
+  :deep(.el-checkbox__label) {
+    color: #4a5b7a;
+    font-size: 0.88rem;
+  }
+}
+
+.switch-link {
+  font-size: 0.87rem;
+  color: #3364d4;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #1140a1;
+  }
+}
+
+.submit-item {
+  margin-bottom: 0;
+}
+
+.auth-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.85rem;
+  text-align: center;
+  color: #7f8da8;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 1024px) {
+  .auth-shell {
+    height: auto;
+  }
+
+  .auth-card {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-intro {
+    padding: 1.25rem 1.15rem 1.05rem;
+    border-right: none;
+    border-bottom: 1px solid rgba(185, 207, 245, 0.62);
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding-bottom: 4.8rem;
+  }
+
+  .intro-title {
+    max-width: none;
+  }
+
+  .intro-desc {
+    max-width: none;
+  }
+
+  .intro-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .auth-panel {
+    height: auto;
+    justify-content: flex-start;
+    padding: 1.2rem 1rem;
+  }
+
+  .captcha-wrap {
+    grid-template-columns: minmax(0, 1fr) 98px;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-intro {
+    display: none;
+  }
+
+  .auth-shell {
+    max-width: 450px;
+  }
+
+  .auth-card {
+    border-radius: 18px;
+  }
+}
+
+@keyframes shellEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes orbFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
   }
 }
 </style>
