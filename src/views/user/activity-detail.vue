@@ -92,7 +92,7 @@
                 type="primary" 
                 size="large" 
                 class="action-btn"
-                :disabled="activity.status !== '0' && activity.status !== '1'"
+                :disabled="!canRegister(activity)"
                 @click="handleSignUp"
               >
                 {{ getBtnText(activity.status) }}
@@ -119,13 +119,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Calendar, Timer, Location, User, School, Phone } from '@element-plus/icons-vue'
-import { getActivity } from '@/api/user/activity'
+import { getActivity, registerActivity } from '@/api/user/activity'
 import defaultCover from '@/assets/images/profile.jpg'
 
 const route = useRoute()
+const router = useRouter()
 const activity = ref(null)
 const loading = ref(true)
 
@@ -136,7 +137,7 @@ onMounted(() => {
 const loadData = () => {
   const id = route.params.id
   if (!id) return
-  
+
   loading.value = true
   getActivity(id).then(response => {
     activity.value = response.data
@@ -159,7 +160,6 @@ const formatDate = (dateStr) => {
 
 const formatTimeRange = (act) => {
   if (!act) return ''
-  // Use registration start if available, otherwise start time
   const start = formatDate(act.registrationStart || act.startTime)
   const end = formatDate(act.endTime)
   return `${start} ~ ${end}`
@@ -167,15 +167,10 @@ const formatTimeRange = (act) => {
 
 const formatContent = (text) => {
   if (!text) return ''
-  // Simple check if it's not HTML, convert newlines to <br>
   if (!text.includes('<')) {
-      return text.replace(/\n/g, '<br>')
+    return text.replace(/\n/g, '<br>')
   }
   return text
-}
-
-const getComputedStatus = (act) => {
-    return act ? (act.status || '0') : '0'
 }
 
 const getStatusType = (status) => {
@@ -189,17 +184,50 @@ const getStatusText = (status) => {
 }
 
 const getBtnText = (status) => {
-    if (status === '0' || status === '1') return '立即报名'
-    if (status === '2') return '活动已结束'
-    return '不可报名'
+  if (status === '0' || status === '1') return '立即报名'
+  if (status === '2') return '活动已结束'
+  return '不可报名'
 }
 
-const handleSignUp = () => {
-    registerActivity(activity.value.activityId).then(response => {
-        ElMessage.success(response.msg || '报名成功！请准时参加。')
-    }).catch(error => {
-        // 错误已由request拦截器处理
-    })
+const canRegister = (act) => {
+  if (!act) return false
+  if (act.status !== '0' && act.status !== '1') return false
+  
+  const now = new Date().getTime()
+  if (act.registrationStart && now < new Date(act.registrationStart).getTime()) return false
+  if (act.registrationEnd && now > new Date(act.registrationEnd).getTime()) return false
+  if (act.endTime && now > new Date(act.endTime).getTime()) return false
+  
+  if (act.maxParticipants && act.currentParticipants >= act.maxParticipants) return false
+  return true
+}
+
+const extractBizError = (error) => {
+  const message = typeof error === 'string'
+    ? error
+    : (error?.message || error?.msg || '')
+  const errorKey = error?.data?.errorKey || ''
+  return { message, errorKey }
+}
+
+const isNeedClubMemberError = (error) => {
+  const { message, errorKey } = extractBizError(error)
+  return errorKey === 'ACTIVITY_NEED_CLUB_MEMBER' || message.includes('ACTIVITY_NEED_CLUB_MEMBER')
+}
+
+const handleSignUp = async () => {
+  if (!activity.value?.activityId) return
+  try {
+    const response = await registerActivity(activity.value.activityId)
+    ElMessage.success(response.msg || '报名成功')
+    router.push({ path: '/user/my-clubs', query: { tab: 'activities' } })
+  } catch (error) {
+    if (isNeedClubMemberError(error)) {
+      setTimeout(() => {
+        router.push(`/user/club/${activity.value.clubId}`)
+      }, 3000)
+    }
+  }
 }
 </script>
 

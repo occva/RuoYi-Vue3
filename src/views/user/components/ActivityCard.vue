@@ -42,7 +42,7 @@
           </div>
           <div class="detail-text">
             <div class="label">活动地点</div>
-            <div class="value">{{ activity.address || '线上活动' }}</div>
+            <div class="value">{{ activity.location || '线上活动' }}</div>
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@
       <div class="card-footer">
         <div class="participant-info">
           <el-icon><User /></el-icon>
-          <span>{{ activity.registerCount || 0 }} 人已报名</span>
+          <span>{{ activity.currentParticipants || 0 }} 人已报名</span>
         </div>
         <el-button type="primary" size="small" class="action-btn">
           查看详情
