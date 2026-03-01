@@ -23,16 +23,21 @@
         <el-tabs v-model="activeTab" class="custom-tabs">
           <!-- 1. 我的社团 (Joined + Managed) -->
           <el-tab-pane label="我的社团" name="joined">
+            <el-tabs v-model="clubSubTab" class="application-sub-tabs">
+              <el-tab-pane :label="`全部社团 (${managedClubs.length + joinedClubs.length})`" name="all" />
+              <el-tab-pane :label="`我管理的 (${managedClubs.length})`" name="managed" />
+              <el-tab-pane :label="`我加入的 (${joinedClubs.length})`" name="joined" />
+            </el-tabs>
             
             <!-- Managed Clubs Section -->
-            <section v-if="managedClubs.length > 0" class="section-block animate-in">
+            <section v-if="visibleManagedClubs.length > 0" class="section-block animate-in">
               <h2 class="section-title">
                 <el-icon><Management /></el-icon>
                 我管理的社团
               </h2>
               <div class="clubs-grid">
                 <div 
-                  v-for="(club, index) in managedClubs" 
+                  v-for="(club, index) in visibleManagedClubs" 
                   :key="club.clubId" 
                   class="club-card"
                   :style="{ '--delay': index * 0.05 + 's' }"
@@ -68,14 +73,14 @@
             </section>
 
             <!-- Joined Clubs Section -->
-            <section v-if="joinedClubs.length > 0" class="section-block animate-in" :style="{ '--delay': '0.2s' }">
+            <section v-if="visibleJoinedClubs.length > 0" class="section-block animate-in" :style="{ '--delay': '0.2s' }">
               <h2 class="section-title">
                 <el-icon><UserFilled /></el-icon>
                 我加入的社团
               </h2>
               <div class="clubs-grid">
                 <div 
-                  v-for="(club, index) in joinedClubs" 
+                  v-for="(club, index) in visibleJoinedClubs" 
                   :key="club.clubId" 
                   class="club-card"
                   :style="{ '--delay': (index * 0.05 + 0.2) + 's' }"
@@ -119,8 +124,8 @@
             </section>
 
             <!-- Empty State -->
-            <div v-if="managedClubs.length === 0 && joinedClubs.length === 0" class="empty-state">
-              <el-empty description="您还没有加入任何社团">
+            <div v-if="visibleManagedClubs.length === 0 && visibleJoinedClubs.length === 0" class="empty-state">
+              <el-empty :description="clubEmptyDescription">
                 <template #extra>
                   <el-button type="primary" plain @click="$router.push('/user/clubs')">去浏览社团</el-button>
                 </template>
@@ -128,7 +133,71 @@
             </div>
           </el-tab-pane>
 
-          <!-- 2. 我的收藏 -->
+          <!-- 2. 我的活动 -->
+          <el-tab-pane label="我的活动" name="activities">
+            <el-tabs v-model="activitySubTab" class="application-sub-tabs">
+              <el-tab-pane :label="`所有活动 (${myActivities.length})`" name="all" />
+              <el-tab-pane :label="`尚未开始 (${upcomingActivities.length})`" name="upcoming" />
+              <el-tab-pane :label="`进行中 (${ongoingActivities.length})`" name="ongoing" />
+              <el-tab-pane :label="`已结束 (${endedActivities.length})`" name="ended" />
+            </el-tabs>
+            <div v-if="filteredMyActivities.length > 0" class="applications-list animate-in">
+              <article
+                v-for="(activity, index) in filteredMyActivities"
+                :key="activity.activityId"
+                class="app-card"
+                :style="{ '--delay': index * 0.05 + 's' }"
+              >
+                <div class="app-header">
+                  <div class="app-title">
+                    <h3 class="app-club-name clickable" @click="viewActivityDetail(activity)">
+                      {{ activity.activityTitle }}
+                    </h3>
+                    <el-tag size="small" effect="plain" type="primary">
+                      {{ activity.clubName || '社团活动' }}
+                    </el-tag>
+                  </div>
+                  <el-tag :type="getActivityStatusType(activity.status)" effect="light" round>
+                    {{ getActivityStatusText(activity.status) }}
+                  </el-tag>
+                </div>
+                <div class="app-meta">
+                  <div class="meta-item">
+                    <span>开始时间</span>
+                    <strong>{{ formatTime(activity.startTime) }}</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span>活动地点</span>
+                    <strong>{{ activity.location || '-' }}</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span>参与人数</span>
+                    <strong>{{ activity.currentParticipants || 0 }} / {{ activity.maxParticipants || '不限' }}</strong>
+                  </div>
+                </div>
+                <div class="app-content">
+                  <div class="content-block">
+                    <label>活动简介</label>
+                    <p>{{ activity.description || '暂无' }}</p>
+                  </div>
+                </div>
+                <div class="app-actions">
+                  <el-button link type="primary" @click="viewActivityDetail(activity)">
+                    查看活动详情
+                  </el-button>
+                </div>
+              </article>
+            </div>
+            <div v-else class="empty-state application-empty">
+              <el-empty :description="activityEmptyDescription">
+                <template #extra>
+                  <el-button type="primary" plain @click="$router.push('/user/activities')">去看看校园活动</el-button>
+                </template>
+              </el-empty>
+            </div>
+          </el-tab-pane>
+
+          <!-- 3. 我的收藏 -->
           <el-tab-pane label="我的收藏" name="favorites">
             <div v-if="favoriteClubs.length > 0" class="clubs-grid animate-in">
                <div 
@@ -173,7 +242,7 @@
             </div>
           </el-tab-pane>
 
-          <!-- 3. 我的申请 -->
+          <!-- 4. 我的申请 -->
           <el-tab-pane label="我的申请" name="applications">
             <el-tabs v-model="applicationSubTab" class="application-sub-tabs">
               <el-tab-pane :label="`加入社团申请 (${joinApplications.length})`" name="join">
@@ -310,27 +379,78 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { getMyClubs, quitClub } from '@/api/user/club'
+import { listMyActivities } from '@/api/user/activity'
 import { Management, UserFilled, Picture, ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
+const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
 const activeTab = ref('joined')
+const clubSubTab = ref('all')
+const activitySubTab = ref('all')
 const applicationSubTab = ref('join')
 
 const managedClubs = ref([])
 const joinedClubs = ref([])
 const favoriteClubs = ref([])
+const myActivities = ref([])
 const joinApplications = ref([])
 const createApplications = ref([])
+
+const validTabs = ['joined', 'activities', 'favorites', 'applications']
+
+const visibleManagedClubs = computed(() => {
+  if (clubSubTab.value === 'joined') return []
+  return managedClubs.value
+})
+
+const visibleJoinedClubs = computed(() => {
+  if (clubSubTab.value === 'managed') return []
+  return joinedClubs.value
+})
+
+const clubEmptyDescription = computed(() => {
+  if (clubSubTab.value === 'managed') return '暂无我管理的社团'
+  if (clubSubTab.value === 'joined') return '暂无我加入的社团'
+  return '您还没有加入任何社团'
+})
+
+const upcomingActivities = computed(() => myActivities.value.filter(activity => activity.status === '0'))
+const ongoingActivities = computed(() => myActivities.value.filter(activity => activity.status === '1'))
+const endedActivities = computed(() => myActivities.value.filter(activity => activity.status === '2' || activity.status === '3'))
+
+const filteredMyActivities = computed(() => {
+  if (activitySubTab.value === 'upcoming') return upcomingActivities.value
+  if (activitySubTab.value === 'ongoing') return ongoingActivities.value
+  if (activitySubTab.value === 'ended') return endedActivities.value
+  return myActivities.value
+})
+
+const activityEmptyDescription = computed(() => {
+  if (activitySubTab.value === 'upcoming') return '暂无尚未开始活动'
+  if (activitySubTab.value === 'ongoing') return '暂无进行中活动'
+  if (activitySubTab.value === 'ended') return '暂无已结束活动'
+  return '暂无我的活动'
+})
+
+const syncTabFromQuery = () => {
+  const tab = route.query?.tab
+  if (typeof tab === 'string' && validTabs.includes(tab)) {
+    activeTab.value = tab
+  }
+}
 
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await getMyClubs()
+    const results = await Promise.allSettled([getMyClubs(), listMyActivities()])
+    const res = results[0].status === 'fulfilled' ? results[0].value : { code: 500, msg: '获取社团数据失败' }
+    const myActivitiesRes = results[1].status === 'fulfilled' ? results[1].value : { code: 500 }
+
     if (res.code === 200) {
       managedClubs.value = res.managed || []
       joinedClubs.value = res.joined || []
@@ -340,9 +460,17 @@ const fetchData = async () => {
     } else {
       ElMessage.error(res.msg || '获取数据失败')
     }
+
+    if (myActivitiesRes.code === 200) {
+      const allActivities = myActivitiesRes.data || myActivitiesRes.rows || []
+      myActivities.value = allActivities
+    } else {
+      myActivities.value = []
+    }
   } catch (error) {
+    myActivities.value = []
     if (error.response && error.response.status === 401) {
-       // redirect handled by permission guard
+      // redirect handled by permission guard
     }
   } finally {
     loading.value = false
@@ -377,6 +505,16 @@ const getCreateStatusText = (status) => {
   return map[status] || '未知状态'
 }
 
+const getActivityStatusType = (status) => {
+  const map = { '0': 'warning', '1': 'success', '2': 'info', '3': 'danger' }
+  return map[status] || 'info'
+}
+
+const getActivityStatusText = (status) => {
+  const map = { '0': '即将开始', '1': '进行中', '2': '已结束', '3': '已取消' }
+  return map[status] || '未知状态'
+}
+
 const formatTime = (value) => {
   if (!value) return '--'
   const date = new Date(value)
@@ -388,6 +526,11 @@ const formatTime = (value) => {
 const goToApprovedClub = (app) => {
   if (!app.approvedClubId) return
   router.push(`/user/club/${app.approvedClubId}`)
+}
+
+const viewActivityDetail = (activity) => {
+  if (!activity?.activityId) return
+  router.push(`/user/activity/${activity.activityId}`)
 }
 
 const handleQuit = (club) => {
@@ -417,7 +560,12 @@ const handleQuit = (club) => {
 }
 
 onMounted(() => {
+  syncTabFromQuery()
   fetchData()
+})
+
+watch(() => route.query.tab, () => {
+  syncTabFromQuery()
 })
 </script>
 
@@ -975,3 +1123,4 @@ onMounted(() => {
   }
 }
 </style>
+
