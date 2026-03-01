@@ -27,7 +27,7 @@
         </template>
 
       <template v-if="userStore.token">
-        <el-dropdown @command="handleCommand" class="avatar-container right-menu-item hover-effect" trigger="hover" popper-class="user-dropdown-menu">
+        <el-dropdown @command="handleCommand" class="avatar-container" trigger="hover" popper-class="user-dropdown-menu">
           <div class="avatar-wrapper">
             <img :src="userStore.avatar" class="user-avatar" />
             <el-icon class="el-icon--right"><caret-bottom /></el-icon>
@@ -42,12 +42,10 @@
                 </div>
               </div>
               
-              <router-link to="/user-profile/profile">
-                <el-dropdown-item>
+              <el-dropdown-item command="profile">
                   <el-icon><User /></el-icon>
                   <span>个人中心</span>
-                </el-dropdown-item>
-              </router-link>
+              </el-dropdown-item>
               <el-dropdown-item command="setLayout" v-if="settingsStore.showSettings">
                 <el-icon><Setting /></el-icon>
                 <span>布局设置</span>
@@ -76,6 +74,7 @@
 <script setup>
 import { ElMessageBox } from 'element-plus'
 import { User, Setting, SwitchButton, CaretBottom } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb'
 import TopNav from '@/components/TopNav'
 import TopBar from './TopBar'
@@ -89,6 +88,7 @@ import useSettingsStore from '@/store/modules/settings'
 const appStore = useAppStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
+const router = useRouter()
 
 function toggleSideBar() {
   appStore.toggleSideBar()
@@ -96,6 +96,9 @@ function toggleSideBar() {
 
 function handleCommand(command) {
   switch (command) {
+    case "profile":
+      router.push('/user-profile/profile')
+      break
     case "setLayout":
       setLayout()
       break
@@ -243,21 +246,41 @@ function toggleTheme() {
       position: relative;
       display: flex;
       align-items: center;
+      gap: 0.45rem;
       cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 10px;
+      padding: 0.24rem 0.46rem 0.24rem 0.24rem;
+      border-radius: 999px;
+      border: 1px solid rgba(155, 182, 235, 0.28);
+      background: rgba(255, 255, 255, 0.67);
+      box-shadow: 0 16px 30px -25px rgba(25, 76, 191, 0.95);
       transition: all 0.2s;
 
+      // Dark mode override
+      html.dark & {
+        background: var(--el-bg-color-overlay);
+        border-color: var(--el-border-color);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
       &:hover {
-        background: var(--el-fill-color-light);
+        transform: translateY(-1px);
+        border-color: rgba(31, 80, 185, 0.35);
+        background: rgba(248, 251, 255, 0.95);
+
+        html.dark & {
+          background: var(--el-fill-color);
+          border-color: var(--el-color-primary-light-5);
+        }
       }
 
       .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.9);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 20px -14px rgba(15, 47, 107, 0.95);
 
         &:hover {
           transform: scale(1.05);
@@ -266,9 +289,9 @@ function toggleTheme() {
       }
 
       .el-icon--right {
-        margin-left: 8px;
-        font-size: 10px;
-        color: var(--el-text-color-secondary);
+        margin-left: 2px;
+        font-size: 12px;
+        color: #7f90af;
         transition: transform 0.3s ease;
       }
 
@@ -281,6 +304,12 @@ function toggleTheme() {
     .avatar-container {
       margin-right: 0px;
       padding-right: 0px;
+      outline: none;
+
+      &:focus, &:focus-visible {
+        outline: none !important;
+        border: none !important;
+      }
     }
 
     .auth-buttons {

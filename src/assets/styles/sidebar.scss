@@ -46,7 +46,7 @@
 
     &.has-logo {
       .el-scrollbar {
-        height: calc(100% - 50px);
+        height: calc(100% - 60px);
       }
     }
 
@@ -71,6 +71,23 @@
     }
 
     .el-menu-item,
+    .el-sub-menu__title {
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      color: inherit;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    // Nested (child) menu items are slightly lighter
+    .nest-menu .el-menu-item,
+    .el-sub-menu .el-menu-item {
+      font-weight: 500;
+      font-size: 13.5px;
+    }
+
+    // Specifically handle titles inside menu to truncate text
+    .el-menu-item span,
     .menu-title {
       overflow: hidden !important;
       text-overflow: ellipsis !important;
@@ -96,9 +113,41 @@
     & .nest-menu .el-sub-menu>.el-sub-menu__title,
     & .el-sub-menu .el-menu-item {
       min-width: vars.$base-sidebar-width !important;
+      transition: background-color 0.25s ease, color 0.25s ease, padding-left 0.25s ease;
 
       &:hover {
         background-color: rgba(0, 0, 0, 0.06) !important;
+        padding-left: 28px !important;
+      }
+    }
+
+    // nest-menu expand/collapse smooth animation
+    & .el-sub-menu {
+      .el-menu {
+        overflow: hidden;
+        // Animate max-height for smooth expand/collapse
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.3s ease;
+      }
+
+      // Animated arrow indicator on the sub-menu title
+      .el-sub-menu__title .el-sub-menu__icon-arrow {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      &.is-opened {
+
+        // Left accent bar for open sub-menus
+        >.el-sub-menu__title {
+          border-left: 3px solid var(--el-color-primary);
+          padding-left: calc(var(--el-menu-base-level-padding) - 3px) !important;
+          color: var(--el-color-primary) !important;
+          font-weight: 700;
+
+          .el-sub-menu__icon-arrow {
+            transform: rotateZ(-180deg);
+          }
+        }
       }
     }
 
@@ -108,6 +157,7 @@
 
       &:hover {
         background-color: vars.$base-sub-menu-hover !important;
+        padding-left: 28px !important;
       }
     }
 
@@ -124,20 +174,31 @@
     .el-menu-item.is-active {
       background-color: var(--el-color-primary) !important;
       color: #ffffff !important;
+      font-weight: 600 !important;
       border-radius: 8px !important;
-      margin: 4px auto !important;
-      width: 90% !important;
-      min-width: 0 !important; // Override the 200px min-width on nested items
+      margin: 0 !important;
+      width: 100% !important;
+      min-width: 0 !important; // Override min-width to prevent width jump on nested items
+      box-sizing: border-box !important; // Keep active item sizing consistent with normal item
+      box-shadow: 0 4px 12px -4px var(--el-color-primary);
 
       &:hover {
         background-color: var(--el-color-primary) !important;
         color: #ffffff !important;
+        padding-left: unset !important; // Prevent the hover indent from affecting active item
       }
 
       .svg-icon {
         color: #ffffff !important;
         fill: #ffffff !important;
       }
+    }
+
+    // Ensure nested sub-menu active items keep the same box model as non-active
+    & .el-sub-menu .el-menu-item.is-active {
+      width: 100% !important;
+      min-width: 0 !important;
+      margin: 0 !important;
     }
   }
 

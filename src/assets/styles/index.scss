@@ -178,3 +178,12 @@ aside {
     margin-bottom: 10px;
   }
 }
+
+// Prevent active-state layout shift across router links and menu items.
+.router-link-active,
+.router-link-exact-active,
+.el-menu-item.is-active,
+.el-sub-menu.is-active > .el-sub-menu__title {
+  transform: none !important;
+  translate: none !important;
+}

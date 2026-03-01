@@ -87,6 +87,7 @@ const activeMenu = computed(() => {
   
   .scrollbar-wrapper {
     background-color: v-bind(getMenuBackground);
+    padding-top: 6px;
   }
 
   .el-menu {

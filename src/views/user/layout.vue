@@ -399,8 +399,11 @@ function logout() {
 }
 
 .nav-link {
+  display: inline-flex;
+  align-items: center;
   color: #576581;
   font-size: 0.92rem;
+  line-height: 1;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -412,11 +415,13 @@ function logout() {
     background: rgba(242, 247, 255, 0.96);
   }
 
-  &.router-link-active {
+  &.router-link-active,
+  &.router-link-exact-active {
     color: #111827;
-    font-weight: 700;
+    font-weight: 600;
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 12px 20px -22px rgba(39, 88, 193, 0.45);
+    transform: none;
   }
 }
 
@@ -432,9 +437,9 @@ function logout() {
 
 .auth-buttons {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.3rem;
   border-radius: 999px;
-  padding: 0.2rem;
+  padding: 0.3rem;
   border: 1px solid rgba(156, 182, 235, 0.26);
   background: rgba(255, 255, 255, 0.65);
   box-shadow: 0 14px 26px -26px rgba(17, 63, 169, 0.9);
@@ -445,28 +450,31 @@ function logout() {
     padding: 0 15px;
     border-radius: 999px;
     font-weight: 600;
-    color: #2d4067;
+    color: #576581;
     background: transparent;
     transition: all 0.2s ease;
     
     &:hover {
-      color: #18439f;
-      border-color: rgba(24, 67, 159, 0.2);
-      background: rgba(237, 245, 255, 0.9);
+      color: #153b82;
+      background: rgba(242, 247, 255, 0.96);
     }
   }
 
   .register-btn {
     height: 34px;
     padding: 0 18px;
-    border-radius: 999px;
+    border-radius: 999px !important;
     font-weight: 600;
-    border: none;
-    background: linear-gradient(135deg, #1d4ed8, #4674ed);
+    border: none !important;
+    background: linear-gradient(135deg, #1d4ed8, #4674ed) !important;
+    color: #fff !important;
+    overflow: hidden;
     box-shadow: 0 16px 26px -20px rgba(29, 78, 216, 0.95);
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
-    &:hover {
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #2563eb, #60a5fa) !important;
+      color: #fff !important;
       transform: translateY(-1px);
       box-shadow: 0 14px 24px -16px rgba(25, 71, 177, 0.95);
     }
@@ -554,9 +562,11 @@ function logout() {
     background: rgba(232, 241, 255, 0.76);
   }
 
-  &.router-link-active {
+  &.router-link-active,
+  &.router-link-exact-active {
     color: #18419a;
     background: rgba(227, 238, 255, 0.9);
+    transform: none;
   }
 }
 

@@ -109,7 +109,7 @@ onMounted(() => {
     &.is-active {
       background: var(--el-color-primary-light-9) !important;
       color: var(--el-color-primary) !important;
-      font-weight: 600 !important;
+      font-weight: 500 !important;
     }
 
     .svg-icon {
@@ -202,7 +202,7 @@ onMounted(() => {
     &.is-active {
       background-color: var(--el-color-primary-light-9) !important;
       color: var(--el-color-primary) !important;
-      font-weight: 600 !important;
+      font-weight: 500 !important;
 
       .svg-icon, .el-icon {
         color: var(--el-color-primary) !important;
