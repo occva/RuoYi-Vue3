@@ -282,6 +282,9 @@ const loadClub = () => {
   loading.value = true
   getClub(id).then(async response => {
     const clubData = response.data
+    if (response.viewStatPaused) {
+      ElMessage.warning(response.viewStatTip || '访问过于频繁，已暂停浏览热度统计')
+    }
 
     // Concurrently fetch related data
     try {

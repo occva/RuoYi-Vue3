@@ -208,6 +208,8 @@ import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message, Monitor 
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
+import { isRelogin } from '@/utils/request'
+import { removeToken } from '@/utils/auth'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -218,9 +220,23 @@ const isManager = computed(() => {
   return userStore.roles.some(role => ['admin', 'club_admin', 'president', 'vice_president'].includes(role))
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (userStore.token && !userStore.name) {
-    userStore.getInfo().catch(() => {})
+    isRelogin.show = true
+    try {
+      await userStore.getInfo()
+    } catch (e) {
+      userStore.token = ''
+      userStore.id = ''
+      userStore.name = ''
+      userStore.nickName = ''
+      userStore.avatar = ''
+      userStore.roles = []
+      userStore.permissions = []
+      removeToken()
+    } finally {
+      isRelogin.show = false
+    }
   }
 })
 
