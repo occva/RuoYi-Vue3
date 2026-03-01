@@ -269,7 +269,7 @@ getList();
 
 <style lang="scss" scoped>
 .app-application {
-  background-color: #f7f9fb;
+  background-color: var(--app-main-bg);
   min-height: calc(100vh - 84px);
   padding: 24px;
 
@@ -277,7 +277,7 @@ getList();
   .premium-card {
     border: none; border-radius: 20px;
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
-    background: #ffffff;
+    background: var(--el-bg-color-overlay);
     :deep(.el-card__header) {
       padding: 20px 24px; border-bottom: 1px solid var(--el-border-color-lighter);
       .card-header {
@@ -307,7 +307,7 @@ getList();
 .application-detail-dialog {
   :deep(.el-dialog__body) {
     padding: 30px 40px !important;
-    background-color: #fcfdfe;
+    background-color: var(--el-bg-color);
   }
 
   .section-container {
@@ -342,7 +342,7 @@ getList();
   .custom-descriptions {
     :deep(.el-descriptions__label) {
       width: 120px;
-      background-color: #f8fafc !important;
+      background-color: var(--el-fill-color-light) !important;
       font-weight: 600;
       color: #64748b;
     }
@@ -351,7 +351,7 @@ getList();
     }
     
     &.review {
-      :deep(.el-descriptions__label) { background-color: #fffbeb !important; }
+      :deep(.el-descriptions__label) { background-color: var(--el-color-warning-light-9) !important; }
     }
   }
 
@@ -367,7 +367,7 @@ getList();
     gap: 16px;
 
     .data-card {
-      background: white;
+      background: var(--el-bg-color-overlay);
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 16px;

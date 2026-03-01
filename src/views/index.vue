@@ -226,6 +226,7 @@ function goTarget(url) {
         padding: 8px;
         background-color: #f2f6fc;
         border-radius: 8px;
+        box-sizing: content-box; // Override global box-sizing: inherit — el-icon needs content-box for correct SVG sizing
       }
 
       .content {

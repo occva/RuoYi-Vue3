@@ -357,7 +357,7 @@ getList();
 
 <style lang="scss" scoped>
 .app-achievement {
-  background-color: #f7f9fb;
+  background-color: var(--app-main-bg);
   min-height: calc(100vh - 84px);
   padding: 24px;
 
@@ -369,7 +369,7 @@ getList();
     border: none;
     border-radius: 20px;
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
-    background: #ffffff;
+    background: var(--el-bg-color-overlay);
 
     :deep(.el-card__header) {
       padding: 20px 24px;

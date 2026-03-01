@@ -409,7 +409,7 @@ getList();
 
 <style lang="scss" scoped>
 .app-club-list {
-  background-color: #f7f9fb;
+  background-color: var(--app-main-bg);
   min-height: calc(100vh - 84px);
   padding: 24px;
 
@@ -422,7 +422,7 @@ getList();
     border-radius: 20px;
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    background: #ffffff;
+    background: var(--el-bg-color-overlay);
 
     &:hover {
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
@@ -461,7 +461,7 @@ getList();
     overflow: hidden;
     
     :deep(th.el-table__cell) {
-      background-color: #f8f9fa;
+      background-color: var(--el-fill-color-light);
       color: #606266;
       font-weight: 600;
       height: 50px;
@@ -472,7 +472,7 @@ getList();
       transition: all 0.2s;
       
       &:hover > td {
-        background-color: #f5f7fa !important;
+        background-color: var(--el-fill-color) !important;
       }
     }
 
@@ -508,7 +508,7 @@ getList();
     }
 
     .image-upload-section {
-      background: #f8fafc;
+      background: var(--el-fill-color-light);
       padding: 20px;
       border-radius: 12px;
       border: 1px dashed #e2e8f0;

@@ -443,7 +443,7 @@ const handleApplicationQuery = async () => {
 
 <style lang="scss" scoped>
 .application-stat {
-  background-color: #f7f9fb;
+  background-color: var(--app-main-bg);
   min-height: calc(100vh - 84px);
   padding: 24px;
 
@@ -477,7 +477,7 @@ const handleApplicationQuery = async () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: white;
+        background: var(--el-bg-color-overlay);
 
         &.primary .card-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         &.warning .card-icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
@@ -487,7 +487,7 @@ const handleApplicationQuery = async () => {
 
       .stat-title {
         font-size: 14px;
-        color: #64748b;
+        color: var(--el-text-color-secondary);
         margin-bottom: 8px;
         font-weight: 500;
       }
@@ -495,7 +495,7 @@ const handleApplicationQuery = async () => {
       .stat-value {
         font-size: 28px;
         font-weight: 800;
-        color: #1e293b;
+        color: var(--el-text-color-primary);
         margin-bottom: 8px;
         letter-spacing: -0.02em;
       }
@@ -509,7 +509,7 @@ const handleApplicationQuery = async () => {
 
         &.up { color: #10b981; }
         &.down { color: #ef4444; }
-        &.neutral { color: #94a3b8; }
+        &.neutral { color: var(--el-text-color-placeholder); }
       }
 
       .card-icon {
@@ -528,7 +528,7 @@ const handleApplicationQuery = async () => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      .title { font-size: 16px; font-weight: 700; color: #1e293b; }
+      .title { font-size: 16px; font-weight: 700; color: var(--el-text-color-primary); }
     }
     
     .chart-container {
@@ -546,7 +546,7 @@ const handleApplicationQuery = async () => {
   border: none;
   border-radius: 20px;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
-  background: #ffffff;
+  background: var(--el-bg-color-overlay);
 }
 </style>
 
@@ -576,7 +576,7 @@ const handleApplicationQuery = async () => {
 
   .stat-dialog__pagination {
     flex-shrink: 0;
-    background: #fff;
+    background: var(--el-bg-color-overlay);
     border-top: 1px solid #f0f0f0;
     margin-top: 12px;
     padding-top: 12px;

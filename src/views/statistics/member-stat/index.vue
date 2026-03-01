@@ -361,7 +361,7 @@ const handleQuery = async () => {
 
 <style lang="scss" scoped>
 .member-stat {
-  background-color: #f7f9fb;
+  background-color: var(--app-main-bg);
   min-height: calc(100vh - 84px);
   padding: 24px;
 
@@ -390,18 +390,18 @@ const handleQuery = async () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: white;
+        background: var(--el-bg-color-overlay);
         &.primary .card-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         &.warning .card-icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
         &.success .card-icon { color: #10b981; background: rgba(16, 185, 129, 0.1); }
         &.danger .card-icon { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
       }
-      .stat-title { font-size: 14px; color: #64748b; margin-bottom: 8px; font-weight: 500; }
-      .stat-value { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 8px; letter-spacing: -0.02em; }
+      .stat-title { font-size: 14px; color: var(--el-text-color-secondary); margin-bottom: 8px; font-weight: 500; }
+      .stat-value { font-size: 28px; font-weight: 800; color: var(--el-text-color-primary); margin-bottom: 8px; letter-spacing: -0.02em; }
       .stat-trend {
         display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;
         &.up { color: #10b981; }
-        &.neutral { color: #94a3b8; }
+        &.neutral { color: var(--el-text-color-placeholder); }
       }
       .card-icon {
         width: 64px; height: 64px; border-radius: 16px;
@@ -413,7 +413,7 @@ const handleQuery = async () => {
   .chart-card {
     .card-header {
       display: flex; justify-content: space-between; align-items: center;
-      .title { font-size: 16px; font-weight: 700; color: #1e293b; }
+      .title { font-size: 16px; font-weight: 700; color: var(--el-text-color-primary); }
     }
     .chart-container {
       height: 350px; width: 100%;
@@ -428,7 +428,7 @@ const handleQuery = async () => {
   border: none;
   border-radius: 20px;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
-  background: #ffffff;
+  background: var(--el-bg-color-overlay);
 }
 </style>
 
@@ -454,7 +454,7 @@ const handleQuery = async () => {
   }
   .stat-dialog__pagination {
     flex-shrink: 0;
-    background: #fff;
+    background: var(--el-bg-color-overlay);
     border-top: 1px solid #f0f0f0;
     margin-top: 12px;
     padding-top: 12px;
