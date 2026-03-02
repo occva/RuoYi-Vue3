@@ -67,3 +67,19 @@ export function quitClub(clubId) {
     method: 'post'
   })
 }
+
+// 撤回入社申请
+export function cancelJoinApplication(applicationId) {
+  return request({
+    url: '/api/app/club/cancel-join/' + applicationId,
+    method: 'post'
+  })
+}
+
+// 撤回创建社团申请
+export function cancelCreateApplication(applyId) {
+  return request({
+    url: '/api/app/club/cancel-create/' + applyId,
+    method: 'post'
+  })
+}

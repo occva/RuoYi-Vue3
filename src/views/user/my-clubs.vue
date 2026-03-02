@@ -44,7 +44,7 @@
                   @click="goToManagedDetail(club)"
                 >
                   <div class="card-image-wrapper">
-                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                    <el-image :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-image" fit="cover">
                       <template #error>
                         <div class="image-placeholder">
                           <el-icon><Picture /></el-icon>
@@ -87,7 +87,7 @@
                   @click="goToDetail(club)"
                 >
                   <div class="card-image-wrapper">
-                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                    <el-image :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-image" fit="cover">
                       <template #error>
                         <div class="image-placeholder">
                           <el-icon><Picture /></el-icon>
@@ -185,6 +185,14 @@
                   <el-button link type="primary" @click="viewActivityDetail(activity)">
                     查看活动详情
                   </el-button>
+                  <el-button
+                    v-if="activity.status !== '2' && activity.status !== '3'"
+                    link
+                    type="danger"
+                    @click="handleCancelActivity(activity)"
+                  >
+                    取消报名
+                  </el-button>
                 </div>
               </article>
             </div>
@@ -208,7 +216,7 @@
                   @click="goToDetail(club)"
                 >
                   <div class="card-image-wrapper">
-                    <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+                    <el-image :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-image" fit="cover">
                       <template #error>
                         <div class="image-placeholder">
                           <el-icon><Picture /></el-icon>
@@ -288,6 +296,24 @@
                         <p>{{ app.reviewComment }}</p>
                       </div>
                     </div>
+                    <div class="app-actions">
+                      <el-button
+                        v-if="app.status === '0'"
+                        link
+                        type="danger"
+                        @click="handleCancelJoin(app)"
+                      >
+                        撤回申请
+                      </el-button>
+                      <el-button
+                        v-if="app.status === '2'"
+                        link
+                        type="primary"
+                        @click="$router.push(`/user/club/${app.clubId}`)"
+                      >
+                        重新申请
+                      </el-button>
+                    </div>
                   </article>
                 </div>
                 <div v-else class="empty-state application-empty">
@@ -304,8 +330,9 @@
                   <article
                     v-for="(app, index) in createApplications"
                     :key="app.applyId"
-                    class="app-card"
-                    :style="{ '--delay': index * 0.05 + 's' }"
+                    class="app-card clickable-card"
+                    :style="{ '--delay': index * 0.05 + 's', cursor: 'pointer' }"
+                    @click="viewCreateApplication(app)"
                   >
                     <div class="app-header">
                       <div class="app-title">
@@ -346,18 +373,58 @@
                         <p>{{ app.reviewComment }}</p>
                       </div>
                     </div>
-                    <div v-if="app.status === '1'" class="app-actions">
+                    <div class="app-actions">
+                      <!-- 待审核 → 撤回 -->
                       <el-button
-                        v-if="app.approvedClubId"
+                        v-if="app.status === '0'"
+                        link
+                        type="danger"
+                        @click.stop="handleCancelCreate(app)"
+                      >
+                        撤回申请
+                      </el-button>
+                      <!-- 已通过 → 查看社团 -->
+                      <template v-if="app.status === '1'">
+                        <el-button
+                          v-if="app.approvedClubId"
+                          link
+                          type="primary"
+                          @click.stop="goToApprovedClub(app)"
+                        >
+                          查看已创建社团
+                        </el-button>
+                        <div v-if="app.adminUserName" class="admin-account-info">
+                          <el-alert
+                            type="success"
+                            :closable="false"
+                            class="admin-alert"
+                          >
+                            <template #title>
+                              <div class="alert-title">
+                                <el-icon><Management /></el-icon>
+                                社长后台账号已生成
+                              </div>
+                            </template>
+                            <div class="alert-desc">
+                              <p>账号：<strong>{{ app.adminUserName }}</strong></p>
+                              <p>初始密码：<strong>{{ app.adminInitPassword || '123456' }}</strong></p>
+                              <p class="login-tip">
+                                请使用此账号登录管理系统，进行社团管理。
+                                <a href="http://localhost:5173/login" target="_blank" class="login-link">前往登录管理后台</a>
+                              </p>
+                            </div>
+                          </el-alert>
+                        </div>
+                      </template>
+                      <!-- 已拒绝/已撤回 → 重新申请（携带 applyId 预填表单） -->
+                      <el-button
+                        v-if="app.status === '2' || app.status === '3'"
                         link
                         type="primary"
-                        @click="goToApprovedClub(app)"
+                        @click.stop="$router.push({ path: '/user/club-apply', query: { from: app.applyId } })"
                       >
-                        查看已创建社团
+                        重新申请
                       </el-button>
-                      <span v-if="app.adminUserName" class="account-text">
-                        社长后台账号：{{ app.adminUserName }}
-                      </span>
                     </div>
                   </article>
                 </div>
@@ -381,8 +448,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getMyClubs, quitClub } from '@/api/user/club'
-import { listMyActivities } from '@/api/user/activity'
+import { getMyClubs, quitClub, cancelJoinApplication, cancelCreateApplication } from '@/api/user/club'
+import { listMyActivities, cancelActivityRegistration } from '@/api/user/activity'
+import { getImgUrl } from '@/utils/ruoyi'
 import { Management, UserFilled, Picture, ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -439,8 +507,12 @@ const activityEmptyDescription = computed(() => {
 
 const syncTabFromQuery = () => {
   const tab = route.query?.tab
+  const subtab = route.query?.subtab
   if (typeof tab === 'string' && validTabs.includes(tab)) {
     activeTab.value = tab
+    if (tab === 'applications' && subtab === 'create') {
+      applicationSubTab.value = 'create'
+    }
   }
 }
 
@@ -496,12 +568,12 @@ const getJoinStatusText = (status) => {
 }
 
 const getCreateStatusType = (status) => {
-  const map = { '0': 'warning', '1': 'success', '2': 'danger' }
+  const map = { '0': 'warning', '1': 'success', '2': 'danger', '3': 'info' }
   return map[status] || 'info'
 }
 
 const getCreateStatusText = (status) => {
-  const map = { '0': '审核中', '1': '已通过', '2': '已拒绝' }
+  const map = { '0': '审核中', '1': '已通过', '2': '已拒绝', '3': '已撤回' }
   return map[status] || '未知状态'
 }
 
@@ -526,6 +598,10 @@ const formatTime = (value) => {
 const goToApprovedClub = (app) => {
   if (!app.approvedClubId) return
   router.push(`/user/club/${app.approvedClubId}`)
+}
+
+const viewCreateApplication = (app) => {
+  router.push({ path: '/user/club-apply', query: { from: app.applyId, view: '1' } })
 }
 
 const viewActivityDetail = (activity) => {
@@ -557,6 +633,66 @@ const handleQuit = (club) => {
   }).catch(() => {
     // cancelled
   })
+}
+
+const handleCancelJoin = (app) => {
+  ElMessageBox.confirm(
+    `确定要撤回对「${app.clubName}」的入社申请吗？`,
+    '撤回确认',
+    { confirmButtonText: '确认撤回', cancelButtonText: '取消', type: 'warning' }
+  ).then(async () => {
+    try {
+      const res = await cancelJoinApplication(app.applicationId)
+      if (res.code === 200) {
+        ElMessage.success('申请已撤回')
+        fetchData()
+      } else {
+        ElMessage.error(res.msg || '撤回失败')
+      }
+    } catch (e) {
+      ElMessage.error('操作失败，请重试')
+    }
+  }).catch(() => {})
+}
+
+const handleCancelCreate = (app) => {
+  ElMessageBox.confirm(
+    `确定要撤回「${app.clubName}」的创建社团申请吗？`,
+    '撤回确认',
+    { confirmButtonText: '确认撤回', cancelButtonText: '取消', type: 'warning' }
+  ).then(async () => {
+    try {
+      const res = await cancelCreateApplication(app.applyId)
+      if (res.code === 200) {
+        ElMessage.success('申请已撤回')
+        fetchData()
+      } else {
+        ElMessage.error(res.msg || '撤回失败')
+      }
+    } catch (e) {
+      ElMessage.error('操作失败，请重试')
+    }
+  }).catch(() => {})
+}
+
+const handleCancelActivity = (activity) => {
+  ElMessageBox.confirm(
+    `确定要取消报名「${activity.activityTitle}」吗？`,
+    '取消报名确认',
+    { confirmButtonText: '确认取消', cancelButtonText: '关闭', type: 'warning' }
+  ).then(async () => {
+    try {
+      const res = await cancelActivityRegistration(activity.activityId)
+      if (res.code === 200) {
+        ElMessage.success('已取消报名')
+        fetchData()
+      } else {
+        ElMessage.error(res.msg || '取消失败')
+      }
+    } catch (e) {
+      ElMessage.error('操作失败，请重试')
+    }
+  }).catch(() => {})
 }
 
 onMounted(() => {
@@ -1033,6 +1169,44 @@ watch(() => route.query.tab, () => {
   background: #f1f5f9;
   border-radius: 999px;
   padding: 0.25rem 0.65rem;
+}
+
+.admin-account-info {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.admin-alert {
+  border-radius: 8px;
+  background-color: #f0fdf4 !important;
+  color: #166534 !important;
+  
+  .alert-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .alert-desc p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+  }
+  
+  .login-tip {
+    margin-top: 12px !important;
+    font-size: 0.85rem;
+    color: #4b5563;
+  }
+  
+  .login-link {
+    color: #2563eb;
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 8px;
+  }
 }
 
 /* Tabs Stylings Override */
