@@ -92,11 +92,29 @@
           <template #header>
             <div class="card-header">
               <span>更新日志</span>
-              <el-tag size="small" effect="plain">2026-01-02</el-tag>
+              <el-tag size="small" effect="plain">截至 2026-03-01</el-tag>
             </div>
           </template>
           <el-collapse accordion model-value="1">
-            <el-collapse-item title="v1.0.0 核心业务上线" name="1">
+            <el-collapse-item title="2026年03月（迭代与修复）" name="1">
+              <ol class="update-list">
+                <li><span class="tag feature">Feature</span> 登录/注册页重构，新增注册协议勾选与校验流程</li>
+                <li><span class="tag new">New</span> 用户端新增“我的活动”页签，支持二级状态筛选</li>
+                <li><span class="tag fix">Fix</span> 修复活动报名错误透传与报名后跳转逻辑</li>
+                <li><span class="tag fix">Fix</span> 修复社团详情游客访问提示、侧边栏激活态偏移与顶部间距</li>
+                <li><span class="tag optimize">Optimize</span> 统一社团页/统计页主题变量并修正首页图标盒模型</li>
+              </ol>
+            </el-collapse-item>
+            <el-collapse-item title="2026年02月（功能扩展）" name="2">
+              <ol class="update-list">
+                <li><span class="tag new">New</span> 新增“新社团申请”页面与申请管理台，管理员角色增加管理端入口</li>
+                <li><span class="tag new">New</span> 上线统计分析页，支持日期筛选、分页与状态快捷查看</li>
+                <li><span class="tag feature">Feature</span> 完善“我的社团”能力，补齐收藏、退出与路由入口</li>
+                <li><span class="tag optimize">Optimize</span> 优化用户端首页背景、头部衔接、页脚结构及分段滚动动效</li>
+                <li><span class="tag fix">Fix</span> 修正入社申请字段映射，完成权限路径对齐与验证码兼容兜底</li>
+              </ol>
+            </el-collapse-item>
+            <el-collapse-item title="2026年01月（基础能力完善）" name="3">
               <ol class="update-list">
                 <li><span class="tag new">New</span> 完成社团/成员/活动/公告四大模块</li>
                 <li><span class="tag new">New</span> 实现"申请-审核-自动入库"业务闭环</li>
@@ -106,7 +124,7 @@
                 <li><span class="tag fix">Fix</span> 修复数据库字段映射与 Mapper 缺陷</li>
               </ol>
             </el-collapse-item>
-             <el-collapse-item title="v0.9.0 基础架构升级" name="2">
+            <el-collapse-item title="2025年12月（项目重构启动）" name="4">
               <ol class="update-list">
                 <li>集成 RuoYi-Vue 脚手架</li>
                 <li>后端升级至 Java 21 + Spring Boot 3.3</li>
