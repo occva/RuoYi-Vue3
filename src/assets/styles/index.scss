@@ -99,7 +99,6 @@ div:focus {
 }
 
 aside {
-  background: #eef1f6;
   padding: 8px 24px;
   margin-bottom: 20px;
   border-radius: 2px;
@@ -183,7 +182,7 @@ aside {
 .router-link-active,
 .router-link-exact-active,
 .el-menu-item.is-active,
-.el-sub-menu.is-active > .el-sub-menu__title {
+.el-sub-menu.is-active>.el-sub-menu__title {
   transform: none !important;
   translate: none !important;
 }

@@ -41,7 +41,7 @@
       <template #header>
         <div class="card-header">
           <span>新社团申请管理</span>
-          <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
             <el-button
               type="danger"
               plain
