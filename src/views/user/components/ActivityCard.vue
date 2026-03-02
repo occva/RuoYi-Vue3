@@ -1,7 +1,7 @@
 <template>
   <div class="activity-card" @click="viewDetail">
     <div class="card-image">
-      <el-image :src="activity.coverUrl || activity.cover" fit="cover" class="activity-img">
+      <el-image :src="getImgUrl(activity.coverUrl || activity.cover)" fit="cover" class="activity-img">
         <template #error>
           <div class="image-placeholder">
             <el-icon><Calendar /></el-icon>
@@ -64,6 +64,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Calendar, Location, School, User } from '@element-plus/icons-vue'
+import { getImgUrl } from '@/utils/ruoyi'
 
 const props = defineProps({
   activity: {

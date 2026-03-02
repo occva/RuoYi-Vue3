@@ -22,9 +22,24 @@ export function listMyActivities() {
   })
 }
 
+// 取消活动报名
+export function cancelActivityRegistration(activityId) {
+  return request({
+    url: '/api/app/activity/cancel/' + activityId,
+    method: 'post'
+  })
+}
+
 export function getActivity(id) {
   return request({
     url: '/api/app/activity/' + id,
+    method: 'get'
+  })
+}
+
+export function listActivityRegistrations(activityId) {
+  return request({
+    url: '/api/app/activity/' + activityId + '/registrations',
     method: 'get'
   })
 }

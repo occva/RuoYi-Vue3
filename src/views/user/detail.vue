@@ -17,11 +17,11 @@
           </button>
 
           <div class="club-profile-image-wrapper">
-            <img :src="club.logoUrl" :alt="club.clubName" class="club-profile-image" />
+            <img :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-profile-image" />
           </div>
 
           <div class="club-header-info">
-            <span class="club-badge">校园社团</span>
+            <span class="club-badge">{{ club.categoryName || '校园社团' }}</span>
             <h1 class="club-title">{{ club.clubName }}</h1>
             <div class="club-meta-grid">
               <div class="club-meta-item">
@@ -30,7 +30,7 @@
               </div>
               <div class="club-meta-item">
                 <el-icon><Clock /></el-icon>
-                <span>创建时间: <strong>{{ formatDate(club.foundedDate) }}</strong></span>
+                <span>成立时间: <strong>{{ formatDate(club.foundedDate) || formatDate(club.createTime) }}</strong></span>
               </div>
               <div class="club-meta-item" v-if="club.remark">
                 <el-icon><Calendar /></el-icon>
@@ -83,17 +83,27 @@
                     <el-tag :type="getStatusType(activity.status)" size="small" effect="light" round>
                       {{ getStatusText(activity.status) }}
                     </el-tag>
+                    <el-tag
+                      v-if="isActivityRegistered(activity)"
+                      type="success"
+                      size="small"
+                      effect="light"
+                      round
+                    >
+                      已报名
+                    </el-tag>
                   </div>
                 </div>
                 <div class="act-actions">
                   <el-button plain @click="showActivityDetail(activity)">查看详情</el-button>
                   <el-button
                     v-if="activity.status === '0' || activity.status === '1'"
-                    type="primary"
-                    :disabled="!canRegister(activity)"
+                    :type="isActivityRegistered(activity) ? 'success' : 'primary'"
+                    :plain="isActivityRegistered(activity)"
+                    :disabled="isActivityRegistered(activity) || !canRegister(activity)"
                     @click="signUpActivity(activity)"
                   >
-                    参与报名
+                    {{ isActivityRegistered(activity) ? '已报名' : '参与报名' }}
                   </el-button>
                 </div>
               </div>
@@ -132,13 +142,13 @@
                 </div>
 
                 <div class="stat-item">
-                  <div class="stat-icon-wrapper is-status" :class="club.isRecruiting === 'Y' ? 'active' : 'inactive'">
+                  <div class="stat-icon-wrapper is-status" :class="club.isRecruiting === '1' ? 'active' : 'inactive'">
                     <el-icon><DataLine /></el-icon>
                   </div>
                   <div class="stat-info">
                     <span class="stat-label">招新状态</span>
-                    <span class="stat-value" :class="{ 'text-blue': club.isRecruiting === 'Y' }">
-                      {{ club.isRecruiting === 'Y' ? '正在招新' : '暂未开放' }}
+                    <span class="stat-value" :class="{ 'text-blue': club.isRecruiting === '1' }">
+                      {{ club.isRecruiting === '1' ? '正在招新' : '暂未开放' }}
                     </span>
                   </div>
                 </div>
@@ -242,6 +252,7 @@ import { User, Clock, Calendar, Location, Star, StarFilled, Phone, Message, View
 import { getClub, joinClub, toggleFavorite as toggleFavoriteApi } from '@/api/user/club'
 import { listActivitiesByClub, registerActivity } from '@/api/user/activity'
 import { listNoticesByClub } from '@/api/user/notice'
+import { getImgUrl } from '@/utils/ruoyi'
 
 const route = useRoute()
 const router = useRouter()
@@ -327,6 +338,7 @@ const toggleFavorite = async () => {
   }
 }
 
+
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
   return dateStr.split(' ')[0] // Returns YYYY-MM-DD
@@ -349,8 +361,18 @@ const showActivityDetail = (activity) => {
   router.push(`/user/activity/${activity.activityId}`)
 }
 
+const isActivityRegistered = (activity) => {
+  if (!activity) return false
+  const value = activity.hasRegistered ?? activity.isRegistered ?? activity.registered
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value === 1
+  if (typeof value === 'string') return ['1', 'true', 'y', 'yes'].includes(value.toLowerCase())
+  return false
+}
+
 const canRegister = (act) => {
   if (!act) return false
+  if (isActivityRegistered(act)) return false
   if (act.status !== '0' && act.status !== '1') return false
   
   const now = new Date().getTime()
@@ -378,7 +400,11 @@ const isNeedClubMemberError = (error) => {
 const signUpActivity = (activity) => {
   registerActivity(activity.activityId).then(response => {
     ElMessage.success(response.msg || ('报名成功: ' + activity.activityTitle))
-    router.push({ path: '/user/my-clubs', query: { tab: 'activities' } })
+    activity.hasRegistered = true
+    const current = Number(activity.currentParticipants || 0)
+    if (!Number.isNaN(current)) {
+      activity.currentParticipants = current + 1
+    }
   }).catch((error) => {
     if (isNeedClubMemberError(error)) {
       const targetClubId = activity?.clubId || club.value?.clubId
@@ -749,6 +775,8 @@ const handleApply = () => {
 }
 .act-status-row {
   display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 .act-actions {
   grid-area: actions;
@@ -918,4 +946,5 @@ const handleApply = () => {
   color: #3b82f6 !important;
 }
 </style>
+
 

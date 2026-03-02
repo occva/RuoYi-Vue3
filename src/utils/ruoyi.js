@@ -86,7 +86,7 @@ export function selectDictLabel(datas, value) {
 
 // 回显数据字典（字符串、数组）
 export function selectDictLabels(datas, value, separator) {
-  if (value === undefined || value.length ===0) {
+  if (value === undefined || value.length === 0) {
     return ""
   }
   if (Array.isArray(value)) {
@@ -225,4 +225,17 @@ export function getNormalPath(p) {
 // 验证是否为blob格式
 export function blobValidate(data) {
   return data.type !== 'application/json'
+}
+
+/**
+ * 图片路径处理：支持 /profile/... 本地相对路径 和 https://... 外部路径
+ * 相对路径自动拼接后端 baseApi 前缀
+ * @param {string} url 原始图片路径
+ * @returns {string} 可直接用于 src 的完整路径
+ */
+export function getImgUrl(url) {
+  if (!url || url.trim() === '') return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  const baseApi = import.meta.env.VITE_APP_BASE_API || ''
+  return baseApi + url
 }
