@@ -74,7 +74,7 @@
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="Logo" align="center" prop="logoUrl" width="80">
           <template #default="scope">
-            <el-avatar :size="40" :src="scope.row.logoUrl" class="table-avatar" />
+            <el-avatar :size="40" :src="getImgUrl(scope.row.logoUrl)" class="table-avatar" />
           </template>
         </el-table-column>
         <el-table-column label="社团名称" align="center" prop="clubName" :show-overflow-tooltip="true" />
@@ -241,6 +241,7 @@
 <script setup name="ClubList">
 import { listClub, getClub, delClub, addClub, updateClub, updateClubPopular, exportClub } from "@/api/club/club";
 import { listCategory } from "@/api/club/category";
+import { getImgUrl } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
 const { club_status } = proxy.useDict('club_status');

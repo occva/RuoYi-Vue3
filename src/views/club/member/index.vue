@@ -48,7 +48,7 @@
         <el-table-column label="成员" align="center" width="220">
           <template #default="scope">
             <div class="member-profile">
-              <el-avatar :size="40" :src="scope.row.avatar" />
+              <el-avatar :size="40" :src="getImgUrl(scope.row.avatar)" />
               <div class="info">
                 <span class="nick">{{ scope.row.nickName }}</span>
                 <span class="user">@{{ scope.row.userName }}</span>
@@ -125,6 +125,7 @@
 <script setup name="ClubMember">
 import { listMember, getMember, delMember, updateMember } from "@/api/club/member";
 import { listClub } from "@/api/club/club";
+import { getImgUrl } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
 const { club_role_type, club_member_status } = proxy.useDict('club_role_type', 'club_member_status');

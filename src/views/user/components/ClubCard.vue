@@ -1,7 +1,7 @@
 <template>
   <div class="club-card" @click="goToDetail">
     <div class="card-image-wrapper">
-      <el-image :src="club.logoUrl" :alt="club.clubName" class="club-image" fit="cover">
+      <el-image :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-image" fit="cover">
         <template #error>
           <div class="image-placeholder">
             <el-icon><Picture /></el-icon>
@@ -40,6 +40,7 @@
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Calendar, Picture, StarFilled } from '@element-plus/icons-vue'
+import { getImgUrl } from '@/utils/ruoyi'
 
 const props = defineProps({
   club: {
