@@ -136,6 +136,19 @@ const captchaEnabled = ref(false)
 // 注册开关
 const register = ref(false)
 const redirect = ref(undefined)
+const clientTypeFromQuery = computed(() => {
+  const raw = route.query.clientType
+  return typeof raw === 'string' ? raw.toLowerCase() : ''
+})
+const loginClientType = computed(() => {
+  if (clientTypeFromQuery.value === 'admin' || clientTypeFromQuery.value === 'user') {
+    return clientTypeFromQuery.value
+  }
+  if (typeof redirect.value === 'string' && redirect.value.startsWith('/user')) {
+    return 'user'
+  }
+  return 'admin'
+})
 
 watch(route, (newRoute) => {
     redirect.value = newRoute.query && newRoute.query.redirect
@@ -157,7 +170,7 @@ function handleLogin() {
         Cookies.remove("rememberMe")
       }
       // 调用action的登录方法
-      userStore.login({ ...loginForm.value, clientType: 'admin' }).then(() => {
+      userStore.login({ ...loginForm.value, clientType: loginClientType.value }).then(() => {
         const query = route.query
         const otherQueryParams = Object.keys(query).reduce((acc, cur) => {
           if (cur !== "redirect") {

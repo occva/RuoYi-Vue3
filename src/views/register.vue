@@ -26,7 +26,7 @@
         </div>
         <div class="intro-links">
           <router-link to="/user/home" class="intro-link">返回首页</router-link>
-          <router-link to="/login" class="intro-link intro-link-ghost">已有账号登录</router-link>
+          <router-link to="/login?clientType=user&redirect=/user/home" class="intro-link intro-link-ghost">已有账号登录</router-link>
         </div>
         </section>
 
@@ -98,7 +98,7 @@
               <span class="meta-tip">注册即表示你同意</span>
               <a href="#" class="policy-link">平台使用规范</a>
             </div>
-            <router-link class="switch-link" :to="'/login'">使用已有账户登录</router-link>
+            <router-link class="switch-link" :to="'/login?clientType=user&redirect=/user/home'">使用已有账户登录</router-link>
           </div>
 
           <el-form-item class="submit-item">
@@ -180,7 +180,7 @@ function handleRegister() {
           dangerouslyUseHTMLString: true,
           type: "success",
         }).then(() => {
-          router.push("/login")
+          router.push("/login?clientType=user&redirect=/user/home")
         }).catch(() => {})
       }).catch(() => {
         loading.value = false

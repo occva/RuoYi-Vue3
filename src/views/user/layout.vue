@@ -241,7 +241,7 @@ onMounted(async () => {
 })
 
 const handleLogin = () => {
-  router.push('/login')
+  router.push('/login?clientType=user&redirect=/user/home')
 }
 
 function handleCommand(command) {
