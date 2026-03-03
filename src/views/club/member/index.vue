@@ -3,7 +3,7 @@
     <el-card class="premium-card search-card">
       <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
         <el-form-item label="社团" prop="clubId">
-          <el-select v-model="queryParams.clubId" placeholder="选择社团" clearable style="width: 200px">
+          <el-select v-model="queryParams.clubId" placeholder="选择社团" style="width: 200px">
             <el-option
               v-for="item in clubOptions"
               :key="item.clubId"
@@ -90,7 +90,7 @@
           <el-input :value="form.nickName" disabled />
         </el-form-item>
         <el-form-item label="成员角色" prop="roleType">
-          <el-select v-model="form.roleType" placeholder="请选择角色" style="width: 100%">
+          <el-select v-model="form.roleType" placeholder="请选择角色" style="width: 100%" @change="handleRoleTypeChange">
             <el-option
               v-for="dict in club_role_type"
               :key="dict.value"
@@ -99,8 +99,14 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item v-if="isTransferPresidentSelection" label="原社长转让后">
+          <el-select v-model="form.transferOldPresidentNewRoleType" style="width: 100%">
+            <el-option label="副社长" value="2" />
+            <el-option label="普通成员" value="3" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
+          <el-radio-group v-model="form.status" :disabled="isSpecialRoleFlow">
             <el-radio
               v-for="dict in club_member_status"
               :key="dict.value"
@@ -123,7 +129,15 @@
 </template>
 
 <script setup name="ClubMember">
-import { listMember, getMember, delMember, updateMember } from "@/api/club/member";
+import {
+  listMember,
+  getMember,
+  delMember,
+  updateMember,
+  transferPresident,
+  appointVicePresident,
+  revokeVicePresident
+} from "@/api/club/member";
 import { listClub } from "@/api/club/club";
 import { getImgUrl } from '@/utils/ruoyi';
 
@@ -139,6 +153,7 @@ const ids = ref([]);
 const total = ref(0);
 const multiple = ref(true);
 const title = ref("");
+const originalRoleType = ref("");
 
 const data = reactive({
   form: {},
@@ -156,8 +171,15 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+const isTransferPresidentSelection = computed(() => form.value?.roleType === '1' && originalRoleType.value !== '1');
+const isAppointViceSelection = computed(() => form.value?.roleType === '2' && originalRoleType.value !== '2');
+const isRevokeViceSelection = computed(() => originalRoleType.value === '2' && form.value?.roleType !== '2' && form.value?.roleType !== '1');
+const isSpecialRoleFlow = computed(() =>
+  isTransferPresidentSelection.value || isAppointViceSelection.value || isRevokeViceSelection.value
+);
 
 function getList() {
+  ensureDefaultClubId();
   loading.value = true;
   listMember(queryParams.value).then(response => {
     memberList.value = response.rows;
@@ -167,19 +189,28 @@ function getList() {
 }
 
 function getClubList() {
-  listClub({ pageSize: 1000 }).then(response => {
-    clubOptions.value = response.rows;
+  return listClub({ pageSize: 1000 }).then(response => {
+    clubOptions.value = response.rows || [];
+    ensureDefaultClubId();
   });
+}
+
+function ensureDefaultClubId() {
+  if (!queryParams.value.clubId && clubOptions.value.length > 0) {
+    queryParams.value.clubId = clubOptions.value[0].clubId;
+  }
 }
 
 
 function handleQuery() {
   queryParams.value.pageNum = 1;
+  ensureDefaultClubId();
   getList();
 }
 
 function resetQuery() {
   proxy.resetForm("queryRef");
+  queryParams.value.clubId = clubOptions.value[0]?.clubId;
   handleQuery();
 }
 
@@ -190,6 +221,7 @@ function handleSelectionChange(selection) {
 
 function cancel() {
   open.value = false;
+  originalRoleType.value = "";
   reset();
 }
 
@@ -198,6 +230,7 @@ function reset() {
     memberId: undefined,
     roleType: '3',
     status: '0',
+    transferOldPresidentNewRoleType: '3',
     remark: undefined
   };
   proxy.resetForm("memberRef");
@@ -208,15 +241,73 @@ function handleUpdate(row) {
   const memberId = row.memberId || ids.value;
   getMember(memberId).then(response => {
     form.value = response.data;
+    form.value.transferOldPresidentNewRoleType = '3';
+    originalRoleType.value = response.data.roleType;
     open.value = true;
     title.value = "修改成员属性";
   });
 }
 
+function handleRoleTypeChange(roleType) {
+  if ((roleType === '1' && originalRoleType.value !== '1') || (roleType === '2' && originalRoleType.value !== '2')) {
+    form.value.status = '0';
+  }
+}
+
 function submitForm() {
   proxy.$refs["memberRef"].validate(valid => {
     if (valid) {
-      updateMember(form.value).then(response => {
+      if (isTransferPresidentSelection.value) {
+        proxy.$modal.confirm(
+          `该操作为社长转让，确认后将立即移交本社团管理权限。\n\n影响清单：\n1. 原社长降级为【${form.value.transferOldPresidentNewRoleType === '2' ? '副社长' : '普通成员'}】\n2. 新社长获得管理端权限\n3. 相关账号可能需要重新登录后生效\n\n确认将【${form.value.nickName || form.value.userName || '该成员'}】设为新社长？`
+        ).then(() => {
+          return transferPresident({
+            clubId: form.value.clubId,
+            fromMemberId: null,
+            toMemberId: form.value.memberId,
+            fromPresidentNewRoleType: form.value.transferOldPresidentNewRoleType || '3'
+          });
+        }).then(() => {
+          proxy.$modal.msgSuccess("转让成功");
+          open.value = false;
+          getList();
+        });
+        return;
+      }
+      if (isAppointViceSelection.value) {
+        proxy.$modal.confirm(
+          `将授予【${form.value.nickName || form.value.userName || '该成员'}】副社长管理权限。\n若其当前无管理端身份，将自动开通。是否继续？`
+        ).then(() => {
+          return appointVicePresident({
+            clubId: form.value.clubId,
+            memberId: form.value.memberId
+          });
+        }).then(() => {
+          proxy.$modal.msgSuccess("任命副社长成功");
+          open.value = false;
+          getList();
+        });
+        return;
+      }
+      if (isRevokeViceSelection.value) {
+        proxy.$modal.confirm(
+          `将撤销【${form.value.nickName || form.value.userName || '该成员'}】副社长权限，并降级为普通成员。是否继续？`
+        ).then(() => {
+          return revokeVicePresident({
+            clubId: form.value.clubId,
+            memberId: form.value.memberId,
+            toRoleType: '3'
+          });
+        }).then(() => {
+          proxy.$modal.msgSuccess("撤销副社长成功");
+          open.value = false;
+          getList();
+        });
+        return;
+      }
+      const payload = { ...form.value };
+      delete payload.transferOldPresidentNewRoleType;
+      updateMember(payload).then(() => {
         proxy.$modal.msgSuccess("修改成功");
         open.value = false;
         getList();
@@ -235,8 +326,13 @@ function handleDelete(row) {
   });
 }
 
-getClubList();
-getList();
+function initPage() {
+  getClubList().finally(() => {
+    getList();
+  });
+}
+
+initPage();
 </script>
 
 <style lang="scss" scoped>
