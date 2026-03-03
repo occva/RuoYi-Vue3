@@ -448,7 +448,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getMyClubs, quitClub, cancelJoinApplication, cancelCreateApplication } from '@/api/user/club'
+import { getMyClubsBase, getMyClubFavorites, getMyClubApplications, quitClub, cancelJoinApplication, cancelCreateApplication } from '@/api/user/club'
 import { listMyActivities, cancelActivityRegistration } from '@/api/user/activity'
 import { getImgUrl } from '@/utils/ruoyi'
 import { Management, UserFilled, Picture, ArrowRight } from '@element-plus/icons-vue'
@@ -468,6 +468,9 @@ const favoriteClubs = ref([])
 const myActivities = ref([])
 const joinApplications = ref([])
 const createApplications = ref([])
+const hasLoadedActivities = ref(false)
+const hasLoadedFavorites = ref(false)
+const hasLoadedApplications = ref(false)
 
 const validTabs = ['joined', 'activities', 'favorites', 'applications']
 
@@ -516,36 +519,88 @@ const syncTabFromQuery = () => {
   }
 }
 
-const fetchData = async () => {
+const fetchMyClubsData = async () => {
   loading.value = true
   try {
-    const results = await Promise.allSettled([getMyClubs(), listMyActivities()])
-    const res = results[0].status === 'fulfilled' ? results[0].value : { code: 500, msg: '获取社团数据失败' }
-    const myActivitiesRes = results[1].status === 'fulfilled' ? results[1].value : { code: 500 }
-
+    const res = await getMyClubsBase()
     if (res.code === 200) {
       managedClubs.value = res.managed || []
       joinedClubs.value = res.joined || []
-      favoriteClubs.value = res.favorites || []
-      joinApplications.value = res.applications || []
-      createApplications.value = res.createApplications || []
     } else {
       ElMessage.error(res.msg || '获取数据失败')
     }
-
-    if (myActivitiesRes.code === 200) {
-      const allActivities = myActivitiesRes.data || myActivitiesRes.rows || []
-      myActivities.value = allActivities
-    } else {
-      myActivities.value = []
-    }
   } catch (error) {
-    myActivities.value = []
     if (error.response && error.response.status === 401) {
       // redirect handled by permission guard
     }
   } finally {
     loading.value = false
+  }
+}
+
+const fetchMyActivitiesData = async (force = false) => {
+  if (hasLoadedActivities.value && !force) {
+    return
+  }
+  try {
+    const myActivitiesRes = await listMyActivities()
+    if (myActivitiesRes.code === 200) {
+      const allActivities = myActivitiesRes.data || myActivitiesRes.rows || []
+      myActivities.value = allActivities
+      hasLoadedActivities.value = true
+    } else {
+      myActivities.value = []
+    }
+  } catch (error) {
+    myActivities.value = []
+  }
+}
+
+const fetchMyFavoritesData = async (force = false) => {
+  if (hasLoadedFavorites.value && !force) {
+    return
+  }
+  try {
+    const res = await getMyClubFavorites()
+    if (res.code === 200) {
+      favoriteClubs.value = res.favorites || []
+      hasLoadedFavorites.value = true
+    } else {
+      favoriteClubs.value = []
+    }
+  } catch (error) {
+    favoriteClubs.value = []
+  }
+}
+
+const fetchMyApplicationsData = async (force = false) => {
+  if (hasLoadedApplications.value && !force) {
+    return
+  }
+  try {
+    const res = await getMyClubApplications()
+    if (res.code === 200) {
+      joinApplications.value = res.applications || []
+      createApplications.value = res.createApplications || []
+      hasLoadedApplications.value = true
+    } else {
+      joinApplications.value = []
+      createApplications.value = []
+    }
+  } catch (error) {
+    joinApplications.value = []
+    createApplications.value = []
+  }
+}
+
+const fetchData = async () => {
+  await fetchMyClubsData()
+  if (activeTab.value === 'activities') {
+    await fetchMyActivitiesData()
+  } else if (activeTab.value === 'favorites') {
+    await fetchMyFavoritesData()
+  } else if (activeTab.value === 'applications') {
+    await fetchMyApplicationsData()
   }
 }
 
@@ -623,7 +678,7 @@ const handleQuit = (club) => {
       const res = await quitClub(club.clubId)
       if (res.code === 200) {
         ElMessage.success('退出成功')
-        fetchData()
+        fetchMyClubsData()
       } else {
         ElMessage.error(res.msg || '退出失败')
       }
@@ -645,7 +700,7 @@ const handleCancelJoin = (app) => {
       const res = await cancelJoinApplication(app.applicationId)
       if (res.code === 200) {
         ElMessage.success('申请已撤回')
-        fetchData()
+        fetchMyApplicationsData(true)
       } else {
         ElMessage.error(res.msg || '撤回失败')
       }
@@ -665,7 +720,7 @@ const handleCancelCreate = (app) => {
       const res = await cancelCreateApplication(app.applyId)
       if (res.code === 200) {
         ElMessage.success('申请已撤回')
-        fetchData()
+        fetchMyApplicationsData(true)
       } else {
         ElMessage.error(res.msg || '撤回失败')
       }
@@ -685,7 +740,7 @@ const handleCancelActivity = (activity) => {
       const res = await cancelActivityRegistration(activity.activityId)
       if (res.code === 200) {
         ElMessage.success('已取消报名')
-        fetchData()
+        fetchMyActivitiesData(true)
       } else {
         ElMessage.error(res.msg || '取消失败')
       }
@@ -702,6 +757,16 @@ onMounted(() => {
 
 watch(() => route.query.tab, () => {
   syncTabFromQuery()
+})
+
+watch(() => activeTab.value, (tab) => {
+  if (tab === 'activities') {
+    fetchMyActivitiesData()
+  } else if (tab === 'favorites') {
+    fetchMyFavoritesData()
+  } else if (tab === 'applications') {
+    fetchMyApplicationsData()
+  }
 })
 </script>
 

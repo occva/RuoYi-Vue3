@@ -25,7 +25,7 @@ service.interceptors.request.use(config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   // 是否需要防止数据重复提交
-  const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
+  const isRepeatSubmit = (config.headers || {}).repeatSubmit === true
   // 间隔时间(ms)，小于此时间视为重复提交
   const interval = (config.headers || {}).interval || 1000
   if (getToken() && !isToken) {
@@ -38,7 +38,7 @@ service.interceptors.request.use(config => {
     config.params = {}
     config.url = url
   }
-  if (!isRepeatSubmit && (config.method === 'post' || config.method === 'put')) {
+  if (isRepeatSubmit && (config.method === 'post' || config.method === 'put')) {
     const requestObj = {
       url: config.url,
       data: typeof config.data === 'object' ? JSON.stringify(config.data) : config.data,

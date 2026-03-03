@@ -17,6 +17,30 @@ export function getMyClubs() {
   })
 }
 
+// 获取我的社团基础数据（已加入/我管理）
+export function getMyClubsBase() {
+  return request({
+    url: '/api/app/club/my/base',
+    method: 'get'
+  })
+}
+
+// 获取我的收藏
+export function getMyClubFavorites() {
+  return request({
+    url: '/api/app/club/my/favorites',
+    method: 'get'
+  })
+}
+
+// 获取我的申请
+export function getMyClubApplications() {
+  return request({
+    url: '/api/app/club/my/applications',
+    method: 'get'
+  })
+}
+
 // 获取社团详情
 export function getClub(id) {
   return request({
@@ -56,7 +80,10 @@ export function joinClub(data) {
 export function toggleFavorite(clubId) {
   return request({
     url: '/api/app/club/favorite/' + clubId,
-    method: 'post'
+    method: 'post',
+    headers: {
+      repeatSubmit: false
+    }
   })
 }
 

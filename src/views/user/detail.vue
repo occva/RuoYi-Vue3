@@ -10,7 +10,13 @@
       <div class="club-header-section">
         <div class="container club-header-container">
           <!-- 收藏按钮 -->
-          <button class="club-favorite-btn" @click="toggleFavorite" :title="isFavorite ? '取消收藏' : '收藏社团'">
+          <button
+            class="club-favorite-btn"
+            :class="{ 'is-loading': favoriteLoading }"
+            :disabled="favoriteLoading"
+            @click="toggleFavorite"
+            :title="isFavorite ? '取消收藏' : '收藏社团'"
+          >
             <el-icon :size="24" :color="isFavorite ? '#ef4444' : '#9ca3af'">
               <component :is="isFavorite ? 'StarFilled' : 'Star'" />
             </el-icon>
@@ -259,6 +265,7 @@ const router = useRouter()
 const club = ref(null)
 const loading = ref(true)
 const isFavorite = ref(false)
+const favoriteLoading = ref(false)
 const isModalOpen = ref(false)
 const submitLoading = ref(false)
 const applyFormRef = ref(null)
@@ -324,7 +331,8 @@ onMounted(loadClub)
 watch(() => route.params.id, loadClub)
 
 const toggleFavorite = async () => {
-  if (!club.value) return
+  if (!club.value || favoriteLoading.value) return
+  favoriteLoading.value = true
   try {
     const res = await toggleFavoriteApi(club.value.clubId)
     if (res.code === 200) {
@@ -334,7 +342,10 @@ const toggleFavorite = async () => {
       ElMessage.error(res.msg || '操作失败')
     }
   } catch (error) {
-    ElMessage.error('操作失败，请先登录')
+    // 非200场景已由全局响应拦截器提示，这里避免重复弹窗
+    console.warn('toggle favorite failed:', error?.message || error)
+  } finally {
+    favoriteLoading.value = false
   }
 }
 
@@ -508,6 +519,13 @@ const handleApply = () => {
 
   &:hover {
     transform: scale(1.1);
+  }
+
+  &:disabled,
+  &.is-loading {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
   }
 }
 

@@ -155,6 +155,9 @@ watch(route, (newRoute) => {
 }, { immediate: true })
 
 function handleLogin() {
+  if (loading.value) {
+    return
+  }
   proxy.$refs.loginRef.validate(valid => {
     if (valid) {
       loading.value = true
