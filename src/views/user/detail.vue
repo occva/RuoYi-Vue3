@@ -96,7 +96,7 @@
                       effect="light"
                       round
                     >
-                      已报名
+                      {{ isActivityCheckedIn(activity) ? '已签到' : '已报名' }}
                     </el-tag>
                   </div>
                 </div>
@@ -109,7 +109,7 @@
                     :disabled="isActivityRegistered(activity) || !canRegister(activity)"
                     @click="signUpActivity(activity)"
                   >
-                    {{ isActivityRegistered(activity) ? '已报名' : '参与报名' }}
+                    {{ getRegisterBtnText(activity) }}
                   </el-button>
                 </div>
               </div>
@@ -379,6 +379,20 @@ const isActivityRegistered = (activity) => {
   if (typeof value === 'number') return value === 1
   if (typeof value === 'string') return ['1', 'true', 'y', 'yes'].includes(value.toLowerCase())
   return false
+}
+
+const isActivityCheckedIn = (activity) => {
+  if (!activity) return false
+  const value = activity.hasCheckedIn ?? activity.checkedIn ?? activity.checkInStatus
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value === 1
+  if (typeof value === 'string') return ['1', 'true', 'y', 'yes'].includes(value.toLowerCase())
+  return false
+}
+
+const getRegisterBtnText = (activity) => {
+  if (isActivityCheckedIn(activity)) return '已签到'
+  return isActivityRegistered(activity) ? '已报名' : '参与报名'
 }
 
 const canRegister = (act) => {

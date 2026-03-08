@@ -66,6 +66,34 @@
                 <span class="value">{{ activity.currentParticipants || 0 }} / {{ activity.maxParticipants || '不限' }}</span>
               </div>
             </div>
+            <div class="info-card checkin-card">
+              <div class="icon-box cyan">
+                <el-icon><Select /></el-icon>
+              </div>
+              <div class="info-text">
+                <span class="label">活动签到</span>
+                <span class="value">{{ getCheckInStatusText(activity) }}</span>
+              </div>
+              <el-button
+                type="success"
+                plain
+                size="small"
+                class="checkin-btn"
+                :disabled="!canCheckIn(activity)"
+                @click="handleCheckIn"
+              >
+                {{ getCheckInBtnText(activity) }}
+              </el-button>
+            </div>
+            <div v-if="activity.myCheckInTime" class="info-card">
+              <div class="icon-box teal">
+                <el-icon><Clock /></el-icon>
+              </div>
+              <div class="info-text">
+                <span class="label">签到时间</span>
+                <span class="value">{{ formatDateTime(activity.myCheckInTime) }}</span>
+              </div>
+            </div>
           </div>
 
           <section class="panel-card description-section">
@@ -121,7 +149,10 @@
                     <img :src="getAvatarUrl(item.avatar)" class="avatar-img" />
                   </div>
                   <div class="participant-main">
-                    <h4 class="participant-name">{{ item.nickName || item.userName || '匿名用户' }}</h4>
+                    <h4 class="participant-name">
+                      <span>{{ item.nickName || item.userName || '匿名用户' }}</span>
+                      <span v-if="isRegistrationCheckedIn(item)" class="checkin-mark">已签到</span>
+                    </h4>
                     <p class="participant-time">报名时间：{{ formatDateTime(item.registrationTime) }}</p>
                   </div>
                 </article>
@@ -144,8 +175,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Calendar, Timer, Location, User, School, Phone } from '@element-plus/icons-vue'
-import { getActivity, registerActivity, listActivityRegistrations } from '@/api/user/activity'
+import { Calendar, Timer, Location, User, School, Phone, Select, Clock } from '@element-plus/icons-vue'
+import { getActivity, registerActivity, listActivityRegistrations, checkinActivity } from '@/api/user/activity'
 import defaultCover from '@/assets/images/profile.jpg'
 
 import { getImgUrl } from '@/utils/ruoyi'
@@ -261,6 +292,24 @@ const isRegistered = (act) => {
   return false
 }
 
+const isCheckedIn = (act) => {
+  if (!act) return false
+  const value = act.hasCheckedIn ?? act.checkedIn ?? act.checkInStatus
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value === 1
+  if (typeof value === 'string') return ['1', 'true', 'y', 'yes'].includes(value.toLowerCase())
+  return false
+}
+
+const isRegistrationCheckedIn = (item) => {
+  if (!item) return false
+  const value = item.checkInStatus
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value === 1
+  if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true'
+  return false
+}
+
 const getBtnText = (act) => {
   if (!act) return '不可报名'
   if (isRegistered(act)) return '已报名'
@@ -282,6 +331,37 @@ const canRegister = (act) => {
   return true
 }
 
+const canCheckIn = (act) => {
+  if (!act) return false
+  if (!isRegistered(act)) return false
+  if (isCheckedIn(act)) return false
+  if (act.status === '2' || act.status === '3') return false
+
+  const now = Date.now()
+  if (act.startTime && now < new Date(act.startTime).getTime()) return false
+  if (act.endTime && now > new Date(act.endTime).getTime()) return false
+  return true
+}
+
+const getCheckInStatusText = (act) => {
+  if (!act) return '不可签到'
+  if (!isRegistered(act)) return '需先报名'
+  if (isCheckedIn(act)) return '已签到'
+  return '未签到'
+}
+
+const getCheckInBtnText = (act) => {
+  if (!act) return '不可签到'
+  if (!isRegistered(act)) return '未报名'
+  if (isCheckedIn(act)) return '已签到'
+
+  const now = Date.now()
+  if (act.startTime && now < new Date(act.startTime).getTime()) return '活动未开始'
+  if (act.endTime && now > new Date(act.endTime).getTime()) return '活动已结束'
+  if (canCheckIn(act)) return '立即签到'
+  return '暂不可签到'
+}
+
 const extractBizError = (error) => {
   const message = typeof error === 'string'
     ? error
@@ -301,6 +381,8 @@ const handleSignUp = async () => {
     const response = await registerActivity(activity.value.activityId)
     ElMessage.success(response.msg || '报名成功')
     activity.value.hasRegistered = true
+    activity.value.hasCheckedIn = false
+    activity.value.myCheckInTime = null
     const current = Number(activity.value.currentParticipants || 0)
     if (!Number.isNaN(current)) {
       activity.value.currentParticipants = current + 1
@@ -311,6 +393,24 @@ const handleSignUp = async () => {
       setTimeout(() => {
         router.push(`/user/club/${activity.value.clubId}`)
       }, 3000)
+    }
+  }
+}
+
+const handleCheckIn = async () => {
+  if (!activity.value?.activityId || !canCheckIn(activity.value)) return
+  try {
+    const response = await checkinActivity(activity.value.activityId)
+    ElMessage.success(response.msg || '签到成功')
+    const detailRes = await getActivity(activity.value.activityId)
+    if (detailRes?.data) {
+      activity.value = detailRes.data
+    }
+    await loadRegistrations(activity.value.activityId)
+  } catch (error) {
+    const { message } = extractBizError(error)
+    if (message) {
+      ElMessage.error(message)
     }
   }
 }
@@ -455,6 +555,8 @@ const handleSignUp = async () => {
     &.green { background: #ecfdf3; color: #10b981; }
     &.orange { background: #fff7ed; color: #f97316; }
     &.purple { background: #f5f3ff; color: #8b5cf6; }
+    &.cyan { background: #ecfeff; color: #0891b2; }
+    &.teal { background: #f0fdfa; color: #0f766e; }
   }
 
   .info-text {
@@ -475,6 +577,20 @@ const handleSignUp = async () => {
       font-weight: 700;
       word-break: break-word;
     }
+
+  }
+}
+
+.checkin-card {
+  justify-content: space-between;
+
+  .info-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .checkin-btn {
+    flex-shrink: 0;
   }
 }
 
@@ -575,6 +691,24 @@ const handleSignUp = async () => {
   font-size: 0.95rem;
   font-weight: 700;
   color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.checkin-mark {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--el-color-success-light-5, #95d475);
+  background: var(--el-color-success-light-9, #f0f9eb);
+  border: 1px solid var(--el-color-success-light-8, #d1edc4);
+  border-radius: 999px;
+  line-height: 20px;
+  flex-shrink: 0;
 }
 
 .participant-time {
@@ -662,6 +796,17 @@ const handleSignUp = async () => {
 
   .sidebar-column {
     position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .checkin-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .checkin-btn {
+    width: 100%;
   }
 }
 </style>

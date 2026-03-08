@@ -50,3 +50,10 @@ export function registerActivity(activityId) {
     method: 'post'
   })
 }
+
+export function checkinActivity(activityId) {
+  return request({
+    url: '/api/app/activity/checkin/' + activityId,
+    method: 'post'
+  })
+}
