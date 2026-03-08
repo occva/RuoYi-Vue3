@@ -2,6 +2,16 @@
   <div class="app-container app-registration">
     <el-card class="premium-card search-card">
       <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+        <el-form-item label="社团" prop="clubId">
+          <el-select v-model="queryParams.clubId" placeholder="选择社团" clearable style="width: 200px">
+            <el-option
+              v-for="item in clubOptions"
+              :key="item.clubId"
+              :label="item.clubName"
+              :value="item.clubId"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="活动名称" prop="activityTitle">
           <el-input v-model="queryParams.activityTitle" placeholder="活动名称" clearable style="width: 200px" @keyup.enter="handleQuery" />
         </el-form-item>
@@ -28,7 +38,7 @@
     <el-card class="premium-card table-card" v-loading="loading">
       <template #header>
         <div class="card-header">
-          <span class="title">活动报名与签到</span>
+          <span class="title">活动签到管理</span>
           <div class="header-operations">
             <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['club:registration:remove']">批量移除</el-button>
             <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
@@ -38,6 +48,7 @@
 
       <el-table :data="registrationList" @selection-change="handleSelectionChange" class="premium-table">
         <el-table-column type="selection" width="55" align="center" />
+        <el-table-column label="所属社团" align="center" prop="clubName" width="180" :show-overflow-tooltip="true" />
         <el-table-column label="活动标题" align="center" prop="activityTitle" :show-overflow-tooltip="true" />
         <el-table-column label="参与人" align="center">
           <template #default="scope">
@@ -53,22 +64,28 @@
             <span>{{ parseTime(scope.row.registrationTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="签到状态" align="center" width="120">
+        <el-table-column label="签到时间" align="center" prop="checkInTime" width="160">
           <template #default="scope">
-            <el-switch
-              v-model="scope.row.checkInStatus"
-              active-value="1"
-              inactive-value="0"
-              active-text="已签到"
-              inactive-text="未签到"
-              inline-prompt
-              @change="handleCheckInStatusChange(scope.row)"
-              v-hasPermi="['club:registration:edit']"
-            />
+            <span>{{ scope.row.checkInTime ? parseTime(scope.row.checkInTime) : '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
+        <el-table-column label="签到状态" align="center" width="120">
           <template #default="scope">
+            <dict-tag :options="activity_checkin_status" :value="scope.row.checkInStatus" />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+          <template #default="scope">
+            <el-button
+              v-if="scope.row.checkInStatus !== '1' && scope.row.status !== '2'"
+              link
+              type="primary"
+              icon="Select"
+              @click="handleCheckin(scope.row)"
+              v-hasPermi="['club:registration:edit']"
+            >
+              手动签到
+            </el-button>
             <el-button link type="danger" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['club:registration:remove']">移除</el-button>
           </template>
         </el-table-column>
@@ -80,12 +97,14 @@
 </template>
 
 <script setup name="ClubRegistration">
-import { listRegistration, updateRegistration, delRegistration } from "@/api/club/registration";
+import { listRegistration, checkin, delRegistration } from "@/api/club/registration";
+import { listClub } from "@/api/club/club";
 
 const { proxy } = getCurrentInstance();
 const { activity_checkin_status } = proxy.useDict('activity_checkin_status');
 
 const registrationList = ref([]);
+const clubOptions = ref([]);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
@@ -96,6 +115,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
+    clubId: undefined,
     activityTitle: undefined,
     nickName: undefined,
     checkInStatus: undefined
@@ -103,6 +123,21 @@ const data = reactive({
 });
 
 const { queryParams } = toRefs(data);
+
+function getClubOptions() {
+  return listClub({ pageSize: 1000 }).then(response => {
+    clubOptions.value = response.rows || [];
+    applyDefaultClubFilter();
+  }).catch(() => {
+    clubOptions.value = [];
+  });
+}
+
+function applyDefaultClubFilter() {
+  if (!queryParams.value.clubId && clubOptions.value.length > 0) {
+    queryParams.value.clubId = clubOptions.value[0].clubId;
+  }
+}
 
 function getList() {
   loading.value = true;
@@ -120,6 +155,7 @@ function handleQuery() {
 
 function resetQuery() {
   proxy.resetForm("queryRef");
+  applyDefaultClubFilter();
   handleQuery();
 }
 
@@ -128,19 +164,12 @@ function handleSelectionChange(selection) {
   multiple.value = !selection.length;
 }
 
-function handleCheckInStatusChange(row) {
-  const text = row.checkInStatus === "1" ? "进行签到" : "取消签到";
-  proxy.$modal.confirm('确认要对该成员"' + text + '"吗？').then(function() {
-    return updateRegistration({
-      registrationId: row.registrationId,
-      checkInStatus: row.checkInStatus,
-      checkInTime: row.checkInStatus === '1' ? new Date() : null
-    });
+function handleCheckin(row) {
+  proxy.$modal.confirm('确认要为该成员执行签到吗？').then(function() {
+    return checkin(row.registrationId);
   }).then(() => {
-    proxy.$modal.msgSuccess(text + "成功");
+    proxy.$modal.msgSuccess("签到成功");
     getList();
-  }).catch(function() {
-    row.checkInStatus = row.checkInStatus === "1" ? "0" : "1";
   });
 }
 
@@ -154,7 +183,12 @@ function handleDelete(row) {
   });
 }
 
-getList();
+async function initPage() {
+  await getClubOptions();
+  getList();
+}
+
+initPage();
 </script>
 
 <style lang="scss" scoped>

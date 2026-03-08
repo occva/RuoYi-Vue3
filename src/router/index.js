@@ -27,6 +27,11 @@ const UserLayout = () => import('@/views/user/layout.vue')
 
 // 公共路由
 export const constantRoutes = [
+    {
+        path: '/',
+        redirect: '/user/home',
+        hidden: true
+    },
     // ========== 用户端路由 ==========
     {
         path: '/user',
@@ -227,7 +232,7 @@ export const dynamicRoutes = [
                 path: 'registration',
                 component: () => import('@/views/club/registration/index'),
                 name: 'ClubRegistration',
-                meta: { title: '报名管理', icon: 'checkbox' },
+                meta: { title: '签到管理', icon: 'checkbox' },
                 permissions: ['club:registration:list']
             }
         ]
