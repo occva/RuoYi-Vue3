@@ -230,9 +230,6 @@
         <el-form-item label="姓名" prop="name">
            <el-input v-model="applicationForm.name" placeholder="请输入您的姓名" />
         </el-form-item>
-        <el-form-item label="学号" prop="studentId">
-           <el-input v-model="applicationForm.studentId" placeholder="请输入您的学号" />
-         </el-form-item>
         <el-form-item label="申请理由" prop="reason">
           <el-input
             v-model="applicationForm.reason"
@@ -283,13 +280,11 @@ const loadMoreActivities = () => {
 const applicationForm = ref({
   clubId: undefined,
   name: '',
-  studentId: '',
   reason: ''
 })
 
 const applyRules = {
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  studentId: [{ required: true, message: '请输入学号', trigger: 'blur' }],
   reason: [{ required: true, message: '请输入申请理由', trigger: 'blur' }]
 }
 
@@ -457,14 +452,13 @@ const handleApply = () => {
       const data = {
         clubId: club.value.clubId,
         clubName: club.value.clubName, // Add clubName to ensure proper data storage
-        studentId: applicationForm.value.studentId,
         realName: applicationForm.value.name,
         applyReason: applicationForm.value.reason
       }
       joinClub(data).then(res => {
         ElMessage.success(res.msg || '申请已提交')
         isModalOpen.value = false
-        applicationForm.value = { name: '', studentId: '', reason: '' }
+        applicationForm.value = { name: '', reason: '' }
         submitLoading.value = false
         if (club.value) {
           club.value.hasApplied = true

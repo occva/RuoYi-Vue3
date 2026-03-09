@@ -204,8 +204,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Message } from '@element-plus/icons-vue'
 import { listCategories } from '@/api/user/category'
-import { applyClub } from '@/api/user/club'
-import request from '@/utils/request'
+import { applyClub, getCreateApplication } from '@/api/user/club'
 import ImageUpload from '@/components/ImageUpload/index.vue'
 
 const route = useRoute()
@@ -327,7 +326,7 @@ onMounted(() => {
   const fromId = route.query?.from
   if (fromId) {
     prefillLoading.value = true
-    request({ url: '/api/app/club/create-application/' + fromId, method: 'get' })
+    getCreateApplication(fromId)
       .then(res => {
         const d = res.data
         if (d) {

@@ -142,6 +142,54 @@
                   </div>
                 </div>
 
+                <!-- 学号 -->
+                <div class="setting-row">
+                  <div class="row-left horizontal-info">
+                    <div class="info-label">学号</div>
+                    <div class="info-content">
+                      <el-input
+                        v-if="editingField === 'studentId'"
+                        v-model="user.studentId"
+                        class="notion-input"
+                        size="small"
+                        maxlength="50"
+                      />
+                      <span v-else>{{ user.studentId || '未设置' }}</span>
+                    </div>
+                  </div>
+                  <div class="action-btn-group">
+                    <template v-if="editingField === 'studentId'">
+                      <el-button class="action-btn confirm" @click="handleUpdateProfile">确认</el-button>
+                      <el-button class="action-btn cancel" @click="cancelEdit">取消</el-button>
+                    </template>
+                    <el-button v-else class="action-btn" @click="enterEdit('studentId')">编辑学号</el-button>
+                  </div>
+                </div>
+
+                <!-- 班级 -->
+                <div class="setting-row">
+                  <div class="row-left horizontal-info">
+                    <div class="info-label">班级</div>
+                    <div class="info-content">
+                      <el-input
+                        v-if="editingField === 'className'"
+                        v-model="user.className"
+                        class="notion-input"
+                        size="small"
+                        maxlength="50"
+                      />
+                      <span v-else>{{ user.className || '未设置' }}</span>
+                    </div>
+                  </div>
+                  <div class="action-btn-group">
+                    <template v-if="editingField === 'className'">
+                      <el-button class="action-btn confirm" @click="handleUpdateProfile">确认</el-button>
+                      <el-button class="action-btn cancel" @click="cancelEdit">取消</el-button>
+                    </template>
+                    <el-button v-else class="action-btn" @click="enterEdit('className')">编辑班级</el-button>
+                  </div>
+                </div>
+
                 <!-- 电子邮箱 -->
                 <div class="setting-row">
                   <div class="row-left horizontal-info">

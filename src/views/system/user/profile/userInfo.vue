@@ -9,6 +9,12 @@
       <el-form-item label="邮箱地址" prop="email">
          <el-input v-model="form.email" maxlength="50" placeholder="请输入邮箱地址" />
       </el-form-item>
+      <el-form-item label="学号" prop="studentId">
+         <el-input v-model="form.studentId" maxlength="50" placeholder="请输入学号（选填）" />
+      </el-form-item>
+      <el-form-item label="班级" prop="className">
+         <el-input v-model="form.className" maxlength="50" placeholder="请输入班级（选填）" />
+      </el-form-item>
       <el-form-item label="性别">
          <el-radio-group v-model="form.sex" class="custom-radio-group">
             <el-radio border value="0">男</el-radio>
@@ -39,6 +45,8 @@ const rules = ref({
   nickName: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
   email: [{ required: true, message: "邮箱地址不能为空", trigger: "blur" }, { type: "email", message: "请输入正确的邮箱地址", trigger: ["blur", "change"] }],
   phonenumber: [{ required: true, message: "手机号码不能为空", trigger: "blur" }, { pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }],
+  studentId: [{ max: 50, message: "学号长度不能超过50个字符", trigger: "blur" }],
+  className: [{ max: 50, message: "班级长度不能超过50个字符", trigger: "blur" }],
 })
 
 /** 提交按钮 */
@@ -51,6 +59,8 @@ function submit() {
         props.user.nickName = form.value.nickName
         props.user.phonenumber = form.value.phonenumber
         props.user.email = form.value.email
+        props.user.studentId = form.value.studentId
+        props.user.className = form.value.className
         props.user.sex = form.value.sex
       }).finally(() => {
         loading.value = false
@@ -67,7 +77,14 @@ function close() {
 // 回显当前登录用户信息
 watch(() => props.user, user => {
   if (user) {
-    form.value = { nickName: user.nickName, phonenumber: user.phonenumber, email: user.email, sex: user.sex }
+    form.value = {
+      nickName: user.nickName,
+      phonenumber: user.phonenumber,
+      email: user.email,
+      studentId: user.studentId,
+      className: user.className,
+      sex: user.sex
+    }
   }
 },{ immediate: true, deep: true })
 </script>

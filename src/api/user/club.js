@@ -110,3 +110,11 @@ export function cancelCreateApplication(applyId) {
     method: 'post'
   })
 }
+
+// 查询创建社团申请详情（用于重新申请预填）
+export function getCreateApplication(applyId) {
+  return request({
+    url: '/api/app/club/create-application/' + applyId,
+    method: 'get'
+  })
+}
