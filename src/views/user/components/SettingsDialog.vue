@@ -468,6 +468,8 @@ function handleLogout() {
               0 4px 8px rgba(15, 15, 15, 0.1), 0 8px 16px rgba(15, 15, 15, 0.1) !important;
   border-radius: 14px !important;
   overflow: hidden;
+  width: min(1000px, calc(100vw - 32px)) !important;
+  max-height: calc(100vh - 64px);
 
   .el-dialog__header { display: none; }
   .el-dialog__body { padding: 0 !important; margin: 0 !important; }
@@ -475,7 +477,7 @@ function handleLogout() {
 
 .settings-layout {
   display: flex;
-  height: 600px; 
+  height: min(600px, calc(100vh - 128px));
   background: white;
   color: #37352f;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -523,6 +525,7 @@ function handleLogout() {
 
 .main-content {
   flex: 1;
+  min-width: 0;
   padding: 40px 60px; 
   overflow-y: auto;
 
@@ -649,8 +652,9 @@ function handleLogout() {
 /* 密码弹窗样式 */
 .notion-pwd-dialog {
 
-  width: 350px !important;      
-  height: 510px !important;    
+  width: min(350px, calc(100vw - 32px)) !important;      
+  height: auto !important;    
+  max-height: calc(100vh - 64px);
 
   display: flex !important;
   flex-direction: column;
@@ -736,6 +740,26 @@ function handleLogout() {
 /* 动画效果 */
 .fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.1s ease; }
 .fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; }
+
+@media (max-width: 768px) {
+  .notion-settings-dialog {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px);
+  }
+
+  .settings-layout {
+    height: calc(100vh - 76px);
+  }
+
+  .sidebar {
+    width: 168px;
+    padding: 8px 6px 10px;
+  }
+
+  .main-content {
+    padding: 22px 20px;
+  }
+}
 </style>
 
 <style lang="scss">
@@ -743,20 +767,5 @@ function handleLogout() {
 .notion-settings-dialog, .notion-pwd-dialog {
   margin: 0 auto !important; // 配合 align-center
   margin-bottom: 0 !important; // 强制移除可能的 bottom 偏移
-}
-
-/* 覆盖 Element Plus 覆盖层，实现真居中 */
-body {
-  .el-overlay {
-    .el-overlay-dialog {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      
-      .el-dialog {
-        margin: 0 !important; // 移除默认的 top 偏移
-      }
-    }
-  }
 }
 </style>

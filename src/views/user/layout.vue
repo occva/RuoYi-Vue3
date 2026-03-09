@@ -1,5 +1,5 @@
 <template>
-  <div class="user-layout">
+  <div class="user-layout" :class="{ 'is-dark': isDarkMode }">
     <!-- 顶部导航 -->
     <header class="user-header" :class="{ 'is-open': mobileMenuOpen }">
       <div class="header-container">
@@ -19,6 +19,7 @@
         </nav>
         
         <div class="right-section" v-if="!userStore.token">
+          <ThemePullSwitch :model-value="isDarkMode" @toggle="toggleTheme" />
           <div class="auth-buttons">
             <el-button @click="handleLogin" class="login-btn">登录</el-button>
             <el-button type="primary" @click="$router.push('/register')" class="register-btn">注册</el-button>
@@ -26,6 +27,7 @@
         </div>
 
         <div class="right-section" v-else>
+          <ThemePullSwitch :model-value="isDarkMode" @toggle="toggleTheme" />
           <el-dropdown @command="handleCommand" class="avatar-container" trigger="hover" popper-class="user-dropdown-menu">
             <div class="avatar-wrapper">
               <img :src="userStore.avatar" class="user-avatar" />
@@ -202,12 +204,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message, Monitor } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
 import { ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
+import ThemePullSwitch from './components/ThemePullSwitch.vue'
+import { useUserTheme } from './theme/useUserTheme'
 import { isRelogin } from '@/utils/request'
 import { removeToken } from '@/utils/auth'
 
@@ -215,12 +219,15 @@ const router = useRouter()
 const userStore = useUserStore()
 const mobileMenuOpen = ref(false)
 const settingsVisible = ref(false)
+const { isDarkMode, initTheme, toggleTheme, clearThemeFlags } = useUserTheme()
 
 const isManager = computed(() => {
   return userStore.roles.some(role => ['admin', 'club_admin', 'president', 'vice_president'].includes(role))
 })
 
 onMounted(async () => {
+  initTheme()
+
   if (userStore.token && !userStore.name) {
     isRelogin.show = true
     try {
@@ -238,6 +245,10 @@ onMounted(async () => {
       isRelogin.show = false
     }
   }
+})
+
+onBeforeUnmount(() => {
+  clearThemeFlags()
 })
 
 const handleLogin = () => {
@@ -289,6 +300,10 @@ function logout() {
   flex-direction: column;
   font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   background: #f5f8ff;
+
+  &.is-dark {
+    background: #0d1528;
+  }
 }
 
 .user-header {
@@ -440,12 +455,12 @@ function logout() {
   gap: 0.3rem;
   border-radius: 999px;
   padding: 0.3rem;
-  border: 1px solid rgba(156, 182, 235, 0.26);
+  border: none;
   background: rgba(255, 255, 255, 0.65);
   box-shadow: 0 14px 26px -26px rgba(17, 63, 169, 0.9);
 
   .login-btn {
-    border: 1px solid transparent;
+    border: none;
     height: 34px;
     padding: 0 15px;
     border-radius: 999px;
@@ -958,7 +973,16 @@ function logout() {
 
       .dropdown-username {
         font-size: 12px;
-        color: #6b7280;
+        color: #5f7194;
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 1px 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(140, 164, 209, 0.35);
+        background: linear-gradient(135deg, rgba(236, 243, 255, 0.95), rgba(229, 238, 255, 0.92));
+        font-weight: 600;
+        line-height: 1.35;
       }
     }
   }
@@ -991,4 +1015,8 @@ function logout() {
     margin: 4px 0 !important;
   }
 }
+</style>
+
+<style lang="scss">
+@use '@/assets/styles/user-dark-theme.scss';
 </style>
