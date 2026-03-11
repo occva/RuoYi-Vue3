@@ -29,37 +29,94 @@
         <aside
           ref="heroPanelRef"
           class="hero-panel"
+          :class="{ 'is-accent-active': heroAccentActive }"
           :style="heroPanelStyle"
           @mouseenter="handleHeroPanelEnter"
           @mousemove="handleHeroPanelMove"
           @mouseleave="handleHeroPanelLeave"
         >
-          <div class="panel-head">
-            <span class="panel-title">社团数据快照</span>
-          </div>
-          <div class="hero-stats">
-            <article class="stat-card">
-              <span class="stat-value">{{ snapshot.clubTotal }}</span>
-              <span class="stat-label">社团总数</span>
-            </article>
-            <article class="stat-card">
-              <span class="stat-value">{{ snapshot.activityTotal }}</span>
-              <span class="stat-label">进行中活动</span>
-            </article>
-            <article class="stat-card">
-              <span class="stat-value">{{ snapshot.noticeTotal }}</span>
-              <span class="stat-label">公告总数</span>
-            </article>
-          </div>
-          <div class="hero-tags">
-            <span class="hero-tag">科技</span>
-            <span class="hero-tag">文艺</span>
-            <span class="hero-tag">体育</span>
-            <span class="hero-tag">公益</span>
-            <button class="hero-tags-more" @click="$router.push('/user/clubs')">
-              更多
-              <el-icon><ArrowRight /></el-icon>
-            </button>
+          <div class="hero-panel-accent" aria-hidden="true"></div>
+          <div class="hero-panel-inner">
+            <transition name="hero-slide" mode="out-in">
+              <div :key="currentHeroSlide.key" class="hero-slide" :class="{ 'is-club-slide': currentHeroSlide.type === 'club' }">
+                <template v-if="currentHeroSlide.type === 'snapshot'">
+                  <div class="panel-head">
+                    <span class="panel-title">社团数据快照</span>
+                  </div>
+                  <div class="hero-stats">
+                    <article class="stat-card">
+                      <span class="stat-value">{{ snapshot.clubTotal }}</span>
+                      <span class="stat-label">社团总数</span>
+                    </article>
+                    <article class="stat-card">
+                      <span class="stat-value">{{ snapshot.activityTotal }}</span>
+                      <span class="stat-label">进行中活动</span>
+                    </article>
+                    <article class="stat-card">
+                      <span class="stat-value">{{ snapshot.noticeTotal }}</span>
+                      <span class="stat-label">公告总数</span>
+                    </article>
+                  </div>
+                  <div class="hero-tags">
+                    <span class="hero-tag">科技</span>
+                    <span class="hero-tag">文艺</span>
+                    <span class="hero-tag">体育</span>
+                    <span class="hero-tag">公益</span>
+                    <button class="hero-tags-more" @click="$router.push('/user/clubs')">
+                      更多
+                      <el-icon><ArrowRight /></el-icon>
+                    </button>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div class="hero-club-overview">
+                    <div class="hero-club-cover">
+                      <el-image :src="getHeroClubImage(currentHeroSlide.club)" :alt="currentHeroSlide.club.clubName" fit="cover">
+                        <template #error>
+                          <div class="hero-club-cover-placeholder">
+                            <el-icon><Picture /></el-icon>
+                          </div>
+                        </template>
+                      </el-image>
+                    </div>
+                    <div class="hero-club-copy">
+                      <div class="panel-head panel-head-club">
+                        <span class="hero-club-badge">热门社团</span>
+                        <span class="panel-title hero-club-title" :title="currentHeroSlide.club.clubName">
+                          {{ currentHeroSlide.club.clubName }}
+                        </span>
+                      </div>
+                      <p class="hero-club-desc line-clamp-2">
+                        {{ currentHeroSlide.club.description || '这里展示当前热门社团的简介与核心亮点。' }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="hero-stats">
+                    <article class="stat-card">
+                      <span class="stat-value">{{ currentHeroSlide.club.viewCount || 0 }}</span>
+                      <span class="stat-label">浏览量</span>
+                    </article>
+                    <article class="stat-card">
+                      <span class="stat-value">{{ currentHeroSlide.club.favoriteCount || 0 }}</span>
+                      <span class="stat-label">收藏量</span>
+                    </article>
+                    <article class="stat-card">
+                      <span class="stat-value">{{ currentHeroSlide.club.memberCount || 0 }}</span>
+                      <span class="stat-label">成员数</span>
+                    </article>
+                  </div>
+                  <div class="hero-tags">
+                    <span class="hero-tag">{{ currentHeroSlide.club.categoryName || '热门社团' }}</span>
+                    <span class="hero-tag">热度 {{ getClubHeat(currentHeroSlide.club) }}</span>
+                    <button class="hero-tags-more" @click="handleHeroPrimaryAction">
+                      详情
+                      <el-icon><ArrowRight /></el-icon>
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </transition>
           </div>
         </aside>
       </div>
@@ -87,7 +144,7 @@
           <el-button link @click="$router.push('/user/clubs')">查看全部 <el-icon><ArrowRight /></el-icon></el-button>
         </div>
         <div ref="clubGridRef" class="club-grid">
-          <ClubCard v-for="club in clubs" :key="club.clubId" :club="club" class="reveal-item reveal-grid-item" />
+          <ClubCard v-for="club in popularClubs" :key="club.clubId" :club="club" class="reveal-item reveal-grid-item" />
         </div>
       </div>
     </main>
@@ -112,16 +169,21 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue'
-import { Bell, ArrowRight } from '@element-plus/icons-vue'
-import { listClubs } from '@/api/user/club'
+import { useRouter } from 'vue-router'
+import { Bell, ArrowRight, Picture } from '@element-plus/icons-vue'
+import { listClubs, listPopularClubs } from '@/api/user/club'
 import { listActivities } from '@/api/user/activity'
 import { listNotices } from '@/api/user/notice'
 import { ElMessageBox } from 'element-plus'
+import { getImgUrl } from '@/utils/ruoyi'
 import ClubCard from './components/ClubCard.vue'
 import ActivityCard from './components/ActivityCard.vue'
 import AIAssistant from './components/AIAssistant.vue'
 
-const clubs = ref([])
+const router = useRouter()
+const HERO_SCAN_DURATION = 5000
+
+const popularClubs = ref([])
 const activities = ref([])
 const notices = ref([])
 const homePageRef = ref(null)
@@ -138,21 +200,58 @@ const panelRotateY = ref(0)
 const panelScale = ref(1)
 const panelShiftX = ref(0)
 const panelShiftY = ref(0)
+const heroPanelBaseHeight = ref(0)
+const heroSlideIndex = ref(0)
+const isHeroMotionReduced = ref(true)
+const isHeroPanelHovered = ref(false)
 let revealObserver = null
 let revealResizeRaf = null
+let heroSlideTimer = null
 
-const heroPanelStyle = computed(() => ({
-  '--panel-rotate-x': `${panelRotateX.value}deg`,
-  '--panel-rotate-y': `${panelRotateY.value}deg`,
-  '--panel-scale': panelScale.value.toString(),
-  '--panel-shift-x': `${panelShiftX.value}px`,
-  '--panel-shift-y': `${panelShiftY.value}px`
-}))
+const heroSlides = computed(() => ([
+  {
+    key: 'snapshot',
+    type: 'snapshot'
+  },
+  ...popularClubs.value.map(club => ({
+    key: `club-${club.clubId}`,
+    type: 'club',
+    club
+  }))
+]))
+
+const currentHeroSlide = computed(() => {
+  return heroSlides.value[heroSlideIndex.value] || heroSlides.value[0] || { key: 'snapshot', type: 'snapshot' }
+})
+
+const heroAccentActive = computed(() => !isHeroMotionReduced.value && heroSlides.value.length > 1)
+
+const heroPanelStyle = computed(() => {
+  const style = {
+    '--panel-rotate-x': `${panelRotateX.value}deg`,
+    '--panel-rotate-y': `${panelRotateY.value}deg`,
+    '--panel-scale': panelScale.value.toString(),
+    '--panel-shift-x': `${panelShiftX.value}px`,
+    '--panel-shift-y': `${panelShiftY.value}px`,
+    '--hero-accent-duration': `${HERO_SCAN_DURATION}ms`
+  }
+
+  if (heroPanelBaseHeight.value > 0 && !isHeroMotionReduced.value) {
+    style.height = `${heroPanelBaseHeight.value}px`
+  }
+
+  return style
+})
 
 onMounted(() => {
+  syncHeroMotionState()
   getStats()
   initRevealAnimation()
   window.addEventListener('resize', handleRevealResize, { passive: true })
+  nextTick(() => {
+    captureHeroPanelBaseHeight()
+  })
+  syncHeroAutoplay()
 })
 
 onBeforeUnmount(() => {
@@ -166,14 +265,30 @@ onBeforeUnmount(() => {
     revealResizeRaf = null
   }
 
+  clearHeroAutoplay()
   window.removeEventListener('resize', handleRevealResize)
 })
 
-watch([clubs, activities, notices], () => {
+watch([popularClubs, activities, notices], () => {
   refreshRevealAnimation()
 })
 
+watch(heroSlides, (slides) => {
+  if (heroSlideIndex.value >= slides.length) {
+    heroSlideIndex.value = 0
+  }
+  syncHeroAutoplay()
+})
+
 const handleRevealResize = () => {
+  syncHeroMotionState()
+  syncHeroAutoplay()
+  heroPanelBaseHeight.value = 0
+
+  nextTick(() => {
+    captureHeroPanelBaseHeight()
+  })
+
   if (revealResizeRaf) {
     cancelAnimationFrame(revealResizeRaf)
   }
@@ -241,12 +356,19 @@ const initRevealAnimation = () => {
   refreshRevealAnimation()
 }
 
-const isPanelMotionDisabled = () => {
+const syncHeroMotionState = () => {
   if (typeof window === 'undefined') return true
-  return window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  isHeroMotionReduced.value = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+const isPanelMotionDisabled = () => {
+  return isHeroMotionReduced.value
 }
 
 const handleHeroPanelEnter = () => {
+  isHeroPanelHovered.value = true
+  clearHeroAutoplay()
+
   if (isPanelMotionDisabled()) return
   panelScale.value = 1.03
 }
@@ -271,40 +393,100 @@ const handleHeroPanelMove = (event) => {
 }
 
 const handleHeroPanelLeave = () => {
+  isHeroPanelHovered.value = false
   panelRotateX.value = 0
   panelRotateY.value = 0
   panelShiftX.value = 0
   panelShiftY.value = 0
   panelScale.value = 1
+  syncHeroAutoplay()
+}
+
+const captureHeroPanelBaseHeight = () => {
+  if (!heroPanelRef.value) return
+
+  const height = Math.round(heroPanelRef.value.getBoundingClientRect().height)
+  if (height > 0) {
+    heroPanelBaseHeight.value = height
+  }
+}
+
+const clearHeroAutoplay = () => {
+  if (heroSlideTimer) {
+    clearTimeout(heroSlideTimer)
+    heroSlideTimer = null
+  }
+}
+
+const syncHeroAutoplay = () => {
+  clearHeroAutoplay()
+
+  if (typeof window === 'undefined' || isHeroMotionReduced.value || isHeroPanelHovered.value || heroSlides.value.length <= 1) {
+    return
+  }
+
+  heroSlideTimer = window.setTimeout(() => {
+    heroSlideIndex.value = (heroSlideIndex.value + 1) % heroSlides.value.length
+    syncHeroAutoplay()
+  }, HERO_SCAN_DURATION)
+}
+
+const extractRows = (response) => {
+  if (Array.isArray(response?.rows)) return response.rows
+  if (Array.isArray(response?.data)) return response.data
+  return []
+}
+
+const getClubHeat = (club) => {
+  const favoriteCount = Number(club?.favoriteCount) || 0
+  const viewCount = Number(club?.viewCount) || 0
+  return favoriteCount * 2 + viewCount
+}
+
+const getHeroClubImage = (club) => getImgUrl(club?.coverUrl || club?.logoUrl || '')
+
+const handleHeroPrimaryAction = () => {
+  if (currentHeroSlide.value.type === 'snapshot') {
+    router.push('/user/clubs')
+    return
+  }
+
+  const clubId = currentHeroSlide.value.club?.clubId
+  if (clubId) {
+    router.push(`/user/club/${clubId}`)
+  }
 }
 
 const getStats = () => {
-  listClubs({ pageNum: 1, pageSize: 6 }).then(response => {
-    const rows = Array.isArray(response.rows) ? response.rows : (Array.isArray(response.data) ? response.data : [])
-    clubs.value = rows.slice(0, 6)
+  listClubs().then(response => {
+    const rows = extractRows(response)
     snapshot.value.clubTotal = Number(response.total) || rows.length
   })
-  
+
+  listPopularClubs(3).then(response => {
+    popularClubs.value = extractRows(response).slice(0, 3)
+  })
+
   listActivities({ pageNum: 1, pageSize: 3, status: '1' }).then(response => {
-    const rows = Array.isArray(response.rows) ? response.rows : []
+    const rows = extractRows(response)
     snapshot.value.activityTotal = Number(response.total) || rows.length
 
-    // try to get ongoing first, if empty get upcoming
     if (rows.length > 0) {
-        activities.value = rows.slice(0, 3)
-    } else {
-        listActivities({ pageNum: 1, pageSize: 3 }).then(res => {
-            const fallbackRows = Array.isArray(res.rows) ? res.rows : []
-            activities.value = fallbackRows.slice(0, 3)
-            if (!snapshot.value.activityTotal) {
-              snapshot.value.activityTotal = Number(res.total) || fallbackRows.length
-            }
-        })
+      activities.value = rows.slice(0, 3)
+      return
     }
+
+    listActivities({ pageNum: 1, pageSize: 3 }).then(res => {
+      const fallbackRows = extractRows(res)
+      activities.value = fallbackRows.slice(0, 3)
+      if (!snapshot.value.activityTotal) {
+        snapshot.value.activityTotal = Number(res.total) || fallbackRows.length
+      }
+    })
   })
 
   listNotices({ pageNum: 1, pageSize: 5 }).then(response => {
-    const rows = Array.isArray(response.rows) ? response.rows : (Array.isArray(response.data) ? response.data : [])
+    const rows = extractRows(response)
     notices.value = rows
     snapshot.value.noticeTotal = Number(response.total) || rows.length
   })
@@ -504,6 +686,8 @@ const viewNotice = (notice) => {
 
 .hero-panel {
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
   transform-style: preserve-3d;
   transform-origin: center;
   transform: perspective(860px) translate3d(var(--panel-shift-x, 0px), var(--panel-shift-y, 0px), 0) rotateX(var(--panel-rotate-x, 0deg)) rotateY(var(--panel-rotate-y, 0deg)) scale(var(--panel-scale, 1));
@@ -524,9 +708,152 @@ const viewNotice = (notice) => {
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
   }
 
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow:
+      0 0 0 1px rgba(118, 172, 255, 0.18),
+      0 0 18px rgba(118, 172, 255, 0.14),
+      0 0 32px rgba(104, 203, 255, 0.1);
+  }
+
   &:hover {
     box-shadow: 0 42px 74px -44px rgba(20, 70, 166, 0.92), 0 20px 38px -20px rgba(14, 72, 168, 0.55);
   }
+}
+
+.hero-panel-inner {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.hero-panel-accent {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.hero-panel-accent::before,
+.hero-panel-accent::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.hero-panel-accent::before {
+  width: 42%;
+  height: 54%;
+  top: -20%;
+  right: -8%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(130, 187, 255, 0.34) 0%, rgba(130, 187, 255, 0.12) 48%, rgba(130, 187, 255, 0) 78%);
+  filter: blur(18px);
+}
+
+.hero-panel-accent::after {
+  inset: -34% -22%;
+  background: linear-gradient(112deg, transparent 30%, rgba(255, 255, 255, 0.18) 47%, rgba(133, 191, 255, 0.22) 52%, transparent 68%);
+  transform: translate3d(-42%, 0, 0);
+}
+
+.hero-panel.is-accent-active::after {
+  opacity: 1;
+  animation: hero-panel-breathe var(--hero-accent-duration, 3000ms) ease-in-out infinite;
+}
+
+.hero-panel.is-accent-active .hero-panel-accent {
+  opacity: 1;
+}
+
+.hero-panel.is-accent-active .hero-panel-accent::before {
+  animation: hero-panel-orbit var(--hero-accent-duration, 3000ms) ease-in-out infinite;
+}
+
+.hero-panel.is-accent-active .hero-panel-accent::after {
+  animation: hero-panel-sheen var(--hero-accent-duration, 3000ms) linear infinite;
+}
+
+.hero-slide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.hero-slide.is-club-slide {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  gap: 0.58rem;
+  min-height: 0;
+}
+
+.hero-club-overview {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: start;
+  gap: 0.8rem;
+  min-height: 0;
+}
+
+.hero-club-cover {
+  border-radius: 18px;
+  overflow: hidden;
+  width: 124px;
+  height: 92px;
+  flex-shrink: 0;
+  background: linear-gradient(160deg, rgba(231, 240, 255, 0.94), rgba(217, 230, 252, 0.66));
+  border: 1px solid rgba(146, 172, 222, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  .el-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.hero-club-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8ba1c9;
+  font-size: 1.5rem;
+  background: linear-gradient(160deg, rgba(235, 243, 255, 0.98), rgba(222, 234, 252, 0.72));
+}
+
+.hero-club-copy {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  gap: 0.36rem;
+}
+
+.hero-club-badge {
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(95, 138, 230, 0.24);
+  background: rgba(237, 244, 255, 0.82);
+  color: #2d5cc0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.16rem 0.5rem;
 }
 
 .panel-head {
@@ -587,6 +914,41 @@ const viewNotice = (notice) => {
   gap: 0.55rem;
 }
 
+.hero-slide.is-club-slide .panel-head {
+  margin-bottom: 0;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-slide.is-club-slide .panel-head-club .panel-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-slide.is-club-slide .hero-stats {
+  gap: 0.5rem;
+}
+
+.hero-slide.is-club-slide .stat-card {
+  min-height: 68px;
+  padding: 0.58rem 0.64rem;
+  border-radius: 14px;
+}
+
+.hero-slide.is-club-slide .hero-tags {
+  margin-top: 0;
+  padding-top: 0;
+  gap: 0.46rem;
+}
+
+.hero-slide.is-club-slide .stat-value {
+  font-size: clamp(1.4rem, 1.8vw, 1.72rem);
+}
+
+.hero-slide.is-club-slide .stat-label {
+  font-size: 0.76rem;
+}
+
 .hero-tag {
   border-radius: 999px;
   background: rgba(237, 244, 255, 0.9);
@@ -629,6 +991,26 @@ const viewNotice = (notice) => {
     color: #123c92;
     background: rgba(223, 236, 255, 0.62);
   }
+}
+
+.hero-club-desc {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #455370;
+  font-size: 0.8rem;
+  line-height: 1.52;
+  min-height: calc(1.52em * 2);
+  max-height: calc(1.52em * 2);
+}
+
+.hero-club-title {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
 }
 
 .hero-orb {
@@ -724,8 +1106,15 @@ const viewNotice = (notice) => {
 
 .club-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2rem;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .activity-grid {
@@ -754,6 +1143,10 @@ const viewNotice = (notice) => {
 
   .hero-trust-row {
     justify-content: center;
+  }
+
+  .club-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -802,12 +1195,22 @@ const viewNotice = (notice) => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .hero-club-overview {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 0.66rem;
+  }
+
+  .hero-club-cover {
+    width: 108px;
+    height: 82px;
+  }
+
   .hero-tags {
     justify-content: center;
   }
 
-  .hero-tags-more {
-    margin-left: 0;
+  .club-grid {
+    grid-template-columns: 1fr;
   }
 
   .stat-card:last-child {
@@ -836,6 +1239,17 @@ const viewNotice = (notice) => {
   .hero-tags-more {
     width: 100%;
     justify-content: center;
+    margin-left: 0;
+  }
+
+  .hero-club-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-club-cover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 3;
   }
 
   .hero-stats {
@@ -849,6 +1263,67 @@ const viewNotice = (notice) => {
   .notice-bar {
     padding: 0.8rem 1rem;
   }
+}
+
+@keyframes hero-panel-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(118, 172, 255, 0.14),
+      0 0 14px rgba(118, 172, 255, 0.1),
+      0 0 26px rgba(104, 203, 255, 0.08);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(118, 172, 255, 0.24),
+      0 0 24px rgba(118, 172, 255, 0.2),
+      0 0 42px rgba(104, 203, 255, 0.14);
+  }
+}
+
+@keyframes hero-panel-orbit {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.78;
+  }
+
+  50% {
+    transform: translate3d(-14%, 4%, 0) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-panel-sheen {
+  0% {
+    transform: translate3d(-46%, 0, 0);
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 0.6;
+  }
+
+  52% {
+    opacity: 0.82;
+  }
+
+  100% {
+    transform: translate3d(34%, 0, 0);
+    opacity: 0;
+  }
+}
+
+.hero-slide-enter-active,
+.hero-slide-leave-active {
+  transition: opacity 280ms ease, transform 320ms ease;
+}
+
+.hero-slide-enter-from,
+.hero-slide-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 .reveal-item {
@@ -875,10 +1350,24 @@ const viewNotice = (notice) => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-slide-enter-active,
+  .hero-slide-leave-active,
+  .reveal-item {
+    transition: none !important;
+  }
+
+  .hero-slide-enter-from,
+  .hero-slide-leave-to,
   .reveal-item {
     opacity: 1 !important;
     transform: none !important;
-    transition: none !important;
+  }
+
+  .hero-panel::after,
+  .hero-panel .hero-panel-accent::before,
+  .hero-panel .hero-panel-accent::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }
 </style>

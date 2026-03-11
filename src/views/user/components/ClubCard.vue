@@ -1,7 +1,7 @@
 <template>
   <div class="club-card" @click="goToDetail">
     <div class="card-image-wrapper">
-      <el-image :src="getImgUrl(club.logoUrl)" :alt="club.clubName" class="club-image" fit="cover">
+      <el-image :src="getClubImage(club)" :alt="club.clubName" class="club-image" fit="cover">
         <template #error>
           <div class="image-placeholder">
             <el-icon><Picture /></el-icon>
@@ -31,6 +31,10 @@
           <el-icon><Calendar /></el-icon>
           <span>{{ club.ongoingActivityCount || 0 }} 活动进行中</span>
         </div>
+        <div class="stat-item">
+          <el-icon><StarFilled /></el-icon>
+          <span>热度 {{ getClubHeat(club) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -38,7 +42,6 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { User, Calendar, Picture, StarFilled } from '@element-plus/icons-vue'
 import { getImgUrl } from '@/utils/ruoyi'
 
@@ -51,11 +54,17 @@ const props = defineProps({
 
 const router = useRouter()
 
+const getClubImage = (club) => getImgUrl(club.coverUrl || club.logoUrl || '')
+
+const getClubHeat = (club) => {
+  const favoriteCount = Number(club.favoriteCount) || 0
+  const viewCount = Number(club.viewCount) || 0
+  return favoriteCount * 2 + viewCount
+}
+
 const goToDetail = () => {
   router.push(`/user/club/${props.club.clubId}`)
 }
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -171,20 +180,38 @@ const goToDetail = () => {
 }
 
 .club-stats {
-  display: flex;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.75rem;
+  margin-top: auto;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  min-width: 0;
+  font-size: 0.82rem;
   color: #64748b;
 
+  span {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
   .el-icon {
-    font-size: 1rem;
+    flex-shrink: 0;
+    font-size: 0.96rem;
     color: #94a3b8;
+  }
+}
+
+@media (max-width: 768px) {
+  .club-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>
