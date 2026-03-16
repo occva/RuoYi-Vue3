@@ -139,14 +139,22 @@ h6 {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
-  background-color: transparent !important;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding: 12px 0 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--el-bg-color-overlay, #fff) 26px);
+  backdrop-filter: blur(8px);
 }
 
 /* 弹窗中的分页器 */
 .el-dialog .pagination-container {
-  position: static !important;
+  position: sticky !important;
+  bottom: 0;
+  z-index: 2;
   margin: 10px 0 0 0;
-  padding: 0 !important;
+  padding: 12px 0 0 0 !important;
+  background: var(--el-bg-color-overlay, #fff);
 
   .el-pagination {
     position: static;

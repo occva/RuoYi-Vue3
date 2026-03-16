@@ -73,58 +73,60 @@
         </div>
       </template>
 
-      <el-table v-loading="loading" :data="activityList" @selection-change="handleSelectionChange" class="premium-table">
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="所属社团" align="center" prop="clubName" width="130" />
-        <el-table-column label="封面" align="center" prop="coverUrl" width="100">
-          <template #default="scope">
-            <image-preview :src="scope.row.coverUrl" :width="60" :height="40" />
-          </template>
-        </el-table-column>
-        <el-table-column label="活动名称" align="left" prop="activityTitle" :show-overflow-tooltip="true">
-          <template #default="scope">
-            <span class="activity-title">{{ scope.row.activityTitle }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="活动时间" align="center" prop="startTime" width="280">
-          <template #default="scope">
-            <div class="time-range">
-              <span>{{ parseTime(scope.row.startTime, '{y}-{m}-{d} {h}:{i}') }}</span>
-              <span class="separator">至</span>
-              <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d} {h}:{i}') || '不限' }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="地点" align="center" prop="location" :show-overflow-tooltip="true" width="150" />
-        <el-table-column label="人数限制" align="center" width="100">
-          <template #default="scope">
-            <span>{{ scope.row.currentParticipants }} / {{ scope.row.maxParticipants || '∞' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" align="center" prop="status" width="100">
-          <template #default="scope">
-            <dict-tag :options="activity_status" :value="scope.row.status" />
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
-          <template #default="scope">
-            <el-button
-              link
-              type="primary"
-              icon="Edit"
-              @click="handleUpdate(scope.row)"
-              v-hasPermi="['system:activity:edit']"
-            >修改</el-button>
-            <el-button
-              link
-              type="danger"
-              icon="Delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['system:activity:remove']"
-            >删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-scroll-area">
+        <el-table v-loading="loading" :data="activityList" @selection-change="handleSelectionChange" class="premium-table">
+          <el-table-column type="selection" width="55" align="center" />
+          <el-table-column label="所属社团" align="center" prop="clubName" width="130" />
+          <el-table-column label="封面" align="center" prop="coverUrl" width="100">
+            <template #default="scope">
+              <image-preview :src="scope.row.coverUrl" :width="60" :height="40" />
+            </template>
+          </el-table-column>
+          <el-table-column label="活动名称" align="left" prop="activityTitle" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <span class="activity-title">{{ scope.row.activityTitle }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="活动时间" align="center" prop="startTime" width="280">
+            <template #default="scope">
+              <div class="time-range">
+                <span>{{ parseTime(scope.row.startTime, '{y}-{m}-{d} {h}:{i}') }}</span>
+                <span class="separator">至</span>
+                <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d} {h}:{i}') || '不限' }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="地点" align="center" prop="location" :show-overflow-tooltip="true" width="150" />
+          <el-table-column label="人数限制" align="center" width="100">
+            <template #default="scope">
+              <span>{{ scope.row.currentParticipants }} / {{ scope.row.maxParticipants || '∞' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" align="center" prop="status" width="100">
+            <template #default="scope">
+              <dict-tag :options="activity_status" :value="scope.row.status" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+            <template #default="scope">
+              <el-button
+                link
+                type="primary"
+                icon="Edit"
+                @click="handleUpdate(scope.row)"
+                v-hasPermi="['system:activity:edit']"
+              >修改</el-button>
+              <el-button
+                link
+                type="danger"
+                icon="Delete"
+                @click="handleDelete(scope.row)"
+                v-hasPermi="['system:activity:remove']"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <pagination
         v-show="total > 0"
@@ -406,10 +408,15 @@ getList();
 <style lang="scss" scoped>
 .app-activity {
   background-color: var(--app-main-bg);
-  min-height: calc(100vh - 84px);
+  min-height: calc(100vh - var(--app-header-offset, 84px));
+  height: calc(100vh - var(--app-header-offset, 84px));
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   .search-card {
+    flex-shrink: 0;
     margin-bottom: 20px;
   }
 
@@ -442,6 +449,25 @@ getList();
     }
   }
 
+  .table-card {
+    flex: 1;
+    min-height: 0;
+
+    :deep(.el-card__body) {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+  }
+
+  .table-scroll-area {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding-bottom: 8px;
+  }
+
   .activity-title {
     font-weight: 600;
     color: #303133;
@@ -470,6 +496,16 @@ getList();
   .premium-table {
     border-radius: 12px;
     overflow: hidden;
+  }
+
+  :deep(.pagination-container) {
+    flex-shrink: 0;
+    margin-top: 12px;
+    padding-top: 12px;
+    padding-bottom: 0;
+    background: var(--el-bg-color-overlay);
+    border-top: 1px solid var(--el-border-color-lighter);
+    backdrop-filter: none;
   }
 }
 

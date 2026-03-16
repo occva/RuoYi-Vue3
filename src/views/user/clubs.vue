@@ -83,16 +83,14 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-container" v-show="total > queryParams.pageSize">
-          <el-pagination
-            background
-            layout="prev, pager, next"
-            :total="total"
-            v-model:current-page="queryParams.pageNum"
-            v-model:page-size="queryParams.pageSize"
-            @current-change="getList"
-          />
-        </div>
+        <Pagination
+          v-show="total > queryParams.pageSize"
+          layout="prev, pager, next"
+          :total="total"
+          v-model:page="queryParams.pageNum"
+          v-model:limit="queryParams.pageSize"
+          @pagination="getList"
+        />
       </div>
     </div>
   </div>

@@ -437,6 +437,9 @@ const handleQuery = async () => {
   }
   .stat-dialog__pagination {
     flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
     background: var(--el-bg-color-overlay);
     border-top: 1px solid #f0f0f0;
     margin-top: 12px;
