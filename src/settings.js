@@ -5,9 +5,11 @@ export default {
   title: import.meta.env.VITE_APP_TITLE,
 
   /**
-   * 侧边栏主题 深色主题theme-dark，浅色主题theme-light，蓝色主题theme-blue
+   * 侧边栏主题 当前启用：浅色主题theme-light、现代主题theme-modern
+   * 停用的深色主题theme-dark保留为注释，便于后续恢复
    */
-  sideTheme: 'theme-dark',
+  // sideTheme: 'theme-dark',
+  sideTheme: 'theme-light',
 
   /**
    * 是否系统布局配置

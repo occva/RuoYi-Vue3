@@ -174,10 +174,10 @@ html.dark {
       color: var(--el-text-color-regular);
     }
 
-    & .theme-dark .nest-menu .el-sub-menu>.el-sub-menu__title,
-    & .theme-dark .el-sub-menu .el-menu-item {
-      background-color: var(--el-bg-color) !important;
-    }
+    // & .theme-dark .nest-menu .el-sub-menu>.el-sub-menu__title,
+    // & .theme-dark .el-sub-menu .el-menu-item {
+    //   background-color: var(--el-bg-color) !important;
+    // }
   }
 
   .topmenu-container {

@@ -43,7 +43,8 @@ const getLogoBackground = computed(() => {
   if (sideTheme.value === 'theme-modern') {
     return variables.menuModernBg
   }
-  return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
+  // return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
+  return variables.menuLightBg
 })
 
 // 获取Logo文字颜色
@@ -57,7 +58,8 @@ const getLogoTextColor = computed(() => {
   if (sideTheme.value === 'theme-modern') {
     return variables.menuModernText
   }
-  return sideTheme.value === 'theme-dark' ? '#fff' : variables.menuLightText
+  // return sideTheme.value === 'theme-dark' ? '#fff' : variables.menuLightText
+  return variables.menuLightText
 })
 </script>
 

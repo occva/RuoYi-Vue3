@@ -58,7 +58,8 @@ const getMenuBackground = computed(() => {
   if (sideTheme.value === 'theme-modern') {
     return variables.menuModernBg
   }
-  return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
+  // return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg
+  return variables.menuLightBg
 })
 
 // 获取菜单文字颜色
@@ -69,7 +70,8 @@ const getMenuTextColor = computed(() => {
   if (sideTheme.value === 'theme-modern') {
     return variables.menuModernText
   }
-  return sideTheme.value === 'theme-dark' ? variables.menuText : variables.menuLightText
+  // return sideTheme.value === 'theme-dark' ? variables.menuText : variables.menuLightText
+  return variables.menuLightText
 })
 
 const activeMenu = computed(() => {
