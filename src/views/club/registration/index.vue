@@ -41,6 +41,7 @@
           <span class="title">活动签到管理</span>
           <div class="header-operations">
             <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['club:registration:remove']">批量移除</el-button>
+            <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['club:registration:list']">导出</el-button>
             <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
           </div>
         </div>
@@ -181,6 +182,12 @@ function handleDelete(row) {
     getList();
     proxy.$modal.msgSuccess("移除成功");
   });
+}
+
+function handleExport() {
+  proxy.download('club/registration/export', {
+    ...queryParams.value
+  }, `registration_${new Date().getTime()}.xlsx`)
 }
 
 async function initPage() {
