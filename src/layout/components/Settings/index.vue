@@ -111,6 +111,7 @@ import useAppStore from '@/store/modules/app'
 import useSettingsStore from '@/store/modules/settings'
 import usePermissionStore from '@/store/modules/permission'
 import { handleThemeStyle } from '@/utils/theme'
+import { resetLayoutSetting, saveLayoutSetting } from '@/utils/layoutSettings'
 
 const { proxy } = getCurrentInstance()
 const appStore = useAppStore()
@@ -164,24 +165,14 @@ watch(() => navType, val => {
 
 function saveSetting() {
   proxy.$modal.loading("正在保存到本地，请稍候...")
-  let layoutSetting = {
-    "navType": storeSettings.value.navType,
-    "tagsView": storeSettings.value.tagsView,
-    "tagsIcon": storeSettings.value.tagsIcon,
-    "fixedHeader": storeSettings.value.fixedHeader,
-    "sidebarLogo": storeSettings.value.sidebarLogo,
-    "dynamicTitle": storeSettings.value.dynamicTitle,
-    "sideTheme": storeSettings.value.sideTheme,
-    "theme": storeSettings.value.theme
-  }
-  localStorage.setItem("layout-setting", JSON.stringify(layoutSetting))
-  setTimeout(proxy.$modal.closeLoading(), 1000)
+  saveLayoutSetting(storeSettings.value)
+  setTimeout(() => proxy.$modal.closeLoading(), 1000)
 }
 
 function resetSetting() {
   proxy.$modal.loading("正在清除设置缓存并刷新，请稍候...")
-  localStorage.removeItem("layout-setting")
-  setTimeout("window.location.reload()", 1000)
+  resetLayoutSetting()
+  setTimeout(() => window.location.reload(), 1000)
 }
 
 function openSetting() {
