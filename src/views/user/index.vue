@@ -163,7 +163,7 @@
     </section>
 
     <!-- AI Assistant -->
-    <AIAssistant />
+    <AIAssistant v-if="aiAssistantEnabled" />
   </div>
 </template>
 
@@ -174,6 +174,7 @@ import { Bell, ArrowRight, Picture } from '@element-plus/icons-vue'
 import { listClubs, listPopularClubs } from '@/api/user/club'
 import { listActivities } from '@/api/user/activity'
 import { listNotices } from '@/api/user/notice'
+import { getAiChatFeature } from '@/api/user/ai'
 import { ElMessageBox } from 'element-plus'
 import { getImgUrl } from '@/utils/ruoyi'
 import ClubCard from './components/ClubCard.vue'
@@ -186,6 +187,7 @@ const HERO_SCAN_DURATION = 5000
 const popularClubs = ref([])
 const activities = ref([])
 const notices = ref([])
+const aiAssistantEnabled = ref(false)
 const homePageRef = ref(null)
 const clubGridRef = ref(null)
 const activityGridRef = ref(null)
@@ -245,6 +247,7 @@ const heroPanelStyle = computed(() => {
 
 onMounted(() => {
   syncHeroMotionState()
+  loadAiAssistantFeature()
   getStats()
   initRevealAnimation()
   window.addEventListener('resize', handleRevealResize, { passive: true })
@@ -435,6 +438,15 @@ const extractRows = (response) => {
   if (Array.isArray(response?.rows)) return response.rows
   if (Array.isArray(response?.data)) return response.data
   return []
+}
+
+const loadAiAssistantFeature = async () => {
+  try {
+    const response = await getAiChatFeature()
+    aiAssistantEnabled.value = response?.aiChatEnabled === true || response?.data?.aiChatEnabled === true
+  } catch (_) {
+    aiAssistantEnabled.value = false
+  }
 }
 
 const getClubHeat = (club) => {

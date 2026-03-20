@@ -42,6 +42,13 @@ export function sendMessage(data) {
   })
 }
 
+export function getAiChatFeature() {
+  return request({
+    url: '/api/app/features',
+    method: 'get'
+  })
+}
+
 export function getChatHistory(sessionId) {
   return request({
     url: '/api/app/ai/chat/history',
