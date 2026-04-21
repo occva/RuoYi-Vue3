@@ -116,73 +116,96 @@
                 <el-icon :size="22"><Connection /></el-icon>
               </div>
               <div class="brand-text">
-                <span class="brand-name">社团中心</span>
-                <span class="brand-tag">Campus Clubs</span>
+                <span class="brand-name">{{ footerConfig.brandName }}</span>
+                <span class="brand-tag">{{ footerConfig.brandTag }}</span>
               </div>
             </div>
-            <p class="footer-desc">发现、加入并领导符合你兴趣的社团组织，让大学生活更精彩</p>
+            <p class="footer-desc">{{ footerConfig.description }}</p>
             <div class="social-links">
-              <a href="#" class="social-link" aria-label="微信" title="微信">
-                <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M664.250054 368.541681c10.015098 0 19.892049 0.732687 29.67281 1.795902-26.647917-122.810047-159.358451-214.077703-310.826188-214.077703-169.353083 0-308.085774 114.232694-308.085774 259.274068 0 83.708494 46.165436 152.460344 123.281791 205.78483l-30.80868 91.730191 107.688651-53.455469c38.558178 7.53665 69.459978 15.308661 107.924012 15.308661 9.66308 0 19.230993-0.470721 28.752858-1.225921-6.025227-20.36584-9.521864-41.723264-9.521864-63.862493C402.328693 476.632491 517.908058 368.541681 664.250054 368.541681zM498.62897 285.87389c23.200398 0 38.557154 15.120372 38.557154 38.061874 0 22.846334-15.356756 38.156018-38.557154 38.156018-23.107277 0-46.260603-15.309684-46.260603-38.156018C452.368366 300.994262 475.522716 285.87389 498.62897 285.87389zM283.016307 362.090758c-23.107277 0-46.402843-15.309684-46.402843-38.156018 0-22.941502 23.295566-38.061874 46.402843-38.061874 23.081695 0 38.46301 15.120372 38.46301 38.061874C321.479317 346.782098 306.098002 362.090758 283.016307 362.090758zM945.448458 606.151333c0-121.888048-123.258255-221.236753-261.683954-221.236753-146.57838 0-262.015505 99.348706-262.015505 221.236753 0 122.06508 115.437126 221.200938 262.015505 221.200938 30.66644 0 61.617359-7.609305 92.423993-15.262612l84.513836 45.786813-23.178909-76.17082C899.379213 735.776599 945.448458 674.90216 945.448458 606.151333zM598.803483 567.994292c-15.332197 0-30.807656-15.096836-30.807656-30.501688 0-15.190981 15.47546-30.477129 30.807656-30.477129 23.295566 0 38.558178 15.286148 38.558178 30.477129C637.361661 552.897456 622.099049 567.994292 598.803483 567.994292zM768.25071 567.994292c-15.213493 0-30.594809-15.096836-30.594809-30.501688 0-15.190981 15.381315-30.477129 30.594809-30.477129 23.107277 0 38.558178 15.286148 38.558178 30.477129C806.808888 552.897456 791.357987 567.994292 768.25071 567.994292z"/></svg>
-              </a>
-              <a href="#" class="social-link" aria-label="QQ" title="QQ">
-                <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z"/></svg>
-              </a>
-              <a href="#" class="social-link" aria-label="邮箱" title="邮箱">
-                <el-icon :size="18"><Message /></el-icon>
-              </a>
+              <div class="social-item">
+                <el-popover
+                  v-if="footerConfig.wechatQrUrl"
+                  placement="top"
+                  trigger="click"
+                  :width="188"
+                  popper-class="footer-contact-popper"
+                >
+                  <template #reference>
+                    <button type="button" class="social-link social-button" aria-label="微信" title="微信">
+                      <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M664.250054 368.541681c10.015098 0 19.892049 0.732687 29.67281 1.795902-26.647917-122.810047-159.358451-214.077703-310.826188-214.077703-169.353083 0-308.085774 114.232694-308.085774 259.274068 0 83.708494 46.165436 152.460344 123.281791 205.78483l-30.80868 91.730191 107.688651-53.455469c38.558178 7.53665 69.459978 15.308661 107.924012 15.308661 9.66308 0 19.230993-0.470721 28.752858-1.225921-6.025227-20.36584-9.521864-41.723264-9.521864-63.862493C402.328693 476.632491 517.908058 368.541681 664.250054 368.541681zM498.62897 285.87389c23.200398 0 38.557154 15.120372 38.557154 38.061874 0 22.846334-15.356756 38.156018-38.557154 38.156018-23.107277 0-46.260603-15.309684-46.260603-38.156018C452.368366 300.994262 475.522716 285.87389 498.62897 285.87389zM283.016307 362.090758c-23.107277 0-46.402843-15.309684-46.402843-38.156018 0-22.941502 23.295566-38.061874 46.402843-38.061874 23.081695 0 38.46301 15.120372 38.46301 38.061874C321.479317 346.782098 306.098002 362.090758 283.016307 362.090758zM945.448458 606.151333c0-121.888048-123.258255-221.236753-261.683954-221.236753-146.57838 0-262.015505 99.348706-262.015505 221.236753 0 122.06508 115.437126 221.200938 262.015505 221.200938 30.66644 0 61.617359-7.609305 92.423993-15.262612l84.513836 45.786813-23.178909-76.17082C899.379213 735.776599 945.448458 674.90216 945.448458 606.151333zM598.803483 567.994292c-15.332197 0-30.807656-15.096836-30.807656-30.501688 0-15.190981 15.47546-30.477129 30.807656-30.477129 23.295566 0 38.558178 15.286148 38.558178 30.477129C637.361661 552.897456 622.099049 567.994292 598.803483 567.994292zM768.25071 567.994292c-15.213493 0-30.594809-15.096836-30.594809-30.501688 0-15.190981 15.381315-30.477129 30.594809-30.477129 23.107277 0 38.558178 15.286148 38.558178 30.477129C806.808888 552.897456 791.357987 567.994292 768.25071 567.994292z"/></svg>
+                    </button>
+                  </template>
+                  <div class="contact-popover">
+                    <img :src="resolveFooterAsset(footerConfig.wechatQrUrl)" alt="微信二维码" class="contact-qr" />
+                  </div>
+                </el-popover>
+                <span v-else class="social-link is-disabled" aria-hidden="true">
+                  <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M664.250054 368.541681c10.015098 0 19.892049 0.732687 29.67281 1.795902-26.647917-122.810047-159.358451-214.077703-310.826188-214.077703-169.353083 0-308.085774 114.232694-308.085774 259.274068 0 83.708494 46.165436 152.460344 123.281791 205.78483l-30.80868 91.730191 107.688651-53.455469c38.558178 7.53665 69.459978 15.308661 107.924012 15.308661 9.66308 0 19.230993-0.470721 28.752858-1.225921-6.025227-20.36584-9.521864-41.723264-9.521864-63.862493C402.328693 476.632491 517.908058 368.541681 664.250054 368.541681zM498.62897 285.87389c23.200398 0 38.557154 15.120372 38.557154 38.061874 0 22.846334-15.356756 38.156018-38.557154 38.156018-23.107277 0-46.260603-15.309684-46.260603-38.156018C452.368366 300.994262 475.522716 285.87389 498.62897 285.87389zM283.016307 362.090758c-23.107277 0-46.402843-15.309684-46.402843-38.156018 0-22.941502 23.295566-38.061874 46.402843-38.061874 23.081695 0 38.46301 15.120372 38.46301 38.061874C321.479317 346.782098 306.098002 362.090758 283.016307 362.090758zM945.448458 606.151333c0-121.888048-123.258255-221.236753-261.683954-221.236753-146.57838 0-262.015505 99.348706-262.015505 221.236753 0 122.06508 115.437126 221.200938 262.015505 221.200938 30.66644 0 61.617359-7.609305 92.423993-15.262612l84.513836 45.786813-23.178909-76.17082C899.379213 735.776599 945.448458 674.90216 945.448458 606.151333zM598.803483 567.994292c-15.332197 0-30.807656-15.096836-30.807656-30.501688 0-15.190981 15.47546-30.477129 30.807656-30.477129 23.295566 0 38.558178 15.286148 38.558178 30.477129C637.361661 552.897456 622.099049 567.994292 598.803483 567.994292zM768.25071 567.994292c-15.213493 0-30.594809-15.096836-30.594809-30.501688 0-15.190981 15.381315-30.477129 30.594809-30.477129 23.107277 0 38.558178 15.286148 38.558178 30.477129C806.808888 552.897456 791.357987 567.994292 768.25071 567.994292z"/></svg>
+                </span>
+              </div>
+
+              <div class="social-item">
+                <el-popover
+                  v-if="footerConfig.qqQrUrl"
+                  placement="top"
+                  trigger="click"
+                  :width="188"
+                  popper-class="footer-contact-popper"
+                >
+                  <template #reference>
+                    <button type="button" class="social-link social-button" aria-label="QQ" title="QQ">
+                      <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z"/></svg>
+                    </button>
+                  </template>
+                  <div class="contact-popover">
+                    <img :src="resolveFooterAsset(footerConfig.qqQrUrl)" alt="QQ二维码" class="contact-qr" />
+                  </div>
+                </el-popover>
+                <span v-else class="social-link is-disabled" aria-hidden="true">
+                  <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z"/></svg>
+                </span>
+              </div>
+
+              <div class="social-item">
+                <button
+                  v-if="footerConfig.email"
+                  type="button"
+                  class="social-link social-button"
+                  aria-label="复制邮箱"
+                  :title="`复制邮箱：${footerConfig.email}`"
+                  @click="copyFooterEmail"
+                >
+                  <el-icon :size="18"><Message /></el-icon>
+                </button>
+                <span v-else class="social-link is-disabled" aria-hidden="true">
+                  <el-icon :size="18"><Message /></el-icon>
+                </span>
+              </div>
             </div>
           </div>
 
-          <!-- 快速链接 -->
-          <div class="footer-section">
-            <h4 class="section-title">探索</h4>
-            <router-link to="/user/home" class="footer-link">
-              <span>首页</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </router-link>
-            <router-link to="/user/clubs" class="footer-link">
-              <span>全部社团</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </router-link>
-            <router-link to="/user/activities" class="footer-link">
-              <span>校园活动</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </router-link>
-          </div>
-
-          <!-- 我的社团 -->
-          <div class="footer-section">
-            <h4 class="section-title">我的</h4>
-            <router-link to="/user/my-clubs" class="footer-link">
-              <span>我的社团</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </router-link>
-            <a href="#" class="footer-link">
-              <span>我的申请</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </a>
-            <a href="#" class="footer-link">
-              <span>活动记录</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </a>
-          </div>
-
-          <!-- 帮助支持 -->
-          <div class="footer-section">
-            <h4 class="section-title">帮助</h4>
-            <a href="#" class="footer-link">
-              <span>常见问题</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </a>
-            <a href="#" class="footer-link">
-              <span>联系客服</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </a>
-            <a href="#" class="footer-link">
-              <span>意见反馈</span>
-              <el-icon class="link-icon"><ArrowRight /></el-icon>
-            </a>
+          <div v-for="group in footerConfig.groups" :key="group.key" class="footer-section">
+            <h4 class="section-title">{{ group.title }}</h4>
+            <template v-for="(link, linkIndex) in group.links" :key="`${group.key}-${linkIndex}`">
+              <a
+                v-if="hasFooterLink(link.url) && (isExternalFooterLink(link.url) || link.newTab)"
+                :href="resolveFooterHref(link.url)"
+                class="footer-link"
+                :target="link.newTab ? '_blank' : '_self'"
+                :rel="link.newTab ? 'noopener noreferrer' : undefined"
+              >
+                <span>{{ link.label }}</span>
+                <el-icon class="link-icon"><ArrowRight /></el-icon>
+              </a>
+              <router-link v-else-if="hasFooterLink(link.url)" :to="link.url" class="footer-link">
+                <span>{{ link.label }}</span>
+                <el-icon class="link-icon"><ArrowRight /></el-icon>
+              </router-link>
+              <span v-else class="footer-link is-disabled">
+                <span>{{ link.label }}</span>
+                <el-icon class="link-icon"><ArrowRight /></el-icon>
+              </span>
+            </template>
           </div>
         </div>
 
@@ -191,10 +214,10 @@
           <div class="footer-bottom-content">
             <p class="copyright">
               <span class="copyright-symbol">©</span>
-              <span>2026</span>
-              <span class="brand-highlight">社团中心</span>
+              <span>{{ currentYear }}</span>
+              <span class="brand-highlight">{{ footerConfig.brandName }}</span>
               <span class="divider">|</span>
-              <span>让校园生活更精彩</span>
+              <span>{{ footerConfig.copyrightText }}</span>
             </p>
           </div>
         </div>
@@ -208,17 +231,21 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message, Monitor } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
 import ThemePullSwitch from './components/ThemePullSwitch.vue'
 import { useUserTheme } from './theme/useUserTheme'
 import { isRelogin } from '@/utils/request'
 import { removeToken } from '@/utils/auth'
+import { getFooterConfig as getAppFooterConfig } from '@/api/app/footer'
+import { createDefaultFooterConfig, hasFooterLink, isExternalFooterLink, normalizeFooterConfig, resolveFooterAsset } from '@/utils/footer'
 
 const router = useRouter()
 const userStore = useUserStore()
 const mobileMenuOpen = ref(false)
 const settingsVisible = ref(false)
+const currentYear = new Date().getFullYear()
+const footerConfig = ref(createDefaultFooterConfig())
 const { isDarkMode, initTheme, toggleTheme, clearThemeFlags } = useUserTheme()
 
 const isManager = computed(() => {
@@ -227,6 +254,7 @@ const isManager = computed(() => {
 
 onMounted(async () => {
   initTheme()
+  loadFooterConfig()
 
   if (userStore.token && !userStore.name) {
     isRelogin.show = true
@@ -287,6 +315,49 @@ function logout() {
       location.href = '/user/home'
     })
   }).catch(() => { })
+}
+
+async function loadFooterConfig() {
+  try {
+    const response = await getAppFooterConfig()
+    footerConfig.value = normalizeFooterConfig(response.data)
+  } catch (error) {
+    footerConfig.value = createDefaultFooterConfig()
+  }
+}
+
+function resolveFooterHref(url) {
+  if (isExternalFooterLink(url)) {
+    return url
+  }
+  return router.resolve(url).href
+}
+
+async function copyFooterEmail() {
+  const email = footerConfig.value.email
+  if (!email) {
+    return
+  }
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(email)
+    } else {
+      const textarea = document.createElement('textarea')
+      textarea.value = email
+      textarea.setAttribute('readonly', 'readonly')
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      textarea.style.pointerEvents = 'none'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+    ElMessage.success('邮箱已复制')
+  } catch (error) {
+    ElMessage.error('复制失败，请手动复制邮箱')
+  }
 }
 </script>
 
@@ -779,8 +850,16 @@ function logout() {
   }
 
   .social-links {
-    display: flex;
+    display: inline-flex;
+    align-items: center;
     gap: 0.5rem;
+  }
+
+  .social-item {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    flex: 0 0 36px;
   }
 
   .social-link {
@@ -806,6 +885,27 @@ function logout() {
       width: 18px;
       height: 18px;
     }
+
+    &.is-disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+
+      &:hover {
+        color: #64748b;
+        background: rgba(51, 65, 85, 0.5);
+        border-color: rgba(71, 85, 105, 0.5);
+        transform: none;
+      }
+    }
+  }
+
+  .social-button {
+    padding: 0;
+    cursor: pointer;
+    appearance: none;
+    font: inherit;
+    width: 100%;
+    height: 100%;
   }
 }
 
@@ -849,6 +949,20 @@ function logout() {
         opacity: 1;
         transform: translateX(0);
         color: #3b82f6;
+      }
+    }
+
+    &.is-disabled {
+      cursor: default;
+
+      .link-icon {
+        opacity: 0.35;
+        transform: translateX(0);
+      }
+
+      &:hover {
+        color: #64748b;
+        padding-left: 0;
       }
     }
   }
@@ -1013,6 +1127,45 @@ function logout() {
 
   .el-divider {
     margin: 4px 0 !important;
+  }
+}
+
+:deep(.footer-contact-popper) {
+  --el-popover-bg-color: #ffffff;
+  --el-popover-border-color: rgba(203, 213, 225, 0.9);
+  padding: 10px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 36px -18px rgba(15, 23, 42, 0.28) !important;
+  line-height: 0 !important;
+}
+
+.contact-popover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 168px;
+  height: 168px;
+  box-sizing: border-box;
+}
+
+.contact-qr {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.contact-mail {
+  color: #cbd5e1;
+  text-decoration: none;
+  line-height: 1.6;
+  word-break: break-all;
+
+  &:hover {
+    color: #60a5fa;
   }
 }
 </style>
