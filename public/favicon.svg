@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Association favicon">
+  <defs>
+    <linearGradient id="favicon-bg" x1="14" y1="8" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2459cf" />
+      <stop offset="100%" stop-color="#4a7ff2" />
+    </linearGradient>
+    <radialGradient id="favicon-shine" cx="28%" cy="18%" r="72%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.58" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <filter id="favicon-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#103894" flood-opacity="0.42" />
+    </filter>
+  </defs>
+
+  <g filter="url(#favicon-shadow)">
+    <rect x="4.5" y="4.5" width="55" height="55" rx="17" fill="url(#favicon-bg)" />
+    <rect x="4.5" y="4.5" width="55" height="55" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.56" />
+    <ellipse cx="22" cy="16" rx="18" ry="11" fill="url(#favicon-shine)" transform="rotate(-15 22 16)" />
+    <rect x="10" y="10" width="44" height="44" rx="12" fill="none" stroke="#ffffff" stroke-opacity="0.22" />
+  </g>
+
+  <g transform="translate(9 9) scale(0.045)" fill="#f8fbff">
+    <path d="M640 384v64H448a128 128 0 0 0-128 128v128a128 128 0 0 0 128 128h320a128 128 0 0 0 128-128V576a128 128 0 0 0-64-110.848V394.88c74.56 26.368 128 97.472 128 181.056v128a192 192 0 0 1-192 192H448a192 192 0 0 1-192-192V576a192 192 0 0 1 192-192z" />
+    <path d="M384 640v-64h192a128 128 0 0 0 128-128V320a128 128 0 0 0-128-128H256a128 128 0 0 0-128 128v128a128 128 0 0 0 64 110.848v70.272A192.06 192.06 0 0 1 64 448V320a192 192 0 0 1 192-192h320a192 192 0 0 1 192 192v128a192 192 0 0 1-192 192z" />
+  </g>
+</svg>
