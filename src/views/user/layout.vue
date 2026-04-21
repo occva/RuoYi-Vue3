@@ -28,6 +28,7 @@
 
         <div class="right-section" v-else>
           <ThemePullSwitch :model-value="isDarkMode" @toggle="toggleTheme" />
+          <NotificationCenter />
           <el-dropdown @command="handleCommand" class="avatar-container" trigger="hover" popper-class="user-dropdown-menu">
             <div class="avatar-wrapper">
               <img :src="userStore.avatar" class="user-avatar" />
@@ -233,6 +234,7 @@ import { Menu, SwitchButton, CaretBottom, Setting, ArrowRight, Message, Monitor 
 import useUserStore from '@/store/modules/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
+import NotificationCenter from './components/NotificationCenter.vue'
 import ThemePullSwitch from './components/ThemePullSwitch.vue'
 import { useUserTheme } from './theme/useUserTheme'
 import { isRelogin } from '@/utils/request'

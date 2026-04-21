@@ -123,15 +123,20 @@
     </section>
 
     <!-- 公告通知 -->
-    <section class="notice-section" v-if="notices.length > 0">
+    <section class="notice-section" v-if="visibleHomeNotice">
       <div class="container">
         <div class="notice-bar reveal-item">
           <el-icon class="notice-icon"><Bell /></el-icon>
           <div class="notice-content">
             <span class="notice-tag">最新公告</span>
-            <span class="notice-title">{{ notices[0].noticeTitle }}</span>
+            <span class="notice-title">{{ visibleHomeNotice.noticeTitle }}</span>
           </div>
-          <el-button link type="primary" @click="viewNotice(notices[0])">查看详情</el-button>
+          <div class="notice-actions">
+            <el-button link type="primary" @click="viewNotice(visibleHomeNotice)">查看详情</el-button>
+            <button type="button" class="notice-close-btn" aria-label="关闭公告提示" @click="dismissHomeNotice">
+              关闭
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -173,20 +178,25 @@ import { useRouter } from 'vue-router'
 import { Bell, ArrowRight, Picture } from '@element-plus/icons-vue'
 import { listClubs, listPopularClubs } from '@/api/user/club'
 import { listActivities } from '@/api/user/activity'
-import { listNotices } from '@/api/user/notice'
+import { getLatestSystemNotice, listNotices } from '@/api/user/notice'
+import { listNotifications } from '@/api/user/notification'
 import { getAiChatFeature } from '@/api/user/ai'
 import { ElMessageBox } from 'element-plus'
 import { getImgUrl } from '@/utils/ruoyi'
+import useUserStore from '@/store/modules/user'
 import ClubCard from './components/ClubCard.vue'
 import ActivityCard from './components/ActivityCard.vue'
 import AIAssistant from './components/AIAssistant.vue'
 
 const router = useRouter()
+const userStore = useUserStore()
 const HERO_SCAN_DURATION = 5000
+const HOME_NOTICE_DISMISS_KEY_PREFIX = 'association:user-home:dismissed-global-notice'
 
 const popularClubs = ref([])
 const activities = ref([])
 const notices = ref([])
+const latestSystemNotice = ref(null)
 const aiAssistantEnabled = ref(false)
 const homePageRef = ref(null)
 const clubGridRef = ref(null)
@@ -227,6 +237,17 @@ const currentHeroSlide = computed(() => {
 })
 
 const heroAccentActive = computed(() => !isHeroMotionReduced.value && heroSlides.value.length > 1)
+
+const dismissedHomeNoticeKey = ref(readDismissedHomeNoticeKey())
+
+const visibleHomeNotice = computed(() => {
+  const notice = latestSystemNotice.value || notices.value[0] || null
+  if (!notice) {
+    return null
+  }
+
+  return getHomeNoticeKey(notice) === dismissedHomeNoticeKey.value ? null : notice
+})
 
 const heroPanelStyle = computed(() => {
   const style = {
@@ -274,6 +295,11 @@ onBeforeUnmount(() => {
 
 watch([popularClubs, activities, notices], () => {
   refreshRevealAnimation()
+})
+
+watch(() => [userStore.token, userStore.id], () => {
+  dismissedHomeNoticeKey.value = readDismissedHomeNoticeKey()
+  loadHomeNotices()
 })
 
 watch(heroSlides, (slides) => {
@@ -440,6 +466,30 @@ const extractRows = (response) => {
   return []
 }
 
+function readDismissedHomeNoticeKey() {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  return window.localStorage.getItem(getHomeNoticeDismissStorageKey()) || ''
+}
+
+function getHomeNoticeDismissStorageKey() {
+  if (!userStore.token) {
+    return `${HOME_NOTICE_DISMISS_KEY_PREFIX}:guest`
+  }
+
+  const userScope = userStore.id || userStore.name || 'user'
+  return `${HOME_NOTICE_DISMISS_KEY_PREFIX}:${userScope}`
+}
+
+function getHomeNoticeKey(notice) {
+  if (!notice) {
+    return ''
+  }
+  const source = notice.noticeSource || 'system'
+  return `${source}-${notice.noticeId}`
+}
+
 const loadAiAssistantFeature = async () => {
   try {
     const response = await getAiChatFeature()
@@ -497,17 +547,89 @@ const getStats = () => {
     })
   })
 
-  listNotices({ pageNum: 1, pageSize: 5 }).then(response => {
+  loadHomeNotices()
+  loadLatestSystemNotice()
+}
+
+const loadHomeNotices = async () => {
+  try {
+    if (userStore.token) {
+      const [notificationResponse, totalResponse] = await Promise.all([
+        listNotifications({ pageNum: 1, pageSize: 5 }),
+        listNotices({ pageNum: 1, pageSize: 1 })
+      ])
+      const notificationRows = extractRows(notificationResponse)
+      const totalRows = extractRows(totalResponse)
+      notices.value = notificationRows
+      snapshot.value.noticeTotal = Number(totalResponse?.total) || totalRows.length
+      return
+    }
+
+    const response = await listNotices({ pageNum: 1, pageSize: 5 })
     const rows = extractRows(response)
     notices.value = rows
     snapshot.value.noticeTotal = Number(response.total) || rows.length
+  } catch (_) {
+    notices.value = []
+    snapshot.value.noticeTotal = 0
+  }
+}
+
+const loadLatestSystemNotice = () => {
+  getLatestSystemNotice().then(response => {
+    latestSystemNotice.value = response?.data || null
+  }).catch(() => {
+    latestSystemNotice.value = null
   })
+}
+
+const dismissHomeNotice = () => {
+  if (!visibleHomeNotice.value || typeof window === 'undefined') {
+    return
+  }
+
+  const noticeKey = getHomeNoticeKey(visibleHomeNotice.value)
+  dismissedHomeNoticeKey.value = noticeKey
+  window.localStorage.setItem(getHomeNoticeDismissStorageKey(), noticeKey)
+}
+
+const sanitizeNoticeHtml = (html) => {
+  if (typeof window === 'undefined' || !html) {
+    return '<p>暂无内容</p>'
+  }
+
+  const doc = new DOMParser().parseFromString(String(html), 'text/html')
+  doc.querySelectorAll('script,style,iframe,frame,object,embed,link,meta,form,input,button,textarea,select').forEach(node => node.remove())
+
+  doc.body.querySelectorAll('*').forEach((node) => {
+    Array.from(node.attributes).forEach((attr) => {
+      const name = attr.name.toLowerCase()
+      const value = attr.value?.trim() || ''
+
+      if (name.startsWith('on')) {
+        node.removeAttribute(attr.name)
+        return
+      }
+
+      if (['href', 'src', 'xlink:href'].includes(name) && /^(javascript|data):/i.test(value)) {
+        node.removeAttribute(attr.name)
+        return
+      }
+
+      if (name === 'style' && /expression|javascript:/i.test(value)) {
+        node.removeAttribute(attr.name)
+      }
+    })
+  })
+
+  const content = doc.body.innerHTML?.trim()
+  return content ? `<div style="white-space: pre-wrap;">${content}</div>` : '<p>暂无内容</p>'
 }
 
 const viewNotice = (notice) => {
   ElMessageBox.alert(
-    `<div style="white-space: pre-wrap;">${notice.noticeContent}</div>`,
-    notice.noticeTitle,
+    sanitizeNoticeHtml(notice?.noticeContent),
+    notice?.noticeTitle || '公告详情',
     {
       dangerouslyUseHTMLString: true,
       confirmButtonText: '关闭'
@@ -1096,6 +1218,26 @@ const viewNotice = (notice) => {
       white-space: nowrap;
     }
   }
+
+  .notice-actions {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .notice-close-btn {
+    border: none;
+    background: transparent;
+    color: #9aa6b2;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #6b7785;
+    }
+  }
 }
 
 .section {
@@ -1274,6 +1416,14 @@ const viewNotice = (notice) => {
 
   .notice-bar {
     padding: 0.8rem 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+
+    .notice-actions {
+      width: 100%;
+      justify-content: flex-end;
+      gap: 0.85rem;
+    }
   }
 }
 
