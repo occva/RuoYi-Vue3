@@ -28,7 +28,7 @@
 
         <div class="right-section" v-else>
           <ThemePullSwitch :model-value="isDarkMode" @toggle="toggleTheme" />
-          <NotificationCenter />
+          <NotificationCenter @open-overlay="closeAiAssistant" />
           <el-dropdown @command="handleCommand" class="avatar-container" trigger="hover" popper-class="user-dropdown-menu">
             <div class="avatar-wrapper">
               <img :src="userStore.avatar" class="user-avatar" />
@@ -104,6 +104,8 @@
         </transition>
       </router-view>
     </main>
+
+    <AIAssistant v-if="aiAssistantEnabled" />
 
     <!-- 页脚 -->
     <footer class="user-footer">
@@ -236,9 +238,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import SettingsDialog from './components/SettingsDialog.vue'
 import NotificationCenter from './components/NotificationCenter.vue'
 import ThemePullSwitch from './components/ThemePullSwitch.vue'
+import AIAssistant from './components/AIAssistant.vue'
 import { useUserTheme } from './theme/useUserTheme'
 import { isRelogin } from '@/utils/request'
 import { removeToken } from '@/utils/auth'
+import { getAiChatFeature } from '@/api/user/ai'
 import { getFooterConfig as getAppFooterConfig } from '@/api/app/footer'
 import { createDefaultFooterConfig, hasFooterLink, isExternalFooterLink, normalizeFooterConfig, resolveFooterAsset } from '@/utils/footer'
 
@@ -246,6 +250,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const mobileMenuOpen = ref(false)
 const settingsVisible = ref(false)
+const aiAssistantEnabled = ref(false)
 const currentYear = new Date().getFullYear()
 const footerConfig = ref(createDefaultFooterConfig())
 const { isDarkMode, initTheme, toggleTheme, clearThemeFlags } = useUserTheme()
@@ -257,6 +262,7 @@ const isManager = computed(() => {
 onMounted(async () => {
   initTheme()
   loadFooterConfig()
+  loadAiAssistantFeature()
 
   if (userStore.token && !userStore.name) {
     isRelogin.show = true
@@ -277,6 +283,15 @@ onMounted(async () => {
   }
 })
 
+const loadAiAssistantFeature = async () => {
+  try {
+    const response = await getAiChatFeature()
+    aiAssistantEnabled.value = response?.aiChatEnabled === true || response?.data?.aiChatEnabled === true
+  } catch (_) {
+    aiAssistantEnabled.value = false
+  }
+}
+
 onBeforeUnmount(() => {
   clearThemeFlags()
 })
@@ -288,12 +303,14 @@ const handleLogin = () => {
 function handleCommand(command) {
   switch (command) {
     case "admin":
+      closeAiAssistant()
       router.push('/index')
       break
     case "logout":
       logout()
       break
     case "settings":
+      closeAiAssistant()
       settingsVisible.value = true
       break
     default:
@@ -303,10 +320,12 @@ function handleCommand(command) {
 
 function handleMobileSettings() {
   mobileMenuOpen.value = false
+  closeAiAssistant()
   settingsVisible.value = true
 }
 
 function logout() {
+  closeAiAssistant()
   ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -317,6 +336,12 @@ function logout() {
       location.href = '/user/home'
     })
   }).catch(() => { })
+}
+
+function closeAiAssistant() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('ai-assistant:close'))
+  }
 }
 
 async function loadFooterConfig() {

@@ -167,8 +167,6 @@
       </div>
     </section>
 
-    <!-- AI Assistant -->
-    <AIAssistant v-if="aiAssistantEnabled" />
   </div>
 </template>
 
@@ -180,13 +178,11 @@ import { listClubs, listPopularClubs } from '@/api/user/club'
 import { listActivities } from '@/api/user/activity'
 import { getLatestSystemNotice, listNotices } from '@/api/user/notice'
 import { listNotifications } from '@/api/user/notification'
-import { getAiChatFeature } from '@/api/user/ai'
 import { ElMessageBox } from 'element-plus'
 import { getImgUrl } from '@/utils/ruoyi'
 import useUserStore from '@/store/modules/user'
 import ClubCard from './components/ClubCard.vue'
 import ActivityCard from './components/ActivityCard.vue'
-import AIAssistant from './components/AIAssistant.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -197,7 +193,6 @@ const popularClubs = ref([])
 const activities = ref([])
 const notices = ref([])
 const latestSystemNotice = ref(null)
-const aiAssistantEnabled = ref(false)
 const homePageRef = ref(null)
 const clubGridRef = ref(null)
 const activityGridRef = ref(null)
@@ -268,7 +263,6 @@ const heroPanelStyle = computed(() => {
 
 onMounted(() => {
   syncHeroMotionState()
-  loadAiAssistantFeature()
   getStats()
   initRevealAnimation()
   window.addEventListener('resize', handleRevealResize, { passive: true })
@@ -488,15 +482,6 @@ function getHomeNoticeKey(notice) {
   }
   const source = notice.noticeSource || 'system'
   return `${source}-${notice.noticeId}`
-}
-
-const loadAiAssistantFeature = async () => {
-  try {
-    const response = await getAiChatFeature()
-    aiAssistantEnabled.value = response?.aiChatEnabled === true || response?.data?.aiChatEnabled === true
-  } catch (_) {
-    aiAssistantEnabled.value = false
-  }
 }
 
 const getClubHeat = (club) => {

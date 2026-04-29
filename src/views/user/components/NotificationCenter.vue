@@ -6,7 +6,7 @@
         class="notification-trigger"
         :class="{ 'is-active': drawerVisible }"
         aria-label="打开通知中心"
-        @click="drawerVisible = true"
+        @click="openDrawer"
       >
         <el-icon :size="18"><Bell /></el-icon>
       </button>
@@ -137,6 +137,7 @@ import {
 } from '@/api/user/notification'
 
 const userStore = useUserStore()
+const emit = defineEmits(['open-overlay'])
 
 const drawerVisible = ref(false)
 const detailVisible = ref(false)
@@ -189,6 +190,11 @@ watch(drawerVisible, (visible) => {
 onBeforeUnmount(() => {
   disconnectSocket(true)
 })
+
+function openDrawer() {
+  emit('open-overlay')
+  drawerVisible.value = true
+}
 
 async function loadSummary(showToastOnIncrease = false) {
   const previousUnread = unreadCount.value

@@ -58,6 +58,23 @@ export function getChatHistory(sessionId) {
   })
 }
 
+export function getChatSessions() {
+  return request({
+    url: '/api/app/ai/chat/sessions',
+    method: 'get',
+    headers: buildHeaders()
+  })
+}
+
+export function deleteChatSession(sessionId) {
+  return request({
+    url: '/api/app/ai/chat/session/delete',
+    method: 'post',
+    headers: buildHeaders(),
+    params: { sessionId }
+  })
+}
+
 export function getActiveSession() {
   return request({
     url: '/api/app/ai/chat/session',
@@ -66,7 +83,7 @@ export function getActiveSession() {
   })
 }
 
-export function streamChat(sessionId, message, { onChunk, onDone, onError }) {
+export function streamChat(sessionId, message, { onChunk, onTool, onDone, onError }) {
   const controller = new AbortController()
 
   fetch(`${baseApi}/api/app/ai/chat/stream`, {
@@ -130,13 +147,28 @@ export function streamChat(sessionId, message, { onChunk, onDone, onError }) {
               if (!line.startsWith('data:')) {
                 continue
               }
-              const data = line.slice(5).trim()
+              let data = line.slice(5)
+              if (data.startsWith(' ')) {
+                data = data.slice(1)
+              }
               if (!data) {
                 continue
               }
-              if (data === '[DONE]') {
+              if (data.trim() === '[DONE]') {
                 onDone?.()
                 return
+              }
+              try {
+                const payload = JSON.parse(data.trim())
+                if (payload?.type === 'tool' && payload.tool) {
+                  onTool?.(payload.tool)
+                  continue
+                }
+                if (payload?.type === 'chunk') {
+                  onChunk?.(payload.content || '')
+                  continue
+                }
+              } catch (_) {
               }
               onChunk?.(data)
             }
